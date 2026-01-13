@@ -114,12 +114,10 @@
     const card = document.getElementById("card");
     const frontImg = document.getElementById("frontImg");
     const backImg = document.getElementById("backImg");
-    const stateName = document.getElementById("stateName");
     const count = document.getElementById("count");
 
     function render() {
       const c = cards[i];
-      stateName.textContent = c.name;
       count.textContent = `${i + 1} / ${cards.length}`;
       frontImg.src = `./images/${c.code}-f.png`;
       backImg.src = `./images/${c.code}-b.png`;
