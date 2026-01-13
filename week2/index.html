@@ -1,146 +1,481 @@
-<!-- redeploy -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Week 2 – States</title>
+  <title>Week 2</title>
   <style>
-    body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #f4f6fb; }
-    header { padding: 14px 16px; background: white; box-shadow: 0 1px 10px rgba(0,0,0,.06); }
-    h1 { margin: 0; font-size: 16px; }
+    :root{
+      --bg:#f4f6fb; --card:#fff; --text:#111; --muted:#5b6472;
+      --shadow:0 10px 24px rgba(0,0,0,.10);
+      --good:#16a34a; --bad:#dc2626; --accent:#1f2a87;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    header{ padding:14px 16px; background:#fff; box-shadow:0 1px 10px rgba(0,0,0,.06); }
+    header .wrap{ max-width:980px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    h1{ margin:0; font-size:16px; }
+    a.link{ color:var(--accent); text-decoration:none; font-weight:700; }
+    a.link:hover{ text-decoration:underline; }
 
-    .wrap { padding: 16px; display: grid; gap: 12px; justify-items: center; }
+    .wrap{ max-width:980px; margin:0 auto; padding:16px; }
 
-    .card {
-      width: min(92vw, 420px);
-      aspect-ratio: 3 / 4;
-      perspective: 1200px;
+    /* Home cards */
+    .home{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:10px; }
+    .card{
+      background:var(--card); border-radius:18px; box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .card h2{ margin:0 0 6px; font-size:20px; }
+    .card p{ margin:0 0 14px; color:var(--muted); line-height:1.3; }
+    .btn{
+      width:100%; border:0; border-radius:14px; padding:14px 16px;
+      font-size:18px; font-weight:800; background:#fff; box-shadow:0 10px 20px rgba(0,0,0,.10);
+      cursor:pointer;
+    }
+    .btn:active{ transform:scale(.99); }
+
+    /* Test layout (keep everything on one screen) */
+    .screen{
+      min-height: calc(100vh - 60px);
+      display:none;
+      padding:16px;
+    }
+    .screen.active{ display:block; }
+    .center{
+      max-width:780px;
+      margin:0 auto;
+      display:grid;
+      gap:12px;
+    }
+    .toprow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:8px 12px; border-radius:999px;
+      background:#eef2ff; color:#28327a; font-weight:800; font-size:13px;
+      white-space:nowrap;
+    }
+    .bar{
+      height:18px;
+      background:#e8ecf5;
+      border-radius:999px;
+      overflow:hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.06);
+      position:relative;
+      flex:1;
+      min-width:140px;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background:#c7d2fe;
+    }
+    .bar span{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:900; color:#111;
+      text-shadow:0 1px 0 rgba(255,255,255,.6);
     }
 
-    .inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 280ms ease;
-      border-radius: 18px;
+    .qcard{
+      background:var(--card); border-radius:18px; box-shadow:var(--shadow);
+      padding:16px;
+      display:grid;
+      gap:12px;
     }
-
-    .flipped .inner { transform: rotateY(180deg); }
-
-    .face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      border-radius: 18px;
-      overflow: hidden;
-      background: white;
-      box-shadow: 0 12px 30px rgba(0,0,0,.14);
+    .qtitle{ margin:0; font-size:18px; }
+    .prompt{ margin:0; color:var(--muted); font-size:14px; line-height:1.3; }
+    .choices{ display:grid; gap:10px; }
+    .choice{
+      border:2px solid #e5e7eb;
+      border-radius:14px;
+      padding:12px 12px;
+      background:#fff;
+      font-size:16px;
+      font-weight:800;
+      text-align:left;
+      cursor:pointer;
     }
+    .choice:active{ transform:scale(.99); }
+    .choice.correct{ border-color: rgba(22,163,74,.5); background: rgba(22,163,74,.08); }
+    .choice.wrong{ border-color: rgba(220,38,38,.5); background: rgba(220,38,38,.08); }
 
-    .face img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: white;
+    .navrow{ display:flex; gap:10px; }
+    .smallbtn{
+      flex:1;
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      background:#fff;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
     }
+    .smallbtn.secondary{ background:#f8fafc; }
+    .smallbtn:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
 
-    .back { transform: rotateY(180deg); }
-
-    .controls {
-      width: min(92vw, 420px);
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
+    .result{
+      background:var(--card); border-radius:18px; box-shadow:var(--shadow);
+      padding:18px;
+      display:grid; gap:10px;
     }
-
-    button {
-      padding: 12px;
-      border: 0;
-      border-radius: 12px;
-      background: white;
-      box-shadow: 0 10px 20px rgba(0,0,0,.10);
-      font-weight: 800;
-      cursor: pointer;
+    .scoreline{ font-size:18px; font-weight:900; }
+    .enc{ color:var(--muted); line-height:1.3; }
+    .misses{
+      display:grid; gap:6px;
+      margin-top:6px;
     }
+    .miss{
+      padding:10px 12px; border-radius:14px; background:#f8fafc;
+      border:1px solid #e5e7eb;
+      font-weight:800;
+      font-size:14px;
+    }
+    .miss b{ color:var(--bad); }
 
-    .meta {
-      width: min(92vw, 420px);
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      opacity: .7;
+    /* Mobile: keep tap targets big */
+    @media (max-width:480px){
+      .card h2{ font-size:18px; }
+      .btn{ font-size:16px; }
+      .choice{ font-size:15px; }
+      .qtitle{ font-size:17px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Week 2 – States</h1>
+    <div class="wrap">
+      <h1>Week 2</h1>
+      <a class="link" href="../">← Back to Lessons</a>
+    </div>
   </header>
 
-  <div class="wrap">
-    <div class="meta">
-      <div></div>
-      <div id="count"></div>
-    </div>
+  <!-- HOME -->
+  <main class="wrap" id="home">
+    <div class="home">
+      <div class="card">
+        <h2>Study Flashcards</h2>
+        <p>Review the states as many times as you want before checking your learning.</p>
+        <button class="btn" id="studyBtn">Study Flashcards</button>
+      </div>
 
-    <div class="card" id="card">
-      <div class="inner">
-        <div class="face front">
-          <img id="frontImg" alt="Front of card">
-        </div>
-        <div class="face back">
-          <img id="backImg" alt="Back of card">
+      <div class="card">
+        <h2>Check Your Learning</h2>
+        <p>One short test with 3 parts. At the end you’ll see your score and what to review.</p>
+        <button class="btn" id="testBtn">Check Your Learning</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- STUDY (placeholder for now) -->
+  <section class="screen" id="studyScreen" aria-hidden="true">
+    <div class="center">
+      <div class="qcard">
+        <p class="qtitle">Study Flashcards</p>
+        <p class="prompt">
+          This will stay your existing flashcard flow. For tonight’s MVP, we’re not changing it yet.
+        </p>
+        <div class="navrow">
+          <button class="smallbtn secondary" id="studyBackHome">← Back</button>
+          <a class="smallbtn" href="./" style="display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;">Refresh</a>
         </div>
       </div>
     </div>
+  </section>
 
-    <div class="controls">
-      <button id="prev">Prev</button>
-      <button id="flip">Flip</button>
-      <button id="next">Next</button>
+  <!-- TEST -->
+  <section class="screen" id="testScreen" aria-hidden="true">
+    <div class="center">
+      <div class="toprow">
+        <span class="pill" id="quizLabel">Quiz 1 of 3</span>
+        <div class="bar" aria-label="Progress">
+          <div id="barFill"></div>
+          <span id="barText">1 of 1</span>
+        </div>
+      </div>
+
+      <div class="qcard">
+        <p class="qtitle" id="qTitle">Question</p>
+        <p class="prompt" id="qPrompt"></p>
+        <div class="choices" id="choices"></div>
+
+        <div class="navrow">
+          <button class="smallbtn secondary" id="quitBtn">← Exit</button>
+          <button class="smallbtn" id="nextBtn" disabled>Next</button>
+        </div>
+      </div>
     </div>
-  </div>
-<div class="controls" style="margin-top:10px;">
-  <button onclick="location.href='./quiz1.html'">Quiz 1: Spelling</button>
-  <button onclick="location.href='./quiz2.html'">Quiz 2: Capitals</button>
-  <button onclick="location.href='./quiz3.html'">Quiz 3: Map → Abbrev</button>
-</div>
+  </section>
 
-<div class="controls" style="margin-top:10px;">
-  <button onclick="location.href='../'">Home</button>
-  <button onclick="location.reload()">Restart</button>
-</div>
+  <!-- RESULTS -->
+  <section class="screen" id="resultScreen" aria-hidden="true">
+    <div class="center">
+      <div class="result">
+        <div class="scoreline" id="scoreLine">Score: --</div>
+        <div class="enc" id="encLine">--</div>
+        <div class="misses" id="misses"></div>
+
+        <div class="navrow">
+          <button class="smallbtn secondary" id="backHomeBtn">← Back to Week 2</button>
+          <button class="smallbtn" id="retryBtn">Try Again</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script>
-    const cards = [
-      { name: "Pennsylvania", code: "pa" },
-      { name: "New Jersey", code: "nj" },
-      { name: "New York", code: "ny" },
-      { name: "Delaware", code: "de" }
+    // ======= MVP DATA (replace with your real Week 2 set) =======
+    // Put the actual states for Week 2 here.
+    // Format: { state:"Pennsylvania", abbrev:"PA", hint:"Keystone State" }
+    const WEEK_STATES = [
+      { state: "Pennsylvania", abbrev: "PA" },
+      { state: "New Jersey",   abbrev: "NJ" },
+      { state: "Delaware",     abbrev: "DE" }
     ];
 
-    let i = 0;
-    const card = document.getElementById("card");
-    const frontImg = document.getElementById("frontImg");
-    const backImg = document.getElementById("backImg");
-    const count = document.getElementById("count");
+    // Wrong answer pool for Quiz 3 (abbrev). Expand later to all 50.
+    const ALL_ABBREV = [
+      "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO",
+      "MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+    ];
 
-    function render() {
-      const c = cards[i];
-      count.textContent = `${i + 1} / ${cards.length}`;
-      frontImg.src = `./images/${c.code}-f.png`;
-      backImg.src = `./images/${c.code}-b.png`;
-      card.classList.remove("flipped");
+    // ======= UI HELPERS =======
+    const home = document.getElementById("home");
+    const studyScreen = document.getElementById("studyScreen");
+    const testScreen = document.getElementById("testScreen");
+    const resultScreen = document.getElementById("resultScreen");
+
+    function show(el){
+      [home, studyScreen, testScreen, resultScreen].forEach(x=>{
+        if(x === el){
+          x.classList.add("active");
+          x.setAttribute("aria-hidden","false");
+        } else {
+          x.classList.remove("active");
+          x.setAttribute("aria-hidden","true");
+        }
+      });
+      window.scrollTo(0,0);
     }
 
-    document.getElementById("flip").onclick = () => card.classList.toggle("flipped");
-    document.getElementById("next").onclick = () => { i = (i + 1) % cards.length; render(); };
-    document.getElementById("prev").onclick = () => { i = (i - 1 + cards.length) % cards.length; render(); };
-    card.onclick = () => card.classList.toggle("flipped");
+    document.getElementById("studyBtn").onclick = ()=> show(studyScreen);
+    document.getElementById("testBtn").onclick  = ()=> startTest();
+    document.getElementById("studyBackHome").onclick = ()=> show(home);
 
-    render();
+    // ======= TEST LOGIC =======
+    let questions = [];
+    let idx = 0;
+    let correctCount = 0;
+    let missed = []; // {q, your, correct}
+
+    const quizLabel = document.getElementById("quizLabel");
+    const barFill = document.getElementById("barFill");
+    const barText = document.getElementById("barText");
+    const qTitle = document.getElementById("qTitle");
+    const qPrompt = document.getElementById("qPrompt");
+    const choicesEl = document.getElementById("choices");
+    const nextBtn = document.getElementById("nextBtn");
+    const quitBtn = document.getElementById("quitBtn");
+
+    quitBtn.onclick = ()=> show(home);
+    document.getElementById("backHomeBtn").onclick = ()=> show(home);
+    document.getElementById("retryBtn").onclick = ()=> startTest();
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function pickWrongState(correctState){
+      const pool = WEEK_STATES.map(s=>s.state).filter(s=>s!==correctState);
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
+
+    function pickWrongAbbrev(correctAbbrev){
+      const pool = ALL_ABBREV.filter(a => a !== correctAbbrev);
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
+
+    // Build 3-part test:
+    // Quiz 1: pick the correct state name from 4 options (uses Week states)
+    // Quiz 2: pick the correct spelling (multiple choice to avoid autocorrect)
+    // Quiz 3: pick the correct abbreviation from 5 options (uses all states as wrong pool)
+    function buildQuestions(){
+      const qs = [];
+
+      // Quiz 1: “Which state is this?” (prompt can be whatever you want later)
+      WEEK_STATES.forEach((s)=>{
+        const wrongs = shuffle(WEEK_STATES.map(x=>x.state).filter(n=>n!==s.state)).slice(0,3);
+        const opts = shuffle([s.state, ...wrongs]);
+        qs.push({
+          quiz: 1,
+          prompt: `Pick the correct state name:`,
+          question: s.state, // shown in title
+          options: opts,
+          answer: s.state
+        });
+      });
+
+      // Quiz 2: spelling/sound-alike trap (multiple choice)
+      // Example: Pencilvainya-style distractor (phonetic but wrong).
+      WEEK_STATES.forEach((s)=>{
+        const bad1 = makePhonetic(s.state);
+        const bad2 = makeScrambleVariant(s.state);
+        const bad3 = pickWrongState(s.state);
+        const opts = shuffle(unique([s.state, bad1, bad2, bad3]).slice(0,4));
+        qs.push({
+          quiz: 2,
+          prompt: `Which one is spelled correctly?`,
+          question: s.state,
+          options: opts,
+          answer: s.state
+        });
+      });
+
+      // Quiz 3: abbreviation
+      WEEK_STATES.forEach((s)=>{
+        const wrongs = shuffle([pickWrongAbbrev(s.abbrev), pickWrongAbbrev(s.abbrev), pickWrongAbbrev(s.abbrev), pickWrongAbbrev(s.abbrev)]).slice(0,4);
+        const opts = shuffle([s.abbrev, ...wrongs]);
+        qs.push({
+          quiz: 3,
+          prompt: `Pick the correct abbreviation for:`,
+          question: s.state,
+          options: opts,
+          answer: s.abbrev
+        });
+      });
+
+      // Keep Quiz 1 block, then Quiz 2, then Quiz 3 (as you requested)
+      return qs;
+    }
+
+    function unique(arr){
+      return [...new Set(arr)];
+    }
+
+    // Very simple “sounds right” generator (we'll customize per state later)
+    function makePhonetic(name){
+      const n = name.toLowerCase();
+      if(n.includes("pennsylvania")) return "Pencilvainya";
+      if(n.includes("delaware")) return "Della-where";
+      if(n.includes("new jersey")) return "New Jerzee";
+      // fallback: replace a common chunk
+      return name.replace(/s/gi,"z");
+    }
+
+    function makeScrambleVariant(name){
+      // gentle wrong version: remove a letter or duplicate one
+      if(name.length < 6) return name + name[name.length-1];
+      return name.slice(0, Math.floor(name.length/2)) + name[Math.floor(name.length/2)] + name.slice(Math.floor(name.length/2)+1);
+    }
+
+    function startTest(){
+      questions = buildQuestions();
+      idx = 0;
+      correctCount = 0;
+      missed = [];
+      renderQuestion();
+      show(testScreen);
+    }
+
+    function renderQuestion(){
+      const q = questions[idx];
+      nextBtn.disabled = true;
+      choicesEl.innerHTML = "";
+
+      // labels
+      quizLabel.textContent = `Quiz ${q.quiz} of 3`;
+      const total = questions.length;
+      barText.textContent = `${idx+1} of ${total}`;
+      barFill.style.width = `${Math.round(((idx+1)/total)*100)}%`;
+
+      qTitle.textContent = q.question;
+      qPrompt.textContent = q.prompt;
+
+      q.options.forEach(opt=>{
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.textContent = opt;
+        b.onclick = ()=> onPick(opt, b);
+        choicesEl.appendChild(b);
+      });
+    }
+
+    function onPick(picked, btn){
+      // lock choices
+      const q = questions[idx];
+      const buttons = [...choicesEl.querySelectorAll("button.choice")];
+      buttons.forEach(b=> b.disabled = true);
+
+      const isCorrect = picked === q.answer;
+      if(isCorrect){
+        correctCount++;
+        btn.classList.add("correct");
+      } else {
+        btn.classList.add("wrong");
+        // mark correct one too
+        buttons.forEach(b=>{
+          if(b.textContent === q.answer) b.classList.add("correct");
+        });
+        missed.push({ q, your: picked, correct: q.answer });
+      }
+
+      nextBtn.disabled = false;
+    }
+
+    nextBtn.onclick = ()=>{
+      idx++;
+      if(idx >= questions.length){
+        showResults();
+      } else {
+        renderQuestion();
+      }
+    };
+
+    function showResults(){
+      const total = questions.length;
+      const pct = Math.round((correctCount/total)*100);
+      document.getElementById("scoreLine").textContent = `Score: ${correctCount} / ${total} (${pct}%)`;
+
+      let msg = "";
+      if(pct === 100) msg = "Perfect score. You crushed it.";
+      else if(pct >= 80) msg = "Nice work. Review the missed ones once and try again.";
+      else if(pct >= 60) msg = "Good start. Let’s review the misses, then retake.";
+      else msg = "No worries. Review the flashcards again and try the test one more time.";
+
+      document.getElementById("encLine").textContent = msg;
+
+      const missesEl = document.getElementById("misses");
+      missesEl.innerHTML = "";
+      if(missed.length){
+        missed.forEach(m=>{
+          const d = document.createElement("div");
+          d.className = "miss";
+          d.innerHTML = `<b>Review:</b> ${m.q.question} — correct: <span style="color:var(--good);font-weight:900;">${m.correct}</span>`;
+          missesEl.appendChild(d);
+        });
+      } else {
+        const d = document.createElement("div");
+        d.className = "miss";
+        d.textContent = "No missed questions. 🔥";
+        missesEl.appendChild(d);
+      }
+
+      show(resultScreen);
+    }
+
+    // Default screen
+    show(home);
   </script>
 </body>
 </html>
