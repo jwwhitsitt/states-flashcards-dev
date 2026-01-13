@@ -1,41 +1,106 @@
 <!doctype html>
 <html lang="en">
-<head> 
+<head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>States Flashcards</title>
+  <title>Week 2</title>
+
   <style>
-    body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #f4f6fb; }
-    header { padding: 16px; background: white; box-shadow: 0 1px 10px rgba(0,0,0,.06); }
-    h1 { margin: 0; font-size: 18px; }
-    main { padding: 16px; display: grid; gap: 12px; }
-    a {
-      display: block;
-      padding: 14px 16px;
-      background: white;
-      border-radius: 14px;
-      box-shadow: 0 10px 20px rgba(0,0,0,.10);
-      text-decoration: none;
-      color: #111;
-      font-weight: 800;
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #f4f6fb;
     }
-    .sub { display:block; font-weight: 600; opacity: .7; margin-top: 4px; }
+
+    header {
+      padding: 18px 16px;
+      background: white;
+      box-shadow: 0 1px 10px rgba(0,0,0,.06);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    main {
+      height: calc(100vh - 72px);
+      display: grid;
+      grid-template-rows: 1fr auto auto auto;
+      gap: 14px;
+      padding: 16px;
+      justify-items: center;
+    }
+
+    .card {
+      width: min(92vw, 420px);
+      background: white;
+      border-radius: 18px;
+      padding: 20px 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.14);
+      display: grid;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 14px;
+      opacity: .75;
+      line-height: 1.4;
+    }
+
+    button {
+      width: min(92vw, 420px);
+      padding: 16px;
+      border: 0;
+      border-radius: 16px;
+      background: white;
+      box-shadow: 0 10px 20px rgba(0,0,0,.10);
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: transparent;
+      box-shadow: none;
+      opacity: .7;
+      font-weight: 700;
+    }
   </style>
 </head>
+
 <body>
   <header>
-    <h1>States Flashcards</h1>
+    <h1>Week 2</h1>
   </header>
 
   <main>
-     <a href="./week1/">
-    Week 1
-    <span class="sub">ME • NH • VT • CT • RI • MA</span>
-  </a>
-    <a href="./week2/">
-      Week 2
-      <span class="sub">PA • NJ • NY • DE</span>
-    </a>
+    <div></div>
+
+    <div class="card">
+      <h2>Study Flashcards</h2>
+      <p>Review the states as many times as you want before checking your learning.</p>
+    </div>
+
+    <button onclick="location.href='./flashcards.html'">
+      Study Flashcards
+    </button>
+
+    <button onclick="location.href='./test.html'">
+      Check Your Learning
+    </button>
+
+    <button class="secondary" onclick="location.href='../'">
+      ← Back to Lessons
+    </button>
   </main>
 </body>
 </html>
