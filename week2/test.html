@@ -25,11 +25,11 @@
       --ok:#22c55e;
       --bad:#ef4444;
 
-      /* default answer-slot sizing (will be overridden dynamically) */
-      --slotW:30px;
-      --slotH:38px;
-      --slotGap:8px;
-      --slotFont:18px;
+      /* these get set dynamically per word + device width */
+      --slotW:28px;
+      --slotH:36px;
+      --slotGap:7px;
+      --slotFont:16px;
     }
 
     *{box-sizing:border-box}
@@ -227,14 +227,14 @@
     .slotsWrap{
       background:#fff;
       border-radius:16px;
-      padding:12px;
+      padding:12px 14px; /* extra side padding to protect borders */
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
       display:flex;
       justify-content:center;
       align-items:center;
       flex:0 0 auto;
       min-height:74px;
-      overflow:hidden; /* keep clean (no scroll) */
+      overflow:hidden;
     }
     .slots{
       display:flex;
@@ -242,8 +242,9 @@
       gap:var(--slotGap);
       align-items:center;
       justify-content:center;
-      width:100%;
-      overflow:hidden; /* safe now because we auto-shrink */
+      width:fit-content; /* key: row is only as wide as it needs to be */
+      max-width:100%;
+      overflow:hidden;
     }
     .slot{
       width:var(--slotW);
@@ -309,9 +310,7 @@
       opacity:.35;
       cursor:default;
     }
-    .tilebtn:disabled{
-      pointer-events:none;
-    }
+    .tilebtn:disabled{ pointer-events:none; }
 
     .bottom{
       display:flex;
@@ -474,7 +473,6 @@
       "Delaware":["Delawere","Delawair","Della-ware","Delawar","Delawarre"]
     };
 
-    // ===== Build questions =====
     const spellingQuestions = WEEK.map(s => {
       const correct = s.state;
       const fakes = shuffle(SPELLING_FAKES[correct] || []).slice(0,3);
@@ -525,7 +523,7 @@
 
     const QUESTIONS = [...spellingQuestions, ...capitalsQuestions, ...abbrevQuestions];
 
-    // ===== UI hooks =====
+    // ===== UI =====
     const sectionPill = document.getElementById("sectionPill");
     const bar = document.getElementById("bar");
     const barText = document.getElementById("barText");
@@ -548,7 +546,6 @@
     const clearBtn = document.getElementById("clearBtn");
     const checkBtn = document.getElementById("checkBtn");
 
-    // ===== state =====
     let idx = 0;
     let locked = false;
     const missed = new Set();
@@ -558,6 +555,9 @@
     let filled = [];
     let tiles = [];
     let correctUpper = "";
+
+    // remember last tiles word so we can re-fit on orientation change
+    let lastTilesWordUpper = null;
 
     const MC_ADVANCE_MS = 500;
     const TILES_ADVANCE_MS = 650;
@@ -588,6 +588,7 @@
       tilesArea.classList.remove("show");
       clearBtn.style.display = "none";
       checkBtn.style.display = "none";
+      lastTilesWordUpper = null;
     }
 
     function setModeTiles(){
@@ -642,36 +643,70 @@
       autoAdvance(MC_ADVANCE_MS);
     }
 
-    // ===== Tiles (CAPS + auto-fit slots) =====
-    function setSlotSizingForWord(targetUpper){
-      // count letters excluding spaces
-      const lettersCount = targetUpper.replace(/ /g,"").length;
-
-      // defaults (short words)
-      let slotW = 30, slotH = 38, gap = 8, font = 18;
-
-      // tune for longer one-word states
-      // (Pennsylvania=12, Mississippi=11, Massachusetts=13, etc.)
-      if(lettersCount >= 11){
-        slotW = 24; slotH = 34; gap = 6; font = 15;
-      }
-      if(lettersCount >= 13){
-        slotW = 21; slotH = 32; gap = 5; font = 14;
-      }
-      if(lettersCount >= 15){
-        slotW = 19; slotH = 30; gap = 4; font = 13;
-      }
-
-      // apply to CSS variables on the card so it affects only this page
+    // ===== Tiles sizing that cannot clip =====
+    function setSlotVars(slotW, slotH, gap, font){
       document.documentElement.style.setProperty("--slotW", slotW + "px");
       document.documentElement.style.setProperty("--slotH", slotH + "px");
       document.documentElement.style.setProperty("--slotGap", gap + "px");
       document.documentElement.style.setProperty("--slotFont", font + "px");
     }
 
+    function fitSlotsToDevice(targetUpper){
+      // number of letter slots (spaces are separate tiny gaps)
+      const letterCount = targetUpper.replace(/ /g,"").length;
+      const spaceCount = (targetUpper.match(/ /g) || []).length;
+
+      // We'll compute using the *actual* inner width of slotsWrap.
+      // Need DOM to be laid out first => call this from requestAnimationFrame.
+      const wrapW = slotsWrap.clientWidth; // includes padding? (clientWidth excludes borders, includes padding)
+      // Give ourselves a safety margin so borders never kiss the edge
+      const safety = 8;
+      const available = Math.max(220, wrapW - safety);
+
+      // Choose nice defaults, then clamp down if necessary
+      let gap = 7;
+      let slotH = 36;
+      let font = 16;
+
+      // space slot width is 0.55 * slotW (from CSS), so include that in fit math
+      // totalWidth = letterCount*W + (letterCount-1+spaceCount)*gap + spaceCount*(0.55*W)
+      // because each space adds an extra element, and also adds an extra gap in the flex row.
+      // Flex gaps apply between all elements, including space elements.
+      const elementsCount = letterCount + spaceCount;
+      const gapsCount = Math.max(0, elementsCount - 1);
+
+      // Solve for W:
+      // available >= W*letterCount + W*0.55*spaceCount + gap*gapsCount
+      // W <= (available - gap*gapsCount) / (letterCount + 0.55*spaceCount)
+      const denom = (letterCount + 0.55*spaceCount) || 1;
+
+      // start with a comfy cap, then compute required W
+      const comfyMax = 30;
+      let slotW = Math.floor((available - gap*gapsCount) / denom);
+      slotW = Math.min(comfyMax, slotW);
+
+      // If still tight, reduce gap a bit and recompute once
+      if(slotW < 20){
+        gap = 5;
+        slotW = Math.floor((available - gap*gapsCount) / denom);
+        slotW = Math.min(28, slotW);
+      }
+
+      // Clamp minimums so it stays usable
+      slotW = Math.max(16, slotW);
+
+      // Scale height/font with width so it still looks clean
+      if(slotW >= 28){ slotH = 36; font = 16; }
+      else if(slotW >= 24){ slotH = 34; font = 15; }
+      else if(slotW >= 20){ slotH = 32; font = 14; }
+      else { slotH = 30; font = 13; }
+
+      setSlotVars(slotW, slotH, gap, font);
+    }
+
     function buildTilesTarget(word){
       correctUpper = word.toUpperCase();
-      setSlotSizingForWord(correctUpper);
+      lastTilesWordUpper = correctUpper;
 
       slotChars = Array.from(correctUpper); // includes spaces
       filled = slotChars.map(ch => ch === " " ? " " : null);
@@ -694,6 +729,13 @@
         d.textContent = filled[i] ? filled[i] : "";
         slotsEl.appendChild(d);
       });
+
+      // After slots exist, fit them to the actual device width
+      requestAnimationFrame(() => {
+        if(lastTilesWordUpper){
+          fitSlotsToDevice(lastTilesWordUpper);
+        }
+      });
     }
 
     function renderPool(){
@@ -702,7 +744,7 @@
         const b = document.createElement("button");
         b.type = "button";
         b.className = "tilebtn" + (t.used ? " used" : "");
-        b.textContent = t.ch;               // already CAPS
+        b.textContent = t.ch;         // already CAPS
         b.disabled = t.used || locked;
 
         b.addEventListener("click", () => {
@@ -862,6 +904,13 @@
 
     clearBtn.addEventListener("click", clearTiles);
     checkBtn.addEventListener("click", () => checkTiles(QUESTIONS[idx]));
+
+    // Re-fit on orientation / resize (only if in tiles mode)
+    window.addEventListener("resize", () => {
+      if(lastTilesWordUpper){
+        requestAnimationFrame(() => fitSlotsToDevice(lastTilesWordUpper));
+      }
+    });
 
     renderQuestion();
   </script>
