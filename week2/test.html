@@ -21,6 +21,7 @@
       --barbg:#e5e7eb;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -29,9 +30,11 @@
       height:100vh;
       display:flex;
       flex-direction:column;
-      overflow:hidden; /* enforce no-scroll */
+      overflow:hidden; /* enforce no page scroll */
     }
+
     header{
+      flex:0 0 auto;
       padding:10px 14px;
       background:#fff;
       box-shadow:0 1px 10px rgba(0,0,0,.06);
@@ -55,39 +58,45 @@
     header .spacer{ width:52px; }
 
     main{
-      flex:1;
+      flex:1 1 auto;
+      min-height:0;
       display:flex;
       justify-content:center;
-      align-items:flex-start;
-      padding:12px;
+      align-items:stretch;
+      padding:10px 12px 12px;
       overflow:hidden;
     }
+
     .wrap{
       width:100%;
       max-width:720px;
       min-height:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
     }
 
+    /* ===== Top progress row (tightened) ===== */
     .toprow{
+      flex:0 0 auto;
       display:flex;
       align-items:center;
       gap:10px;
-      margin-bottom:10px;
     }
     .pill{
       background:#dbeafe;
       color:#1e3a8a;
       font-weight:1000;
       border-radius:999px;
-      padding:8px 12px;
-      font-size:14px;
-      min-width:92px;
+      padding:7px 10px;
+      font-size:13px;
+      min-width:88px;
       text-align:center;
       white-space:nowrap;
     }
     .barwrap{
       flex:1;
-      height:18px;
+      height:16px;
       background:var(--barbg);
       border-radius:999px;
       position:relative;
@@ -109,33 +118,35 @@
       justify-content:center;
       font-weight:1000;
       color:#111827;
-      font-size:14px;
+      font-size:13px;
       text-shadow:0 1px 0 rgba(255,255,255,.75);
       pointer-events:none;
     }
 
+    /* ===== Main card (no scroll) ===== */
     .card{
+      flex:1 1 auto;
+      min-height:0;
       background:var(--card);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:14px;
+      padding:12px;
       display:flex;
       flex-direction:column;
       gap:10px;
-      height:calc(100vh - 62px - 24px - 34px); /* header + padding + toprow-ish */
-      max-height:760px;
-      overflow:hidden;
+      overflow:hidden; /* keep everything on screen */
     }
 
     .imgbox{
+      flex:0 0 auto;
       border-radius:16px;
       background:#fff;
-      display:none; /* default hidden (we'll show only when needed) */
+      display:none;
       align-items:center;
       justify-content:center;
-      padding:10px;
+      padding:8px;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      height:220px; /* fixed so layout is predictable */
+      height:160px; /* smaller to avoid scroll */
       overflow:hidden;
     }
     .imgbox.show{ display:flex; }
@@ -147,35 +158,40 @@
     }
 
     .qtitle{
-      font-size:30px;
+      flex:0 0 auto;
+      font-size:26px;          /* reduced */
       font-weight:1000;
       line-height:1.05;
       margin-top:2px;
     }
     .qsub{
+      flex:0 0 auto;
       color:var(--muted);
       font-weight:800;
-      margin-bottom:2px;
+      margin:0;
+      font-size:14px;
     }
 
     .answers{
+      flex:1 1 auto;
+      min-height:0;
       display:flex;
       flex-direction:column;
-      gap:10px;
-      flex:1;
-      min-height:0;
-      overflow:hidden;
+      gap:8px;               /* reduced */
+      overflow:hidden;       /* no scrolling */
       justify-content:flex-start;
     }
     .choice{
-      border-radius:16px;
+      flex:0 0 auto;
+      border-radius:14px;
       border:2px solid #e5e7eb;
       background:#fff;
-      padding:14px 14px;
-      font-size:20px;
+      padding:10px 12px;     /* reduced height */
+      font-size:18px;        /* reduced */
       font-weight:1000;
       text-align:left;
       cursor:pointer;
+      line-height:1.15;
       transition:transform .05s ease, border-color .1s ease, background .1s ease;
     }
     .choice:active{ transform:scale(.995); }
@@ -189,16 +205,17 @@
     }
 
     .bottom{
+      flex:0 0 auto;
       display:flex;
       gap:10px;
       margin-top:2px;
     }
     .btn{
       flex:1;
-      padding:12px 14px;
+      padding:10px 12px;     /* reduced */
       border-radius:14px;
       border:0;
-      font-size:16px;
+      font-size:15px;        /* reduced */
       font-weight:1000;
       cursor:pointer;
       background:var(--btn);
@@ -217,25 +234,27 @@
     }
 
     .result{
+      flex:0 0 auto;
       text-align:center;
       font-weight:1000;
       color:var(--muted);
-      font-size:14px;
-      margin-top:4px;
+      font-size:13px;
+      margin-top:2px;
+      min-height:18px;
     }
 
     .review{
       margin-top:6px;
-      padding:12px;
-      border-radius:16px;
+      padding:10px;
+      border-radius:14px;
       background:#f8fafc;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      overflow:auto;
-      max-height:200px;
+      overflow:auto;           /* internal scroll if list is long (page still won’t scroll) */
+      max-height:170px;
     }
     .review h2{
       margin:0 0 6px 0;
-      font-size:16px;
+      font-size:15px;
       font-weight:1000;
     }
     .review ul{
@@ -243,12 +262,22 @@
       padding-left:18px;
       color:#111827;
       font-weight:800;
+      font-size:14px;
     }
     .small{
-      font-size:13px;
+      font-size:12.5px;
       color:var(--muted);
       font-weight:800;
       margin-top:6px;
+    }
+
+    /* Extra safety for short screens */
+    @media (max-height: 700px){
+      .imgbox{ height:140px; }
+      .qtitle{ font-size:24px; }
+      .choice{ padding:9px 12px; font-size:17px; }
+      .btn{ padding:9px 12px; }
+      .answers{ gap:7px; }
     }
   </style>
 </head>
@@ -299,15 +328,6 @@
       { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
     ];
 
-    // Pool for wrong answers (used for MC distractors)
-    const ALL_STATES = [
-      "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
-      "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
-      "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey",
-      "New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
-      "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
-    ];
-
     function shuffle(arr){
       const a = arr.slice();
       for(let i=a.length-1;i>0;i--){
@@ -317,37 +337,68 @@
       return a;
     }
 
-    function pickDistinct(pool, count, excludeSet){
-      const out = [];
-      const p = shuffle(pool).filter(x => !excludeSet.has(x));
-      for(const item of p){
-        if(out.length>=count) break;
-        out.push(item);
+    // spelling fake options (all are attempts at the SAME word)
+    const SPELLING_FAKES = {
+      "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania","Pennsylvainia","Pensylvania"],
+      "New Jersey":["New Jerzee","New Jersy","Nu Jersey","New Jersie","New Jerzy"],
+      "New York":["New Yorc","Nu York","New Yark","New Yorck","New Yorrk"],
+      "Delaware":["Della-ware","Delawair","Delawere","Delawar","Delawairre"]
+    };
+
+    // If we ever don’t have enough fakes for a word, generate a couple simple variants.
+    function generateFallbackFakes(word){
+      const w = word;
+      const s = w.replace(/\s+/g,"");
+      const variants = new Set();
+
+      // basic “kid-misspell” style transforms
+      variants.add(w.replace(/nn/g,"n"));
+      variants.add(w.replace(/ie/g,"ei"));
+      variants.add(w.replace(/y/g,"i"));
+      variants.add(w.replace(/a/g,"e"));
+      variants.add(w.replace(/e/g,"a"));
+
+      // small swap near middle if possible
+      if(s.length >= 6){
+        const i = Math.floor(s.length/2);
+        const arr = s.split("");
+        [arr[i], arr[i+1]] = [arr[i+1], arr[i]];
+        variants.add(arr.join(""));
       }
-      return out;
+
+      // convert back to spaced if original had spaces (New York etc.)
+      const out = [];
+      for(const v of variants){
+        if(v && v !== word) out.push(v);
+      }
+      return out.slice(0,6);
     }
 
-    // spelling "sounds right" fake options (not necessarily letters from the word)
-    const SPELLING_FAKES = {
-      "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania"],
-      "New Jersey":["New Jerzee","New Jersy","Nu Jersey"],
-      "New York":["New Yorc","Nu York","New Yark"],
-      "Delaware":["Della-ware","Delawair","Delawere"]
-    };
+    function buildSpellingChoices(correct){
+      const base = (SPELLING_FAKES[correct] || []).slice();
+      const fallback = generateFallbackFakes(correct);
+      const pool = shuffle([...base, ...fallback]).filter(x => x && x !== correct);
+
+      // Need exactly 3 fakes + correct = 4 total
+      const fakes = [];
+      for(const item of pool){
+        if(fakes.length >= 3) break;
+        if(!fakes.includes(item)) fakes.push(item);
+      }
+
+      // absolute safety: if still short, pad with repeated-ish variants
+      while(fakes.length < 3){
+        fakes.push(correct + " "); // visually different, still an “attempt”
+      }
+
+      return shuffle([correct, ...fakes]);
+    }
 
     // ====== Build 3-part test (12 questions: 4+4+4) ======
 
-    // Part 1: Spelling (shows image, but NEVER shows correct state name as a heading)
+    // Part 1: Spelling (shows image; does NOT reveal the correct state name as a header)
     const spellingQuestions = WEEK.map(s => {
       const correct = s.state;
-
-      // choose 2 fakes + 1 random wrong state name (so "New Jersey" can appear as a distractor sometimes)
-      const fakes = shuffle(SPELLING_FAKES[correct] || []).slice(0,2);
-      const wrongState = pickDistinct(ALL_STATES, 1, new Set([correct]))[0];
-
-      // total 4 choices
-      const choices = shuffle([correct, ...fakes, wrongState]);
-
       return {
         section:"Spelling",
         showImage:true,
@@ -355,17 +406,15 @@
         title:"Pick the correct spelling",
         subtitle:"Which one is spelled correctly?",
         correct,
-        choices
+        choices: buildSpellingChoices(correct)
       };
     });
 
-    // Part 2: Capitals (NO image)
+    // Part 2: Capitals (NO image — don’t give the answer away)
     const capitalQuestions = WEEK.map(s => {
       const correct = s.state;
-      // 3 other state names as distractors (can be any states)
-      const wrongs = pickDistinct(ALL_STATES, 3, new Set([correct]));
-      const choices = shuffle([correct, ...wrongs]);
-
+      const wrongs = WEEK.map(x => x.state).filter(x => x !== correct);
+      const choices = shuffle([correct, ...wrongs]); // stays within this week set (4 choices total)
       return {
         section:"Capitals",
         showImage:false,
@@ -377,16 +426,11 @@
       };
     });
 
-    // Part 3: Abbreviations (NO image, MC)
+    // Part 3: Abbreviations (NO image)
     const abbrevQuestions = WEEK.map(s => {
       const correct = s.abbrev;
-      const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-                    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-                    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-
-      const wrongs = pickDistinct(pool, 3, new Set([correct]));
-      const choices = shuffle([correct, ...wrongs]);
-
+      const wrongs = WEEK.map(x => x.abbrev).filter(x => x !== correct);
+      const choices = shuffle([correct, ...wrongs]); // stays within this week set (4 choices total)
       return {
         section:"Abbreviations",
         showImage:false,
@@ -418,7 +462,6 @@
 
     let idx = 0;
     let locked = false;
-    let chosen = null;
 
     const results = []; // {question, chosen, correct}
     const missed = new Set();
@@ -434,7 +477,6 @@
 
     function renderQuestion(){
       locked = false;
-      chosen = null;
       nextBtn.disabled = true;
       resultEl.textContent = "";
       reviewBox.style.display = "none";
@@ -462,16 +504,17 @@
         const b = document.createElement("button");
         b.className = "choice";
         b.type = "button";
-        b.textContent = choice;
-        b.addEventListener("click", () => chooseAnswer(b, choice));
+        b.textContent = choice.trimEnd();
+        b.addEventListener("click", () => chooseAnswer(choice.trimEnd()));
         answersEl.appendChild(b);
       });
+
+      nextBtn.textContent = (idx === QUESTIONS.length - 1) ? "Finish" : "Next";
     }
 
-    function chooseAnswer(btn, choice){
+    function chooseAnswer(choice){
       if(locked) return;
       locked = true;
-      chosen = choice;
 
       const q = QUESTIONS[idx];
       const isCorrect = (choice === q.correct);
@@ -479,8 +522,9 @@
       // mark buttons
       const btns = Array.from(document.querySelectorAll(".choice"));
       btns.forEach(b => {
-        if(b.textContent === q.correct) b.classList.add("correct");
-        else if(b.textContent === choice) b.classList.add("wrong");
+        const txt = b.textContent;
+        if(txt === q.correct) b.classList.add("correct");
+        else if(txt === choice) b.classList.add("wrong");
         b.disabled = true;
       });
 
@@ -488,52 +532,40 @@
         resultEl.textContent = "✅ Nice!";
       } else {
         resultEl.textContent = "❌ Almost — keep going.";
-        // track what to review (by section + prompt)
         missed.add(`${q.section}: ${q.title}`);
       }
 
       results.push({ q, chosen: choice, correct: q.correct });
       nextBtn.disabled = false;
-
-      // if last question, change Next label
-      if(idx === QUESTIONS.length - 1){
-        nextBtn.textContent = "Finish";
-      } else {
-        nextBtn.textContent = "Next";
-      }
     }
 
     function showSummary(){
-      // compute score
       const total = results.length;
       const correct = results.filter(r => r.chosen === r.correct).length;
       const pct = Math.round((correct / total) * 100);
 
-      // replace card content with summary (still no-scroll)
       imgbox.classList.remove("show");
       answersEl.innerHTML = "";
       qtitle.textContent = `Score: ${pct}%`;
       qsub.textContent = `You got ${correct} out of ${total} correct.`;
 
-      // review list
       const misses = Array.from(missed);
       const reviewHtml = `
         <div class="review">
           <h2>${misses.length ? "Review these:" : "Nothing to review — nice work!"}</h2>
           ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : ""}
-          <div class="small">Tip: You can go back and study, then try again.</div>
+          <div class="small">Tip: Study again, then try the test one more time.</div>
         </div>
       `;
       reviewBox.style.display = "block";
       reviewBox.innerHTML = reviewHtml;
 
-      // buttons
       exitBtn.textContent = "Back to Week 2";
       nextBtn.style.display = "none";
 
-      // progress bar full
       bar.style.width = "100%";
       barText.textContent = `${total} of ${total}`;
+      sectionPill.textContent = "Done";
     }
 
     nextBtn.addEventListener("click", () => {
@@ -546,7 +578,6 @@
     });
 
     exitBtn.addEventListener("click", () => {
-      // always go back to week menu
       window.location.href = "./index.html";
     });
 
