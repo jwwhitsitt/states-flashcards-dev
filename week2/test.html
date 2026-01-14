@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Week 2 – Check Your Learning</title>
+  <title>Week 2 – Check Your Learning (DEV)</title>
 
   <style>
     :root{
@@ -31,7 +31,7 @@
       height:100vh;
       display:flex;
       flex-direction:column;
-      overflow:hidden; /* enforce no-scroll */
+      overflow:hidden; /* no scroll */
     }
     header{
       padding:10px 14px;
@@ -116,7 +116,6 @@
       pointer-events:none;
     }
 
-    /* Card is fixed-height and must never scroll */
     .card{
       background:var(--card);
       border-radius:var(--radius);
@@ -125,12 +124,11 @@
       display:flex;
       flex-direction:column;
       gap:8px;
-      height:calc(100vh - 62px - 20px - 34px); /* header + main padding + toprow-ish */
+      height:calc(100vh - 62px - 20px - 34px);
       max-height:760px;
       overflow:hidden;
     }
 
-    /* Image: slightly smaller so 4 answers always fit without scrolling */
     .imgbox{
       border-radius:16px;
       background:#fff;
@@ -139,7 +137,7 @@
       justify-content:center;
       padding:8px;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      height:185px;         /* smaller than before */
+      height:185px;
       overflow:hidden;
     }
     .imgbox.show{ display:flex; }
@@ -150,7 +148,6 @@
       border-radius:12px;
     }
 
-    /* Title sizes slightly reduced to protect no-scroll */
     .qtitle{
       font-size:28px;
       font-weight:1000;
@@ -165,23 +162,22 @@
       line-height:1.15;
     }
 
+    /* MC answers */
     .answers{
       display:flex;
       flex-direction:column;
-      gap:8px;          /* tighter */
+      gap:8px;
       flex:1;
       min-height:0;
       overflow:hidden;
       justify-content:flex-start;
     }
-
-    /* Answer buttons smaller so 4 fit comfortably */
     .choice{
       border-radius:14px;
       border:2px solid #e5e7eb;
       background:#fff;
-      padding:10px 12px;   /* reduced height */
-      font-size:18px;      /* reduced */
+      padding:10px 12px;
+      font-size:18px;
       font-weight:1000;
       text-align:left;
       cursor:pointer;
@@ -189,15 +185,87 @@
       line-height:1.2;
     }
     .choice:active{ transform:scale(.995); }
-    .choice.correct{
-      border-color:var(--good);
-      background:#ecfdf5;
+    .choice.correct{ border-color:var(--good); background:#ecfdf5; }
+    .choice.wrong{ border-color:var(--bad); background:#fef2f2; }
+
+    /* Tiles mode */
+    .tilesWrap{
+      display:none;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+      gap:10px;
+      flex-direction:column;
     }
-    .choice.wrong{
-      border-color:var(--bad);
-      background:#fef2f2;
+    .tilesWrap.show{ display:flex; }
+
+    .slots{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:center;
+      align-items:center;
+      padding:6px 0;
+      min-height:64px;
+    }
+    .slot{
+      width:42px;
+      height:46px;
+      border-radius:12px;
+      background:#f8fafc;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      font-size:20px;
+      user-select:none;
+    }
+    .slot.filled{
+      background:#fff;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.10);
+    }
+    .gap{
+      width:22px; /* visual space between words */
+      height:46px;
     }
 
+    .pool{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:center;
+      align-items:center;
+      padding:6px 0;
+      overflow:hidden;
+    }
+    .tile{
+      min-width:44px;
+      height:44px;
+      padding:0 12px;
+      border-radius:14px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      font-weight:1000;
+      font-size:18px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow:0 8px 16px rgba(0,0,0,.08);
+    }
+    .tile:active{ transform:scale(.99); }
+    .tile.used{
+      opacity:.35;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+
+    .tileControls{
+      display:flex;
+      gap:10px;
+      margin-top:auto;
+    }
+
+    /* Bottom buttons */
     .bottom{
       display:flex;
       gap:10px;
@@ -205,7 +273,7 @@
     }
     .btn{
       flex:1;
-      padding:11px 14px; /* slightly smaller */
+      padding:11px 14px;
       border-radius:14px;
       border:0;
       font-size:16px;
@@ -232,17 +300,16 @@
       color:var(--muted);
       font-size:14px;
       margin-top:2px;
-      min-height:18px; /* prevents tiny layout jump */
+      min-height:18px;
     }
 
-    /* Summary / review block */
     .reviewBox{
       display:none;
       border-radius:16px;
       background:#f8fafc;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
       padding:10px 12px;
-      overflow:hidden; /* no scroll */
+      overflow:hidden;
     }
     .reviewBox h2{
       margin:0 0 6px 0;
@@ -262,13 +329,6 @@
       margin-top:6px;
       line-height:1.2;
     }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-weight:1000;
-      margin-top:6px;
-    }
   </style>
 </head>
 
@@ -281,7 +341,6 @@
 
   <main>
     <div class="wrap">
-
       <div class="toprow">
         <div class="pill" id="sectionPill">Spelling</div>
         <div class="barwrap" aria-label="Progress">
@@ -296,7 +355,19 @@
         <div class="qtitle" id="qtitle">Pick the correct spelling</div>
         <div class="qsub" id="qsub">Tap one answer.</div>
 
+        <!-- Multiple choice -->
         <div class="answers" id="answers"></div>
+
+        <!-- Tiles mode -->
+        <div class="tilesWrap" id="tilesWrap">
+          <div class="slots" id="slots"></div>
+          <div class="pool" id="pool"></div>
+
+          <div class="tileControls">
+            <button class="btn secondary" id="clearBtn" type="button">Clear</button>
+            <button class="btn" id="submitTilesBtn" type="button" disabled>Check</button>
+          </div>
+        </div>
 
         <div class="bottom" id="bottomRow">
           <button class="btn secondary" id="exitBtn">Exit</button>
@@ -304,7 +375,6 @@
         </div>
 
         <div class="result" id="result"></div>
-
         <div class="reviewBox" id="reviewBox"></div>
       </section>
     </div>
@@ -319,13 +389,9 @@
       { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
     ];
 
-    const ALL_STATES = [
-      "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
-      "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
-      "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey",
-      "New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
-      "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
-    ];
+    const ABBREV_POOL = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                         "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                         "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
     function shuffle(arr){
       const a = arr.slice();
@@ -346,7 +412,7 @@
       return out;
     }
 
-    // spelling "sounds right" fake options
+    // spelling fakes
     const SPELLING_FAKES = {
       "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania","Pennsilvanya","Pensilvanya"],
       "New Jersey":["New Jerzee","New Jersy","New Jersie","New Jersei","New Jerzy"],
@@ -354,81 +420,91 @@
       "Delaware":["Delawair","Delawere","Della-ware","Delawar","Delawear"]
     };
 
-    // ====== Build 3-part test (12 questions: 4+4+4) ======
+    // ====== Question builders ======
 
-    // Part 1: Spelling (shows image, NEVER shows correct state name as a heading)
-    // IMPORTANT: always 4 choices, always includes the correct answer, and all choices look like attempts at the SAME word.
-    const spellingQuestions = WEEK.map(s => {
-      const correct = s.state;
-      const fakePool = (SPELLING_FAKES[correct] || []).slice();
-      // pick 3 fakes; if not enough, fall back to simple mutations
-      let fakes = shuffle(fakePool).filter(x => x && x !== correct).slice(0,3);
+    // Part 1: Spelling (MC, always 4, always includes correct)
+    function buildSpellingQuestions(){
+      return WEEK.map(s => {
+        const correct = s.state;
+        let fakes = shuffle((SPELLING_FAKES[correct] || []).slice()).filter(x => x && x !== correct);
 
-      while(fakes.length < 3){
-        // simple mutation fallback (safe + readable)
-        const base = correct.replace(/\s+/g," ");
-        const mut = base
-          .replace(/ph/g,"f")
-          .replace(/sylv/g,"silv")
-          .replace(/ware/g,"wair")
-          .replace(/york/g,"yorc");
-        const candidate = (mut !== correct ? mut : base + "y");
-        if(!fakes.includes(candidate) && candidate !== correct) fakes.push(candidate);
-        if(fakes.length >= 3) break;
-        // last fallback: duplicate-ish but still wrong
-        const candidate2 = correct.slice(0, Math.max(3, correct.length-1)) + correct.slice(-1);
-        if(!fakes.includes(candidate2) && candidate2 !== correct) fakes.push(candidate2);
-      }
+        // Ensure at least 3 fakes (basic fallback mutations)
+        while(fakes.length < 3){
+          const base = correct.replace(/\s+/g," ");
+          const candidate = base.replace(/ph/g,"f").replace(/york/ig,"yorc").replace(/ware/ig,"wair");
+          if(candidate !== correct && !fakes.includes(candidate)) fakes.push(candidate);
+          if(fakes.length >= 3) break;
+          const candidate2 = correct.replace(/syl/ig,"sil");
+          if(candidate2 !== correct && !fakes.includes(candidate2)) fakes.push(candidate2);
+          if(fakes.length >= 3) break;
+          const candidate3 = correct + "e";
+          if(candidate3 !== correct && !fakes.includes(candidate3)) fakes.push(candidate3);
+        }
 
-      const choices = shuffle([correct, ...fakes.slice(0,3)]);
+        const choices = shuffle([correct, ...fakes.slice(0,3)]);
+        return {
+          mode:"mc",
+          section:"Spelling",
+          showImage:true,
+          img:s.img,
+          title:"Pick the correct spelling",
+          subtitle:"Which one is spelled correctly?",
+          correct,
+          choices,
+          reviewLabel:`Spelling: ${correct}`
+        };
+      });
+    }
 
-      return {
-        section:"Spelling",
-        showImage:true,
-        img:s.img,
-        title:"Pick the correct spelling",
-        subtitle:"Which one is spelled correctly?",
-        correct,
-        choices
-      };
-    });
+    // Part 2: Capitals (TILES MVP)
+    function buildCapitalTileQuestions(){
+      return WEEK.map(s => {
+        return {
+          mode:"tiles",
+          section:"Capitals",
+          showImage:false,
+          img:null,
+          title:s.capital,
+          subtitle:"Tap the letters to spell the state.",
+          correct:s.state,
+          tiles: buildTilesForState(s.state),
+          reviewLabel:`Capitals: ${s.capital} → ${s.state}`
+        };
+      });
+    }
 
-    // Part 2: Capitals (NO image)
-    const capitalQuestions = WEEK.map(s => {
-      const correct = s.state;
-      const wrongs = pickDistinct(ALL_STATES, 3, new Set([correct]));
-      const choices = shuffle([correct, ...wrongs]);
-      return {
-        section:"Capitals",
-        showImage:false,
-        img:null,
-        title:s.capital,
-        subtitle:"Which state has this capital?",
-        correct,
-        choices
-      };
-    });
+    // Part 3: Abbrev (MC)
+    function buildAbbrevQuestions(){
+      return WEEK.map(s => {
+        const correct = s.abbrev;
+        const wrongs = pickDistinct(ABBREV_POOL, 3, new Set([correct]));
+        const choices = shuffle([correct, ...wrongs]);
+        return {
+          mode:"mc",
+          section:"Abbreviations",
+          showImage:false,
+          img:null,
+          title:s.state,
+          subtitle:"Which abbreviation matches this state?",
+          correct,
+          choices,
+          reviewLabel:`Abbreviations: ${s.state} → ${s.abbrev}`
+        };
+      });
+    }
 
-    // Part 3: Abbreviations (NO image)
-    const abbrevQuestions = WEEK.map(s => {
-      const correct = s.abbrev;
-      const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-                    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-                    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-      const wrongs = pickDistinct(pool, 3, new Set([correct]));
-      const choices = shuffle([correct, ...wrongs]);
-      return {
-        section:"Abbreviations",
-        showImage:false,
-        img:null,
-        title:s.state,
-        subtitle:"Which abbreviation matches this state?",
-        correct,
-        choices
-      };
-    });
+    // Build tiles from state name (letters only). Spaces become gaps in the slots.
+    function buildTilesForState(stateName){
+      // Only letters (A–Z). Keep duplicates.
+      const letters = stateName.toUpperCase().split("").filter(ch => ch >= "A" && ch <= "Z");
+      return shuffle(letters);
+    }
 
-    const QUESTIONS = [...spellingQuestions, ...capitalQuestions, ...abbrevQuestions];
+    const QUESTIONS = [
+      ...buildSpellingQuestions(),
+      ...buildCapitalTileQuestions(),
+      ...buildAbbrevQuestions()
+    ];
 
     // ====== UI hooks ======
     const sectionPill = document.getElementById("sectionPill");
@@ -439,19 +515,32 @@
     const img = document.getElementById("img");
     const qtitle = document.getElementById("qtitle");
     const qsub = document.getElementById("qsub");
+
     const answersEl = document.getElementById("answers");
-    const resultEl = document.getElementById("result");
-    const reviewBox = document.getElementById("reviewBox");
+    const tilesWrap = document.getElementById("tilesWrap");
+    const slotsEl = document.getElementById("slots");
+    const poolEl = document.getElementById("pool");
+    const clearBtn = document.getElementById("clearBtn");
+    const submitTilesBtn = document.getElementById("submitTilesBtn");
 
     const bottomRow = document.getElementById("bottomRow");
     const exitBtn = document.getElementById("exitBtn");
     const nextBtn = document.getElementById("nextBtn");
 
+    const resultEl = document.getElementById("result");
+    const reviewBox = document.getElementById("reviewBox");
+
     let idx = 0;
     let locked = false;
 
-    const results = []; // {q, chosen, correct}
-    const missed = new Set(); // store meaningful review items
+    const results = [];
+    const missed = new Set();
+
+    // Tiles state
+    let tileAnswer = [];         // array of letters placed (no spaces)
+    let tileUsed = [];           // booleans for pool tiles
+    let tileSlots = [];          // structure of slots including gaps: [{type:'slot', letter:''}|{type:'gap'}]
+    let tilePoolLetters = [];    // letters in pool for current question
 
     function setProgress(){
       const n = QUESTIONS.length;
@@ -462,20 +551,30 @@
       sectionPill.textContent = QUESTIONS[idx].section;
     }
 
-    function renderQuestion(){
+    function resetCommonUI(){
       locked = false;
       nextBtn.disabled = true;
       resultEl.textContent = "";
       reviewBox.style.display = "none";
       reviewBox.innerHTML = "";
-      answersEl.style.display = "flex";
       bottomRow.style.display = "flex";
       nextBtn.style.display = "block";
 
+      // show/hide modes
+      answersEl.style.display = "none";
+      tilesWrap.classList.remove("show");
+      answersEl.innerHTML = "";
+      slotsEl.innerHTML = "";
+      poolEl.innerHTML = "";
+      submitTilesBtn.disabled = true;
+    }
+
+    function renderQuestion(){
+      resetCommonUI();
       const q = QUESTIONS[idx];
       setProgress();
 
-      // image rules
+      // Image rules
       if(q.showImage && q.img){
         imgbox.classList.add("show");
         img.src = q.img;
@@ -489,27 +588,36 @@
       qtitle.textContent = q.title;
       qsub.textContent = q.subtitle;
 
+      if(q.mode === "mc"){
+        answersEl.style.display = "flex";
+        renderMC(q);
+      } else {
+        tilesWrap.classList.add("show");
+        renderTiles(q);
+      }
+
+      nextBtn.textContent = (idx === QUESTIONS.length - 1) ? "Finish" : "Next";
+    }
+
+    // ====== MC mode ======
+    function renderMC(q){
       answersEl.innerHTML = "";
       q.choices.forEach(choice => {
         const b = document.createElement("button");
         b.className = "choice";
         b.type = "button";
         b.textContent = choice;
-        b.addEventListener("click", () => chooseAnswer(choice));
+        b.addEventListener("click", () => chooseMC(q, choice));
         answersEl.appendChild(b);
       });
-
-      nextBtn.textContent = (idx === QUESTIONS.length - 1) ? "Finish" : "Next";
     }
 
-    function chooseAnswer(choice){
+    function chooseMC(q, choice){
       if(locked) return;
       locked = true;
 
-      const q = QUESTIONS[idx];
       const isCorrect = (choice === q.correct);
 
-      // mark buttons
       const btns = Array.from(document.querySelectorAll(".choice"));
       btns.forEach(b => {
         const t = b.textContent;
@@ -522,36 +630,165 @@
         resultEl.textContent = "✅ Nice!";
       } else {
         resultEl.textContent = "❌ Almost — keep going.";
-        // build better review text so "Spelling: Pick the correct spelling" never happens
-        let reviewItem = "";
-        if(q.section === "Spelling"){
-          // we can’t show the state during the question, but we CAN on the review page.
-          // Find which state this spelling question corresponded to via its image path.
-          const match = WEEK.find(s => s.img === q.img);
-          reviewItem = match ? `Spelling: ${match.state}` : `Spelling: (practice spelling)`;
-        } else if(q.section === "Capitals"){
-          reviewItem = `Capitals: ${q.title}`; // title is capital name
-        } else {
-          reviewItem = `Abbreviations: ${q.title}`; // title is state name
-        }
-        missed.add(reviewItem);
+        missed.add(q.reviewLabel);
       }
 
       results.push({ q, chosen: choice, correct: q.correct });
       nextBtn.disabled = false;
     }
 
+    // ====== Tiles mode (Capitals MVP) ======
+    function renderTiles(q){
+      // Build visual slots with gaps for spaces
+      tileAnswer = [];
+      tilePoolLetters = q.tiles.slice();
+      tileUsed = tilePoolLetters.map(() => false);
+
+      tileSlots = [];
+      const chars = q.correct.toUpperCase().split("");
+
+      chars.forEach(ch => {
+        if(ch === " "){
+          tileSlots.push({ type:"gap" });
+        } else if(ch >= "A" && ch <= "Z"){
+          tileSlots.push({ type:"slot", letter:"" });
+        } else {
+          // ignore punctuation for now (not needed for states)
+        }
+      });
+
+      drawSlots();
+      drawPool();
+
+      submitTilesBtn.disabled = true;
+      clearBtn.disabled = false;
+
+      clearBtn.onclick = () => clearTiles();
+      submitTilesBtn.onclick = () => checkTiles(q);
+    }
+
+    function drawSlots(){
+      slotsEl.innerHTML = "";
+      tileSlots.forEach((s) => {
+        if(s.type === "gap"){
+          const g = document.createElement("div");
+          g.className = "gap";
+          slotsEl.appendChild(g);
+        } else {
+          const d = document.createElement("div");
+          d.className = "slot" + (s.letter ? " filled" : "");
+          d.textContent = s.letter || "";
+          slotsEl.appendChild(d);
+        }
+      });
+    }
+
+    function drawPool(){
+      poolEl.innerHTML = "";
+      tilePoolLetters.forEach((letter, i) => {
+        const t = document.createElement("button");
+        t.type = "button";
+        t.className = "tile" + (tileUsed[i] ? " used" : "");
+        t.textContent = letter;
+        t.disabled = tileUsed[i];
+        t.addEventListener("click", () => tapTile(i));
+        poolEl.appendChild(t);
+      });
+    }
+
+    function tapTile(i){
+      if(locked) return;
+      if(tileUsed[i]) return;
+
+      // Find leftmost empty slot
+      const slotIndex = tileSlots.findIndex(s => s.type === "slot" && !s.letter);
+      if(slotIndex === -1) return; // already full
+
+      // Place letter
+      tileSlots[slotIndex].letter = tilePoolLetters[i];
+      tileUsed[i] = true;
+
+      // enable check if full
+      submitTilesBtn.disabled = !isTilesFilled();
+
+      drawSlots();
+      drawPool();
+    }
+
+    function isTilesFilled(){
+      return tileSlots.every(s => s.type === "gap" || (s.type === "slot" && s.letter));
+    }
+
+    function clearTiles(){
+      if(locked) return;
+      tileSlots.forEach(s => { if(s.type === "slot") s.letter = ""; });
+      tileUsed = tileUsed.map(() => false);
+      submitTilesBtn.disabled = true;
+      resultEl.textContent = "";
+      drawSlots();
+      drawPool();
+    }
+
+    function readTilesAnswer(){
+      // Join letters ignoring gaps
+      return tileSlots.filter(s => s.type === "slot").map(s => s.letter).join("");
+    }
+
+    function normalizeState(s){
+      return s.toUpperCase().replace(/[^A-Z]/g,"");
+    }
+
+    function checkTiles(q){
+      if(locked) return;
+      if(!isTilesFilled()) return;
+
+      locked = true;
+      clearBtn.disabled = true;
+      submitTilesBtn.disabled = true;
+
+      const typed = readTilesAnswer();
+      const correct = normalizeState(q.correct);
+
+      const isCorrect = (typed === correct);
+
+      if(isCorrect){
+        resultEl.textContent = "✅ Nice!";
+      } else {
+        resultEl.textContent = "❌ Almost — try Clear and try again.";
+        missed.add(q.reviewLabel);
+        // Allow retry without advancing: unlock again
+        locked = false;
+        clearBtn.disabled = false;
+        submitTilesBtn.disabled = false;
+        // keep Next disabled until they get it right OR we allow next anyway (your call)
+        nextBtn.disabled = true;
+        results.push({ q, chosen: typed, correct: correct });
+        return;
+      }
+
+      results.push({ q, chosen: typed, correct: correct });
+      nextBtn.disabled = false;
+    }
+
+    // ====== Summary ======
     function showSummary(){
       const total = results.length;
-      const correctCount = results.filter(r => r.chosen === r.correct).length;
+      const correctCount = results.filter(r => {
+        // For tiles, compare normalized strings
+        if(r.q.mode === "tiles"){
+          return String(r.chosen) === String(r.correct);
+        }
+        return r.chosen === r.correct;
+      }).length;
+
       const pct = Math.round((correctCount / total) * 100);
 
-      // Stop showing question UI
+      // hide quiz UI
       imgbox.classList.remove("show");
-      answersEl.style.display = "none";   // THIS removes the huge white-space problem
+      answersEl.style.display = "none";
+      tilesWrap.classList.remove("show");
       resultEl.textContent = "";
 
-      // Headline
       sectionPill.textContent = "Done";
       bar.style.width = "100%";
       barText.textContent = `${total} of ${total}`;
@@ -559,39 +796,31 @@
       qtitle.textContent = `Score: ${pct}%`;
       qsub.textContent = `You got ${correctCount} out of ${total} correct.`;
 
-      // Buttons: keep one clear action
+      // buttons
       exitBtn.textContent = "Back to Week 2";
       nextBtn.style.display = "none";
 
-      // Review text + tip
       const misses = Array.from(missed);
+      const perfect = (pct === 100 && misses.length === 0);
 
-      let tipText = `Tip: Go back to Study, then try again.`;
-      let badgeText = `✅ Nice!`;
-      if(pct === 100){
-        tipText = `Tip: You nailed it. Do one quick study run tomorrow to lock it in.`;
-        badgeText = `🏆 Perfect score!`;
-      } else if(pct >= 80){
-        tipText = `Tip: Great job — review the missed ones once, then try again.`;
-        badgeText = `🌟 So close!`;
-      }
+      const tipText = perfect
+        ? "Perfect score! Nice work. Do one quick study run tomorrow to lock it in."
+        : "Tip: Review the missed ones, then try again when you're ready.";
+
+      const reviewTitle = perfect
+        ? "Nothing to review — nice work!"
+        : (misses.length ? "Review these:" : "Nice work!");
 
       const reviewHtml = `
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn secondary" type="button" onclick="window.location.href='./index.html'">Back to Week 2</button>
-          <div class="badge">${badgeText}</div>
-          <div style="height:6px;"></div>
-          <div style="font-weight:1000;color:var(--muted);"> ${pct === 100 ? "" : (misses.length ? "Review these:" : "Nothing to review — nice work!")}</div>
-          ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : `<div style="font-weight:900;">Nothing to review — nice work!</div>`}
-          <div class="small">${tipText}</div>
-        </div>
+        <h2>${reviewTitle}</h2>
+        ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : ""}
+        <div class="small">${tipText}</div>
       `;
-
-      // Show summary inside a dedicated block (no scroll)
       reviewBox.style.display = "block";
       reviewBox.innerHTML = reviewHtml;
     }
 
+    // ====== Nav ======
     nextBtn.addEventListener("click", () => {
       if(idx === QUESTIONS.length - 1){
         showSummary();
