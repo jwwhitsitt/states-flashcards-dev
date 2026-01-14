@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Week 2 – Check Your Learning</title>
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --link:#1d4ed8;
+      --bar:#c7d2fe;
+      --barbg:#e8ecf5;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* compact header (tiny tax) */
+    header{
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    header a{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:700;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      text-align:center;
+      flex:1;
+    }
+
+    main{
+      flex:1;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding:14px;
+      overflow:hidden; /* enforce no-scroll */
+    }
+
+    .wrap{
+      width:100%;
+      max-width:720px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-height:0;
+    }
+
+    .toprow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#28327a;
+      font-weight:900;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .bar{
+      position:relative;
+      flex:1;
+      height:18px;
+      background:var(--barbg);
+      border-radius:999px;
+      overflow:hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.06);
+      min-width:140px;
+    }
+    .barfill{
+      height:100%;
+      width:0%;
+      background:var(--bar);
+      transition:width .15s ease-in-out;
+    }
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:900;
+      color:#111;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:0;
+    }
+
+    .qimg{
+      width:100%;
+      max-height:28vh; /* key: keep no-scroll */
+      object-fit:contain;
+      border-radius:14px;
+      box-shadow:0 8px 18px rgba(0,0,0,.10);
+      background:#fff;
+    }
+
+    .qtitle{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      line-height:1.2;
+    }
+
+    .qprompt{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.25;
+    }
+
+    .choices{
+      display:grid;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    button.choice{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      font-size:16px;
+      font-weight:900;
+      text-align:left;
+      cursor:pointer;
+    }
+    button.choice:active{ transform:scale(.99); }
+    button.choice.correct{
+      border-color: rgba(22,163,74,.55);
+      background: rgba(22,163,74,.10);
+    }
+    button.choice.wrong{
+      border-color: rgba(220,38,38,.55);
+      background: rgba(220,38,38,.10);
+    }
+    button.choice:disabled{ cursor:not-allowed; }
+
+    .navrow{
+      display:flex;
+      gap:10px;
+      margin-top:auto;
+    }
+    .btn{
+      flex:1;
+      padding:12px 14px;
+      border-radius:14px;
+      border:0;
+      background:#0f172a;
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
+    }
+    .btn.secondary{
+      background:#e5e7eb;
+      color:#111827;
+      box-shadow:none;
+    }
+    .btn:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+
+    /* results */
+    .resultTitle{ font-size:20px; font-weight:1000; margin:0; }
+    .resultLine{ margin:0; color:var(--muted); line-height:1.3; }
+    .misses{ display:grid; gap:8px; }
+    .miss{
+      padding:10px 12px;
+      border-radius:14px;
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      font-size:14px;
+      font-weight:800;
+    }
+    .miss b{ color:var(--bad); }
+
+    @media (max-width:480px){
+      header h1{ font-size:14px; }
+      .qtitle{ font-size:17px; }
+      button.choice{ font-size:15px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Check Your Learning</h1>
+    <span style="width:58px"></span>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="toprow">
+        <div class="pill" id="sectionPill">Spelling</div>
+        <div class="bar" aria-label="Progress">
+          <div class="barfill" id="barFill"></div>
+          <div class="bartext" id="barText">1 of 1</div>
+        </div>
+      </div>
+
+      <section class="card" id="card">
+        <img id="qImg" class="qimg" alt="" style="display:none" />
+        <p class="qtitle" id="qTitle"></p>
+        <p class="qprompt" id="qPrompt"></p>
+        <div class="choices" id="choices"></div>
+
+        <div class="navrow">
+          <button class="btn secondary" id="exitBtn">Exit</button>
+          <button class="btn" id="nextBtn" disabled>Next</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ========= WEEK 2 DATA =========
+    // Update these if your week 2 set is different.
+    // imageFront: use your state map image path if you want visuals in test.
+    const WEEK2 = [
+      { state: "Pennsylvania", abbrev: "PA", imageFront: "./images/pa-f.png" },
+      { state: "New Jersey",   abbrev: "NJ", imageFront: "./images/nj-f.png" },
+      { state: "New York",     abbrev: "NY", imageFront: "./images/ny-f.png" },
+      { state: "Delaware",     abbrev: "DE", imageFront: "./images/de-f.png" }
+    ];
+
+    // Capitals for Quiz 2 (MVP multiple-choice tonight)
+    // Make sure these are correct before using with Melly.
+    const CAPITALS = {
+      "Pennsylvania": "Harrisburg",
+      "New Jersey": "Trenton",
+      "New York": "Albany",
+      "Delaware": "Dover"
+    };
+
+    const ALL_ABBREV = [
+      "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO",
+      "MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+    ];
+
+    // ========= UTIL =========
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+    function unique(arr){ return [...new Set(arr)]; }
+
+    function pickWrongFrom(list, correct){
+      const pool = list.filter(x=>x!==correct);
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
+
+    // “sounds right” distractor for spelling (customize later)
+    function phoneticWrong(state){
+      const s = state.toLowerCase();
+      if(s === "pennsylvania") return "Pencilvainya";
+      if(s === "new jersey") return "New Jerzee";
+      if(s === "new york") return "New Yorc";
+      if(s === "delaware") return "Della-where";
+      return state.replace(/s/gi,"z");
+    }
+    function visualWrong(state){
+      // gentle wrong: drop a letter or double one
+      if(state.length < 6) return state + state[state.length-1];
+      return state.slice(0,2) + state.slice(3); // remove 3rd char
+    }
+
+    // ========= BUILD TEST =========
+    // Three sections, each contains ALL states
+    // Section 1: spelling correct
+    // Section 2: capital -> state (MC)
+    // Section 3: abbreviation (MC)
+    const questions = [];
+
+    // Section 1: spelling
+    WEEK2.forEach(s=>{
+      const correct = s.state;
+      const opts = unique([
+        correct,
+        phoneticWrong(correct),
+        visualWrong(correct),
+        pickWrongFrom(WEEK2.map(x=>x.state), correct)
+      ]).slice(0,4);
+
+      questions.push({
+        section: 1,
+        sectionName: "Spelling",
+        img: s.imageFront,
+        title: correct,
+        prompt: "Which one is spelled correctly?",
+        options: shuffle(opts),
+        answer: correct
+      });
+    });
+
+    // Section 2: capitals -> state name (MC)
+    WEEK2.forEach(s=>{
+      const correctState = s.state;
+      const capital = CAPITALS[correctState] || "Unknown";
+      const wrongStates = shuffle(WEEK2.map(x=>x.state).filter(n=>n!==correctState)).slice(0,3);
+      const opts = shuffle([correctState, ...wrongStates]);
+
+      questions.push({
+        section: 2,
+        sectionName: "Capitals",
+        img: s.imageFront,
+        title: capital,
+        prompt: "Which state has this capital?",
+        options: opts,
+        answer: correctState
+      });
+    });
+
+    // Section 3: abbreviations
+    WEEK2.forEach(s=>{
+      const correctAb = s.abbrev;
+      const wrongs = unique([
+        pickWrongFrom(ALL_ABBREV, correctAb),
+        pickWrongFrom(ALL_ABBREV, correctAb),
+        pickWrongFrom(ALL_ABBREV, correctAb),
+        pickWrongFrom(ALL_ABBREV, correctAb)
+      ]).slice(0,4);
+
+      const opts = shuffle([correctAb, ...wrongs]);
+
+      questions.push({
+        section: 3,
+        sectionName: "Abbreviations",
+        img: s.imageFront,
+        title: s.state,
+        prompt: "Pick the correct abbreviation:",
+        options: opts,
+        answer: correctAb
+      });
+    });
+
+    // ========= UI =========
+    const sectionPill = document.getElementById("sectionPill");
+    const barFill = document.getElementById("barFill");
+    const barText = document.getElementById("barText");
+    const qImg = document.getElementById("qImg");
+    const qTitle = document.getElementById("qTitle");
+    const qPrompt = document.getElementById("qPrompt");
+    const choicesEl = document.getElementById("choices");
+    const nextBtn = document.getElementById("nextBtn");
+    const exitBtn = document.getElementById("exitBtn");
+    const card = document.getElementById("card");
+
+    let i = 0;
+    let correctCount = 0;
+    const missed = [];
+
+    exitBtn.onclick = ()=> location.href = "./index.html";
+    nextBtn.onclick = ()=> {
+      i++;
+      if(i >= questions.length) showResults();
+      else render();
+    };
+
+    function setProgress(){
+      const total = questions.length;
+      const pct = Math.round(((i+1)/total)*100);
+      barFill.style.width = pct + "%";
+      barText.textContent = `${i+1} of ${total}`;
+    }
+
+    function render(){
+      const q = questions[i];
+      nextBtn.disabled = true;
+      sectionPill.textContent = q.sectionName;
+      setProgress();
+
+      // image (optional)
+      if(q.img){
+        qImg.src = q.img;
+        qImg.alt = q.title;
+        qImg.style.display = "block";
+      } else {
+        qImg.style.display = "none";
+      }
+
+      qTitle.textContent = q.title;
+      qPrompt.textContent = q.prompt;
+
+      choicesEl.innerHTML = "";
+      q.options.forEach(opt=>{
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.textContent = opt;
+        b.onclick = ()=> pick(opt, b);
+        choicesEl.appendChild(b);
+      });
+    }
+
+    function pick(picked, btn){
+      const q = questions[i];
+      const buttons = [...choicesEl.querySelectorAll("button.choice")];
+      buttons.forEach(b=> b.disabled = true);
+
+      const correct = (picked === q.answer);
+      if(correct){
+        correctCount++;
+        btn.classList.add("correct");
+      } else {
+        btn.classList.add("wrong");
+        buttons.forEach(b=>{
+          if(b.textContent === q.answer) b.classList.add("correct");
+        });
+        missed.push({ q, picked });
+      }
+
+      // subtle delay, then enable next (no retries)
+      setTimeout(()=> { nextBtn.disabled = false; }, 250);
+    }
+
+    function showResults(){
+      const total = questions.length;
+      const pct = Math.round((correctCount/total)*100);
+
+      let msg = "";
+      if(pct === 100) msg = "Perfect. You crushed it.";
+      else if(pct >= 85) msg = "Nice work. Review the missed ones once, then try again.";
+      else if(pct >= 70) msg = "Good effort. A quick review will bump this score up fast.";
+      else msg = "No worries. Review flashcards again, then try the test one more time.";
+
+      // Build results UI inside the same card to avoid extra pages
+      const missHtml = missed.length
+        ? `<div class="misses">${missed.map(m => (
+            `<div class="miss"><b>Review:</b> ${m.q.sectionName} — <span style="color:var(--muted)">${m.q.title}</span> → <span style="color:var(--good);font-weight:1000;">${m.q.answer}</span></div>`
+          )).join("")}</div>`
+        : `<div class="misses"><div class="miss">No missed questions. 🔥</div></div>`;
+
+      card.innerHTML = `
+        <p class="resultTitle">Results</p>
+        <p class="qtitle" style="margin:0">Score: ${correctCount} / ${total} (${pct}%)</p>
+        <p class="resultLine">${msg}</p>
+        ${missHtml}
+        <div class="navrow">
+          <button class="btn secondary" onclick="location.href='./index.html'">← Back</button>
+          <button class="btn" onclick="location.reload()">Try Again</button>
+        </div>
+      `;
+    }
+
+    // start
+    render();
+  </script>
+</body>
+</html>
