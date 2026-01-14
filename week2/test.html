@@ -1,840 +1,282 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Week 2 – Check Your Learning (DEV)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Week 2 – Check Your Learning</title>
 
-  <style>
-    :root{
-      --bg:#f4f6fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#475569;
-      --shadow:0 10px 30px rgba(15,23,42,.12);
-      --radius:18px;
-      --link:#1d4ed8;
-      --btn:#0f172a;
-      --btn2:#e5e7eb;
-      --btn2text:#111827;
-      --bar:#c7d2fe;
-      --barbg:#e5e7eb;
-      --good:#22c55e;
-      --bad:#ef4444;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden; /* no scroll */
-    }
-    header{
-      padding:10px 14px;
-      background:#fff;
-      box-shadow:0 1px 10px rgba(0,0,0,.06);
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    header a{
-      text-decoration:none;
-      color:var(--link);
-      font-weight:900;
-      white-space:nowrap;
-    }
-    header h1{
-      margin:0;
-      font-size:16px;
-      font-weight:1000;
-      text-align:center;
-      flex:1;
-    }
-    header .spacer{ width:52px; }
+<style>
+:root{
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#475569;
+  --shadow:0 10px 30px rgba(15,23,42,.12);
+  --radius:18px;
+  --link:#1d4ed8;
+  --btn:#0f172a;
+  --btn2:#e5e7eb;
+}
 
-    main{
-      flex:1;
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      padding:10px 12px;
-      overflow:hidden;
-    }
-    .wrap{
-      width:100%;
-      max-width:720px;
-      min-height:0;
-    }
+*{box-sizing:border-box}
 
-    .toprow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:8px;
-    }
-    .pill{
-      background:#dbeafe;
-      color:#1e3a8a;
-      font-weight:1000;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:14px;
-      min-width:92px;
-      text-align:center;
-      white-space:nowrap;
-    }
-    .barwrap{
-      flex:1;
-      height:18px;
-      background:var(--barbg);
-      border-radius:999px;
-      position:relative;
-      overflow:hidden;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-    }
-    .bar{
-      height:100%;
-      width:0%;
-      background:var(--bar);
-      border-radius:999px;
-      transition:width .25s ease;
-    }
-    .bartext{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:1000;
-      color:#111827;
-      font-size:14px;
-      text-shadow:0 1px 0 rgba(255,255,255,.75);
-      pointer-events:none;
-    }
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
 
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      height:calc(100vh - 62px - 20px - 34px);
-      max-height:760px;
-      overflow:hidden;
-    }
+header{
+  padding:10px 14px;
+  background:#fff;
+  box-shadow:0 1px 10px rgba(0,0,0,.06);
+  display:flex;
+  align-items:center;
+}
+header a{
+  color:var(--link);
+  text-decoration:none;
+  font-weight:900;
+}
+header h1{
+  flex:1;
+  text-align:center;
+  margin:0;
+  font-size:16px;
+  font-weight:1000;
+}
 
-    .imgbox{
-      border-radius:16px;
-      background:#fff;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:8px;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      height:185px;
-      overflow:hidden;
-    }
-    .imgbox.show{ display:flex; }
-    .imgbox img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      border-radius:12px;
-    }
+main{
+  flex:1;
+  padding:12px;
+  display:flex;
+  justify-content:center;
+}
 
-    .qtitle{
-      font-size:28px;
-      font-weight:1000;
-      line-height:1.05;
-      margin-top:2px;
-    }
-    .qsub{
-      color:var(--muted);
-      font-weight:800;
-      margin-bottom:0;
-      font-size:16px;
-      line-height:1.15;
-    }
+.card{
+  background:var(--card);
+  width:100%;
+  max-width:720px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
 
-    /* MC answers */
-    .answers{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      flex:1;
-      min-height:0;
-      overflow:hidden;
-      justify-content:flex-start;
-    }
-    .choice{
-      border-radius:14px;
-      border:2px solid #e5e7eb;
-      background:#fff;
-      padding:10px 12px;
-      font-size:18px;
-      font-weight:1000;
-      text-align:left;
-      cursor:pointer;
-      transition:transform .05s ease, border-color .1s ease, background .1s ease;
-      line-height:1.2;
-    }
-    .choice:active{ transform:scale(.995); }
-    .choice.correct{ border-color:var(--good); background:#ecfdf5; }
-    .choice.wrong{ border-color:var(--bad); background:#fef2f2; }
+/* ===== Prompt ===== */
+.capital{
+  font-size:28px;
+  font-weight:1000;
+}
+.sub{
+  color:var(--muted);
+  font-weight:800;
+}
 
-    /* Tiles mode */
-    .tilesWrap{
-      display:none;
-      flex:1;
-      min-height:0;
-      overflow:hidden;
-      gap:10px;
-      flex-direction:column;
-    }
-    .tilesWrap.show{ display:flex; }
+/* ===== Answer Rail ===== */
+.answer-row{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:nowrap;
+}
 
-    .slots{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      justify-content:center;
-      align-items:center;
-      padding:6px 0;
-      min-height:64px;
-    }
-    .slot{
-      width:42px;
-      height:46px;
-      border-radius:12px;
-      background:#f8fafc;
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:1000;
-      font-size:20px;
-      user-select:none;
-    }
-    .slot.filled{
-      background:#fff;
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.10);
-    }
-    .gap{
-      width:22px; /* visual space between words */
-      height:46px;
-    }
+/* size tiers (locked per question) */
+.answer-row.large .slot{ width:44px; height:44px; font-size:22px; }
+.answer-row.medium .slot{ width:38px; height:38px; font-size:18px; }
+.answer-row.small .slot{ width:32px; height:32px; font-size:16px; }
 
-    .pool{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      justify-content:center;
-      align-items:center;
-      padding:6px 0;
-      overflow:hidden;
-    }
-    .tile{
-      min-width:44px;
-      height:44px;
-      padding:0 12px;
-      border-radius:14px;
-      border:2px solid #e5e7eb;
-      background:#fff;
-      font-weight:1000;
-      font-size:18px;
-      cursor:pointer;
-      user-select:none;
-      box-shadow:0 8px 16px rgba(0,0,0,.08);
-    }
-    .tile:active{ transform:scale(.99); }
-    .tile.used{
-      opacity:.35;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
+.slot{
+  border:2px dashed #cbd5e1;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:1000;
+  background:#fff;
+}
 
-    .tileControls{
-      display:flex;
-      gap:10px;
-      margin-top:auto;
-    }
+/* space between words */
+.slot.space{
+  border:none;
+  width:14px;
+}
 
-    /* Bottom buttons */
-    .bottom{
-      display:flex;
-      gap:10px;
-      margin-top:2px;
-    }
-    .btn{
-      flex:1;
-      padding:11px 14px;
-      border-radius:14px;
-      border:0;
-      font-size:16px;
-      font-weight:1000;
-      cursor:pointer;
-      background:var(--btn);
-      color:#fff;
-      box-shadow:0 10px 20px rgba(0,0,0,.10);
-    }
-    .btn.secondary{
-      background:var(--btn2);
-      color:var(--btn2text);
-      box-shadow:none;
-    }
-    .btn:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
+/* ===== Tile Pool ===== */
+.pool{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+}
 
-    .result{
-      text-align:center;
-      font-weight:1000;
-      color:var(--muted);
-      font-size:14px;
-      margin-top:2px;
-      min-height:18px;
-    }
+.tile{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  border:2px solid #e5e7eb;
+  background:#fff;
+  font-size:22px;
+  font-weight:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.tile.used{
+  opacity:.25;
+  pointer-events:none;
+}
 
-    .reviewBox{
-      display:none;
-      border-radius:16px;
-      background:#f8fafc;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      padding:10px 12px;
-      overflow:hidden;
-    }
-    .reviewBox h2{
-      margin:0 0 6px 0;
-      font-size:16px;
-      font-weight:1000;
-    }
-    .reviewBox ul{
-      margin:0;
-      padding-left:18px;
-      color:#111827;
-      font-weight:800;
-    }
-    .small{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
-      margin-top:6px;
-      line-height:1.2;
-    }
-  </style>
+/* ===== Buttons ===== */
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:auto;
+}
+button{
+  flex:1;
+  padding:12px;
+  border-radius:14px;
+  border:0;
+  font-size:16px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.primary{
+  background:var(--btn);
+  color:#fff;
+}
+.secondary{
+  background:var(--btn2);
+  color:#111827;
+}
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+/* ===== Feedback ===== */
+.result{
+  text-align:center;
+  font-weight:1000;
+}
+.correct{ color:#16a34a; }
+.wrong{ color:#dc2626; }
+
+</style>
 </head>
 
 <body>
-  <header>
-    <a href="./index.html">← Back</a>
-    <h1>Check Your Learning</h1>
-    <div class="spacer"></div>
-  </header>
 
-  <main>
-    <div class="wrap">
-      <div class="toprow">
-        <div class="pill" id="sectionPill">Spelling</div>
-        <div class="barwrap" aria-label="Progress">
-          <div class="bar" id="bar"></div>
-          <div class="bartext" id="barText">1 of 12</div>
-        </div>
-      </div>
+<header>
+  <a href="./index.html">← Back</a>
+  <h1>Check Your Learning</h1>
+</header>
 
-      <section class="card" id="card">
-        <div class="imgbox" id="imgbox"><img id="img" alt="" /></div>
+<main>
+  <section class="card">
 
-        <div class="qtitle" id="qtitle">Pick the correct spelling</div>
-        <div class="qsub" id="qsub">Tap one answer.</div>
+    <div class="capital" id="capital">Harrisburg</div>
+    <div class="sub">Tap the letters to spell the state.</div>
 
-        <!-- Multiple choice -->
-        <div class="answers" id="answers"></div>
+    <div class="answer-row" id="answerRow"></div>
 
-        <!-- Tiles mode -->
-        <div class="tilesWrap" id="tilesWrap">
-          <div class="slots" id="slots"></div>
-          <div class="pool" id="pool"></div>
+    <div class="pool" id="pool"></div>
 
-          <div class="tileControls">
-            <button class="btn secondary" id="clearBtn" type="button">Clear</button>
-            <button class="btn" id="submitTilesBtn" type="button" disabled>Check</button>
-          </div>
-        </div>
+    <div class="result" id="result>"></div>
 
-        <div class="bottom" id="bottomRow">
-          <button class="btn secondary" id="exitBtn">Exit</button>
-          <button class="btn" id="nextBtn" disabled>Next</button>
-        </div>
-
-        <div class="result" id="result"></div>
-        <div class="reviewBox" id="reviewBox"></div>
-      </section>
+    <div class="actions">
+      <button class="secondary" id="clearBtn">Clear</button>
+      <button class="primary" id="checkBtn">Check</button>
     </div>
-  </main>
 
-  <script>
-    // ====== Data ======
-    const WEEK = [
-      { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", img:"./images/pa-f.png" },
-      { state:"New Jersey",   abbrev:"NJ", capital:"Trenton",    img:"./images/nj-f.png" },
-      { state:"New York",     abbrev:"NY", capital:"Albany",     img:"./images/ny-f.png" },
-      { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
-    ];
+  </section>
+</main>
+
+<script>
+/* ===== DATA ===== */
+const question = {
+  capital:"Harrisburg",
+  answer:"PENNSYLVANIA"
+};
+
+/* ===== SETUP ===== */
+const answerRow = document.getElementById("answerRow");
+const pool = document.getElementById("pool");
+const result = document.getElementById("result");
+const clearBtn = document.getElementById("clearBtn");
+const checkBtn = document.getElementById("checkBtn");
+
+const letters = question.answer.split("");
+let filled = [];
+
+/* ===== SIZE LOGIC ===== */
+const len = question.answer.replace(" ","").length;
+if(len <= 8) answerRow.classList.add("large");
+else if(len <= 11) answerRow.classList.add("medium");
+else answerRow.classList.add("small");
+
+/* ===== BUILD ANSWER SLOTS ===== */
+letters.forEach(l=>{
+  if(l===" "){
+    const s = document.createElement("div");
+    s.className="slot space";
+    answerRow.appendChild(s);
+  }else{
+    const s = document.createElement("div");
+    s.className="slot";
+    answerRow.appendChild(s);
+  }
+});
+
+/* ===== BUILD TILE POOL ===== */
+const shuffled = [...letters].filter(l=>l!==" ").sort(()=>Math.random()-.5);
+shuffled.forEach(l=>{
+  const t = document.createElement("div");
+  t.className="tile";
+  t.textContent=l;
+  t.onclick=()=>placeTile(t,l);
+  pool.appendChild(t);
+});
+
+/* ===== FUNCTIONS ===== */
+function placeTile(tile, letter){
+  const slots=[...document.querySelectorAll(".slot")];
+  const empty=slots.find(s=>!s.textContent);
+  if(!empty) return;
+  empty.textContent=letter;
+  tile.classList.add("used");
+  filled.push(letter);
+}
+
+function clearAll(){
+  document.querySelectorAll(".slot").forEach(s=>s.textContent="");
+  document.querySelectorAll(".tile").forEach(t=>t.classList.remove("used"));
+  filled=[];
+  result.textContent="";
+}
+
+function checkAnswer(){
+  const attempt = filled.join("");
+  if(attempt===question.answer.replace(" ","")){
+    result.textContent="✅ Nice job!";
+    result.className="result correct";
+  }else{
+    result.textContent="❌ Almost — try again.";
+    result.className="result wrong";
+  }
+}
+
+clearBtn.onclick=clearAll;
+checkBtn.onclick=checkAnswer;
+</script>
 
-    const ABBREV_POOL = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-                         "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-                         "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-
-    function shuffle(arr){
-      const a = arr.slice();
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
-      }
-      return a;
-    }
-
-    function pickDistinct(pool, count, excludeSet){
-      const out = [];
-      const p = shuffle(pool).filter(x => !excludeSet.has(x));
-      for(const item of p){
-        if(out.length>=count) break;
-        out.push(item);
-      }
-      return out;
-    }
-
-    // spelling fakes
-    const SPELLING_FAKES = {
-      "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania","Pennsilvanya","Pensilvanya"],
-      "New Jersey":["New Jerzee","New Jersy","New Jersie","New Jersei","New Jerzy"],
-      "New York":["New Yorc","Nu York","New Yark","New Yorck","New Yorrk"],
-      "Delaware":["Delawair","Delawere","Della-ware","Delawar","Delawear"]
-    };
-
-    // ====== Question builders ======
-
-    // Part 1: Spelling (MC, always 4, always includes correct)
-    function buildSpellingQuestions(){
-      return WEEK.map(s => {
-        const correct = s.state;
-        let fakes = shuffle((SPELLING_FAKES[correct] || []).slice()).filter(x => x && x !== correct);
-
-        // Ensure at least 3 fakes (basic fallback mutations)
-        while(fakes.length < 3){
-          const base = correct.replace(/\s+/g," ");
-          const candidate = base.replace(/ph/g,"f").replace(/york/ig,"yorc").replace(/ware/ig,"wair");
-          if(candidate !== correct && !fakes.includes(candidate)) fakes.push(candidate);
-          if(fakes.length >= 3) break;
-          const candidate2 = correct.replace(/syl/ig,"sil");
-          if(candidate2 !== correct && !fakes.includes(candidate2)) fakes.push(candidate2);
-          if(fakes.length >= 3) break;
-          const candidate3 = correct + "e";
-          if(candidate3 !== correct && !fakes.includes(candidate3)) fakes.push(candidate3);
-        }
-
-        const choices = shuffle([correct, ...fakes.slice(0,3)]);
-        return {
-          mode:"mc",
-          section:"Spelling",
-          showImage:true,
-          img:s.img,
-          title:"Pick the correct spelling",
-          subtitle:"Which one is spelled correctly?",
-          correct,
-          choices,
-          reviewLabel:`Spelling: ${correct}`
-        };
-      });
-    }
-
-    // Part 2: Capitals (TILES MVP)
-    function buildCapitalTileQuestions(){
-      return WEEK.map(s => {
-        return {
-          mode:"tiles",
-          section:"Capitals",
-          showImage:false,
-          img:null,
-          title:s.capital,
-          subtitle:"Tap the letters to spell the state.",
-          correct:s.state,
-          tiles: buildTilesForState(s.state),
-          reviewLabel:`Capitals: ${s.capital} → ${s.state}`
-        };
-      });
-    }
-
-    // Part 3: Abbrev (MC)
-    function buildAbbrevQuestions(){
-      return WEEK.map(s => {
-        const correct = s.abbrev;
-        const wrongs = pickDistinct(ABBREV_POOL, 3, new Set([correct]));
-        const choices = shuffle([correct, ...wrongs]);
-        return {
-          mode:"mc",
-          section:"Abbreviations",
-          showImage:false,
-          img:null,
-          title:s.state,
-          subtitle:"Which abbreviation matches this state?",
-          correct,
-          choices,
-          reviewLabel:`Abbreviations: ${s.state} → ${s.abbrev}`
-        };
-      });
-    }
-
-    // Build tiles from state name (letters only). Spaces become gaps in the slots.
-    function buildTilesForState(stateName){
-      // Only letters (A–Z). Keep duplicates.
-      const letters = stateName.toUpperCase().split("").filter(ch => ch >= "A" && ch <= "Z");
-      return shuffle(letters);
-    }
-
-    const QUESTIONS = [
-      ...buildSpellingQuestions(),
-      ...buildCapitalTileQuestions(),
-      ...buildAbbrevQuestions()
-    ];
-
-    // ====== UI hooks ======
-    const sectionPill = document.getElementById("sectionPill");
-    const bar = document.getElementById("bar");
-    const barText = document.getElementById("barText");
-
-    const imgbox = document.getElementById("imgbox");
-    const img = document.getElementById("img");
-    const qtitle = document.getElementById("qtitle");
-    const qsub = document.getElementById("qsub");
-
-    const answersEl = document.getElementById("answers");
-    const tilesWrap = document.getElementById("tilesWrap");
-    const slotsEl = document.getElementById("slots");
-    const poolEl = document.getElementById("pool");
-    const clearBtn = document.getElementById("clearBtn");
-    const submitTilesBtn = document.getElementById("submitTilesBtn");
-
-    const bottomRow = document.getElementById("bottomRow");
-    const exitBtn = document.getElementById("exitBtn");
-    const nextBtn = document.getElementById("nextBtn");
-
-    const resultEl = document.getElementById("result");
-    const reviewBox = document.getElementById("reviewBox");
-
-    let idx = 0;
-    let locked = false;
-
-    const results = [];
-    const missed = new Set();
-
-    // Tiles state
-    let tileAnswer = [];         // array of letters placed (no spaces)
-    let tileUsed = [];           // booleans for pool tiles
-    let tileSlots = [];          // structure of slots including gaps: [{type:'slot', letter:''}|{type:'gap'}]
-    let tilePoolLetters = [];    // letters in pool for current question
-
-    function setProgress(){
-      const n = QUESTIONS.length;
-      const pos = idx + 1;
-      const pct = Math.round((pos / n) * 100);
-      bar.style.width = pct + "%";
-      barText.textContent = `${pos} of ${n}`;
-      sectionPill.textContent = QUESTIONS[idx].section;
-    }
-
-    function resetCommonUI(){
-      locked = false;
-      nextBtn.disabled = true;
-      resultEl.textContent = "";
-      reviewBox.style.display = "none";
-      reviewBox.innerHTML = "";
-      bottomRow.style.display = "flex";
-      nextBtn.style.display = "block";
-
-      // show/hide modes
-      answersEl.style.display = "none";
-      tilesWrap.classList.remove("show");
-      answersEl.innerHTML = "";
-      slotsEl.innerHTML = "";
-      poolEl.innerHTML = "";
-      submitTilesBtn.disabled = true;
-    }
-
-    function renderQuestion(){
-      resetCommonUI();
-      const q = QUESTIONS[idx];
-      setProgress();
-
-      // Image rules
-      if(q.showImage && q.img){
-        imgbox.classList.add("show");
-        img.src = q.img;
-        img.alt = "State flashcard";
-      } else {
-        imgbox.classList.remove("show");
-        img.src = "";
-        img.alt = "";
-      }
-
-      qtitle.textContent = q.title;
-      qsub.textContent = q.subtitle;
-
-      if(q.mode === "mc"){
-        answersEl.style.display = "flex";
-        renderMC(q);
-      } else {
-        tilesWrap.classList.add("show");
-        renderTiles(q);
-      }
-
-      nextBtn.textContent = (idx === QUESTIONS.length - 1) ? "Finish" : "Next";
-    }
-
-    // ====== MC mode ======
-    function renderMC(q){
-      answersEl.innerHTML = "";
-      q.choices.forEach(choice => {
-        const b = document.createElement("button");
-        b.className = "choice";
-        b.type = "button";
-        b.textContent = choice;
-        b.addEventListener("click", () => chooseMC(q, choice));
-        answersEl.appendChild(b);
-      });
-    }
-
-    function chooseMC(q, choice){
-      if(locked) return;
-      locked = true;
-
-      const isCorrect = (choice === q.correct);
-
-      const btns = Array.from(document.querySelectorAll(".choice"));
-      btns.forEach(b => {
-        const t = b.textContent;
-        if(t === q.correct) b.classList.add("correct");
-        else if(t === choice) b.classList.add("wrong");
-        b.disabled = true;
-      });
-
-      if(isCorrect){
-        resultEl.textContent = "✅ Nice!";
-      } else {
-        resultEl.textContent = "❌ Almost — keep going.";
-        missed.add(q.reviewLabel);
-      }
-
-      results.push({ q, chosen: choice, correct: q.correct });
-      nextBtn.disabled = false;
-    }
-
-    // ====== Tiles mode (Capitals MVP) ======
-    function renderTiles(q){
-      // Build visual slots with gaps for spaces
-      tileAnswer = [];
-      tilePoolLetters = q.tiles.slice();
-      tileUsed = tilePoolLetters.map(() => false);
-
-      tileSlots = [];
-      const chars = q.correct.toUpperCase().split("");
-
-      chars.forEach(ch => {
-        if(ch === " "){
-          tileSlots.push({ type:"gap" });
-        } else if(ch >= "A" && ch <= "Z"){
-          tileSlots.push({ type:"slot", letter:"" });
-        } else {
-          // ignore punctuation for now (not needed for states)
-        }
-      });
-
-      drawSlots();
-      drawPool();
-
-      submitTilesBtn.disabled = true;
-      clearBtn.disabled = false;
-
-      clearBtn.onclick = () => clearTiles();
-      submitTilesBtn.onclick = () => checkTiles(q);
-    }
-
-    function drawSlots(){
-      slotsEl.innerHTML = "";
-      tileSlots.forEach((s) => {
-        if(s.type === "gap"){
-          const g = document.createElement("div");
-          g.className = "gap";
-          slotsEl.appendChild(g);
-        } else {
-          const d = document.createElement("div");
-          d.className = "slot" + (s.letter ? " filled" : "");
-          d.textContent = s.letter || "";
-          slotsEl.appendChild(d);
-        }
-      });
-    }
-
-    function drawPool(){
-      poolEl.innerHTML = "";
-      tilePoolLetters.forEach((letter, i) => {
-        const t = document.createElement("button");
-        t.type = "button";
-        t.className = "tile" + (tileUsed[i] ? " used" : "");
-        t.textContent = letter;
-        t.disabled = tileUsed[i];
-        t.addEventListener("click", () => tapTile(i));
-        poolEl.appendChild(t);
-      });
-    }
-
-    function tapTile(i){
-      if(locked) return;
-      if(tileUsed[i]) return;
-
-      // Find leftmost empty slot
-      const slotIndex = tileSlots.findIndex(s => s.type === "slot" && !s.letter);
-      if(slotIndex === -1) return; // already full
-
-      // Place letter
-      tileSlots[slotIndex].letter = tilePoolLetters[i];
-      tileUsed[i] = true;
-
-      // enable check if full
-      submitTilesBtn.disabled = !isTilesFilled();
-
-      drawSlots();
-      drawPool();
-    }
-
-    function isTilesFilled(){
-      return tileSlots.every(s => s.type === "gap" || (s.type === "slot" && s.letter));
-    }
-
-    function clearTiles(){
-      if(locked) return;
-      tileSlots.forEach(s => { if(s.type === "slot") s.letter = ""; });
-      tileUsed = tileUsed.map(() => false);
-      submitTilesBtn.disabled = true;
-      resultEl.textContent = "";
-      drawSlots();
-      drawPool();
-    }
-
-    function readTilesAnswer(){
-      // Join letters ignoring gaps
-      return tileSlots.filter(s => s.type === "slot").map(s => s.letter).join("");
-    }
-
-    function normalizeState(s){
-      return s.toUpperCase().replace(/[^A-Z]/g,"");
-    }
-
-    function checkTiles(q){
-      if(locked) return;
-      if(!isTilesFilled()) return;
-
-      locked = true;
-      clearBtn.disabled = true;
-      submitTilesBtn.disabled = true;
-
-      const typed = readTilesAnswer();
-      const correct = normalizeState(q.correct);
-
-      const isCorrect = (typed === correct);
-
-      if(isCorrect){
-        resultEl.textContent = "✅ Nice!";
-      } else {
-        resultEl.textContent = "❌ Almost — try Clear and try again.";
-        missed.add(q.reviewLabel);
-        // Allow retry without advancing: unlock again
-        locked = false;
-        clearBtn.disabled = false;
-        submitTilesBtn.disabled = false;
-        // keep Next disabled until they get it right OR we allow next anyway (your call)
-        nextBtn.disabled = true;
-        results.push({ q, chosen: typed, correct: correct });
-        return;
-      }
-
-      results.push({ q, chosen: typed, correct: correct });
-      nextBtn.disabled = false;
-    }
-
-    // ====== Summary ======
-    function showSummary(){
-      const total = results.length;
-      const correctCount = results.filter(r => {
-        // For tiles, compare normalized strings
-        if(r.q.mode === "tiles"){
-          return String(r.chosen) === String(r.correct);
-        }
-        return r.chosen === r.correct;
-      }).length;
-
-      const pct = Math.round((correctCount / total) * 100);
-
-      // hide quiz UI
-      imgbox.classList.remove("show");
-      answersEl.style.display = "none";
-      tilesWrap.classList.remove("show");
-      resultEl.textContent = "";
-
-      sectionPill.textContent = "Done";
-      bar.style.width = "100%";
-      barText.textContent = `${total} of ${total}`;
-
-      qtitle.textContent = `Score: ${pct}%`;
-      qsub.textContent = `You got ${correctCount} out of ${total} correct.`;
-
-      // buttons
-      exitBtn.textContent = "Back to Week 2";
-      nextBtn.style.display = "none";
-
-      const misses = Array.from(missed);
-      const perfect = (pct === 100 && misses.length === 0);
-
-      const tipText = perfect
-        ? "Perfect score! Nice work. Do one quick study run tomorrow to lock it in."
-        : "Tip: Review the missed ones, then try again when you're ready.";
-
-      const reviewTitle = perfect
-        ? "Nothing to review — nice work!"
-        : (misses.length ? "Review these:" : "Nice work!");
-
-      const reviewHtml = `
-        <h2>${reviewTitle}</h2>
-        ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : ""}
-        <div class="small">${tipText}</div>
-      `;
-      reviewBox.style.display = "block";
-      reviewBox.innerHTML = reviewHtml;
-    }
-
-    // ====== Nav ======
-    nextBtn.addEventListener("click", () => {
-      if(idx === QUESTIONS.length - 1){
-        showSummary();
-        return;
-      }
-      idx++;
-      renderQuestion();
-    });
-
-    exitBtn.addEventListener("click", () => {
-      window.location.href = "./index.html";
-    });
-
-    renderQuestion();
-  </script>
 </body>
 </html>
