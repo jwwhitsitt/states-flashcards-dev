@@ -76,7 +76,7 @@
       flex-direction:column;
       gap:12px;
       height:calc(100vh - 62px - 28px); /* header + padding */
-      max-height:720px; /* keeps it tidy on desktop too */
+      max-height:760px; /* desktop guard */
     }
 
     .frame{
@@ -90,6 +90,20 @@
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
       padding:12px;
       overflow:hidden;
+      cursor:pointer; /* tap-to-flip hint */
+      position:relative;
+    }
+
+    .tapHint{
+      position:absolute;
+      bottom:10px;
+      left:0;
+      right:0;
+      text-align:center;
+      font-size:12px;
+      font-weight:800;
+      color:rgba(71,85,105,.9);
+      pointer-events:none;
     }
 
     img{
@@ -98,34 +112,6 @@
       max-height:100%;
       object-fit:contain;
       border-radius:12px;
-    }
-
-    .backside{
-      width:100%;
-      height:100%;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-      padding:10px;
-      gap:8px;
-    }
-    .state{
-      font-size:36px;
-      font-weight:1000;
-      line-height:1.05;
-    }
-    .abbr{
-      font-size:22px;
-      font-weight:900;
-      color:var(--muted);
-      letter-spacing:.08em;
-    }
-    .hint{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
     }
 
     .nav{
@@ -164,8 +150,8 @@
     }
 
     @media (max-width:480px){
-      .state{ font-size:32px; }
-      .abbr{ font-size:20px; }
+      header h1{ font-size:15px; }
+      .btn{ font-size:15px; }
     }
   </style>
 </head>
@@ -180,7 +166,7 @@
   <main>
     <div class="wrap">
       <section class="card" aria-label="Flashcard">
-        <div class="frame" id="frame"></div>
+        <div class="frame" id="frame" aria-label="Tap to flip"></div>
 
         <div class="nav">
           <button class="btn secondary" id="prevBtn">Back</button>
@@ -194,12 +180,13 @@
   </main>
 
   <script>
-    // Week 2 set (4 states)
+    // IMPORTANT: These file names must exist in week2/images/
+    // pa-f.png <-> pa-b.png, etc.
     const CARDS = [
-      { state:"Pennsylvania", abbrev:"PA", img:"./images/pa-f.png" },
-      { state:"New Jersey",   abbrev:"NJ", img:"./images/nj-f.png" },
-      { state:"New York",     abbrev:"NY", img:"./images/ny-f.png" },
-      { state:"Delaware",     abbrev:"DE", img:"./images/de-f.png" }
+      { front:"./images/pa-f.png", back:"./images/pa-b.png" },
+      { front:"./images/nj-f.png", back:"./images/nj-b.png" },
+      { front:"./images/ny-f.png", back:"./images/ny-b.png" },
+      { front:"./images/de-f.png", back:"./images/de-b.png" }
     ];
 
     const frame = document.getElementById("frame");
@@ -212,34 +199,23 @@
     let showingFront = true;
 
     function render(){
-      const c = CARDS[i];
-
-      // buttons
       prevBtn.disabled = (i === 0);
       nextBtn.disabled = (i === CARDS.length - 1);
-
-      // meta
       meta.textContent = `Card ${i+1} of ${CARDS.length}`;
 
-      // content
       frame.innerHTML = "";
-      if(showingFront){
-        const img = document.createElement("img");
-        img.src = c.img;
-        img.alt = c.state;
-        frame.appendChild(img);
-        flipBtn.textContent = "Flip";
-      } else {
-        const back = document.createElement("div");
-        back.className = "backside";
-        back.innerHTML = `
-          <div class="state">${c.state}</div>
-          <div class="abbr">${c.abbrev}</div>
-          <div class="hint">Tap Flip to see the map again</div>
-        `;
-        frame.appendChild(back);
-        flipBtn.textContent = "Flip";
-      }
+
+      const src = showingFront ? CARDS[i].front : CARDS[i].back;
+
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = showingFront ? "Front of flashcard" : "Back of flashcard";
+      frame.appendChild(img);
+
+      const hint = document.createElement("div");
+      hint.className = "tapHint";
+      hint.textContent = "Tap the card to flip";
+      frame.appendChild(hint);
     }
 
     function flip(){
@@ -248,16 +224,24 @@
     }
 
     prevBtn.addEventListener("click", ()=>{
-      if(i>0){ i--; showingFront = true; render(); }
+      if(i > 0){
+        i--;
+        showingFront = true; // always start on front when changing cards
+        render();
+      }
     });
 
     nextBtn.addEventListener("click", ()=>{
-      if(i<CARDS.length-1){ i++; showingFront = true; render(); }
+      if(i < CARDS.length - 1){
+        i++;
+        showingFront = true;
+        render();
+      }
     });
 
     flipBtn.addEventListener("click", flip);
 
-    // tap anywhere on the card to flip (kid-friendly)
+    // Tap anywhere on the card to flip
     frame.addEventListener("click", flip);
 
     render();
