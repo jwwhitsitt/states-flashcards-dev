@@ -1,283 +1,843 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Week 2 – Check Your Learning</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 2 – Check Your Learning</title>
 
-<style>
-:root{
-  --bg:#f4f6fb;
-  --card:#ffffff;
-  --text:#0f172a;
-  --muted:#475569;
-  --shadow:0 10px 30px rgba(15,23,42,.12);
-  --radius:18px;
-  --link:#1d4ed8;
-  --btn:#0f172a;
-  --btn2:#e5e7eb;
-}
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+      --btn:#0f172a;
+      --btn2:#e5e7eb;
+      --btn2text:#111827;
+      --bar:#c7d2fe;
+      --barbg:#e5e7eb;
 
-*{box-sizing:border-box}
+      /* sizing knobs */
+      --btnH:56px;          /* BIG buttons */
+      --choicePadY:14px;    /* answer button height */
+      --choiceFont:20px;
+      --titleFont:40px;
+      --subFont:18px;
+    }
 
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden; /* no page scroll */
+    }
 
-header{
-  padding:10px 14px;
-  background:#fff;
-  box-shadow:0 1px 10px rgba(0,0,0,.06);
-  display:flex;
-  align-items:center;
-}
-header a{
-  color:var(--link);
-  text-decoration:none;
-  font-weight:900;
-}
-header h1{
-  flex:1;
-  text-align:center;
-  margin:0;
-  font-size:16px;
-  font-weight:1000;
-}
+    header{
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+    header a{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .spacer{ width:52px; }
 
-main{
-  flex:1;
-  padding:12px;
-  display:flex;
-  justify-content:center;
-}
+    main{
+      flex:1 1 auto;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:12px;
+      overflow:hidden;
+    }
+    .wrap{
+      width:100%;
+      max-width:720px;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
 
-.card{
-  background:var(--card);
-  width:100%;
-  max-width:720px;
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
+    .toprow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+    .pill{
+      background:#dbeafe;
+      color:#1e3a8a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:14px;
+      min-width:92px;
+      text-align:center;
+      white-space:nowrap;
+    }
+    .barwrap{
+      flex:1;
+      height:18px;
+      background:var(--barbg);
+      border-radius:999px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:var(--bar);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      color:#111827;
+      font-size:14px;
+      text-shadow:0 1px 0 rgba(255,255,255,.75);
+      pointer-events:none;
+    }
 
-/* ===== Prompt ===== */
-.capital{
-  font-size:28px;
-  font-weight:1000;
-}
-.sub{
-  color:var(--muted);
-  font-weight:800;
-}
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      flex:1 1 auto;
+      min-height:0;
+      overflow:hidden;
+    }
 
-/* ===== Answer Rail ===== */
-.answer-row{
-  display:flex;
-  justify-content:center;
-  gap:6px;
-  flex-wrap:nowrap;
-}
+    /* image */
+    .imgbox{
+      border-radius:16px;
+      background:#fff;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .imgbox.show{ display:flex; }
+    /* spelling image smaller to reduce scrolling; capitals has no image anyway */
+    .imgbox.spell { height:200px; }
+    .imgbox img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      border-radius:12px;
+    }
 
-/* size tiers (locked per question) */
-.answer-row.large .slot{ width:44px; height:44px; font-size:22px; }
-.answer-row.medium .slot{ width:38px; height:38px; font-size:18px; }
-.answer-row.small .slot{ width:32px; height:32px; font-size:16px; }
+    .qtitle{
+      font-size:var(--titleFont);
+      font-weight:1000;
+      line-height:1.02;
+      margin-top:2px;
+    }
+    .qsub{
+      color:var(--muted);
+      font-weight:800;
+      font-size:var(--subFont);
+      margin-top:-2px;
+    }
 
-.slot{
-  border:2px dashed #cbd5e1;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:1000;
-  background:#fff;
-}
+    /* MC answers */
+    .answers{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      flex:1 1 auto;
+      min-height:0;
+      overflow:hidden;
+    }
+    .choice{
+      border-radius:16px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      padding:var(--choicePadY) 14px;
+      font-size:var(--choiceFont);
+      font-weight:1000;
+      text-align:left;
+      cursor:pointer;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
+    }
+    .choice:active{ transform:scale(.995); }
+    .choice.correct{
+      border-color:#22c55e;
+      background:#ecfdf5;
+    }
+    .choice.wrong{
+      border-color:#ef4444;
+      background:#fef2f2;
+    }
 
-/* space between words */
-.slot.space{
-  border:none;
-  width:14px;
-}
+    /* Capitals tiles */
+    .tilesWrap{
+      display:none;
+      flex-direction:column;
+      gap:10px;
+      flex:1 1 auto;
+      min-height:0;
+      overflow:hidden;
+    }
+    .tilesWrap.show{ display:flex; }
 
-/* ===== Tile Pool ===== */
-.pool{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  justify-content:center;
-}
+    .slots{
+      display:flex;
+      flex-wrap:nowrap;
+      gap:6px;
+      align-items:center;
+      justify-content:center;
+      padding:4px 2px;
+      overflow:hidden;
+    }
+    .slot{
+      width:28px;
+      height:34px;
+      border-radius:10px;
+      border:2px dashed #cbd5e1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      font-size:18px;
+      color:#0f172a;
+      background:#fff;
+      flex:0 0 auto;
+      user-select:none;
+    }
+    .slot.filled{
+      border-style:solid;
+      border-color:#94a3b8;
+    }
+    .slot.space{
+      width:14px;
+      height:10px;
+      border:none;
+      background:transparent;
+    }
 
-.tile{
-  width:52px;
-  height:52px;
-  border-radius:14px;
-  border:2px solid #e5e7eb;
-  background:#fff;
-  font-size:22px;
-  font-weight:1000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-.tile.used{
-  opacity:.25;
-  pointer-events:none;
-}
+    /* Tile pool can wrap; keep big */
+    .pool{
+      display:grid;
+      grid-template-columns:repeat(6, minmax(0, 1fr));
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      margin-top:2px;
+      margin-bottom:6px;
+      max-height:210px; /* hard cap so buttons stay visible */
+      overflow:hidden;
+    }
+    .tile{
+      height:54px;
+      border-radius:16px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      font-weight:1000;
+      font-size:22px;
+      color:#0f172a;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease, opacity .1s ease;
+    }
+    .tile:active{ transform:scale(.99); }
+    .tile.used{
+      opacity:.25;
+      pointer-events:none;
+    }
 
-/* ===== Buttons ===== */
-.actions{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
-}
-button{
-  flex:1;
-  padding:12px;
-  border-radius:14px;
-  border:0;
-  font-size:16px;
-  font-weight:1000;
-  cursor:pointer;
-}
-.primary{
-  background:var(--btn);
-  color:#fff;
-}
-.secondary{
-  background:var(--btn2);
-  color:#111827;
-}
-button:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-}
+    .feedback{
+      text-align:center;
+      font-weight:1000;
+      color:var(--muted);
+      font-size:14px;
+      min-height:18px;
+    }
 
-/* ===== Feedback ===== */
-.result{
-  text-align:center;
-  font-weight:1000;
-}
-.correct{ color:#16a34a; }
-.wrong{ color:#dc2626; }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex:0 0 auto;
+      margin-top:10px; /* NOT auto */
+    }
+    .btn{
+      flex:1;
+      height:var(--btnH);
+      border-radius:16px;
+      border:0;
+      font-size:18px;
+      font-weight:1000;
+      cursor:pointer;
+      background:var(--btn);
+      color:#fff;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
+    }
+    .btn.secondary{
+      background:var(--btn2);
+      color:var(--btn2text);
+      box-shadow:none;
+    }
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
 
-</style>
+    /* Summary */
+    .summaryBox{
+      display:none;
+      flex-direction:column;
+      gap:12px;
+      flex:1 1 auto;
+      min-height:0;
+    }
+    .summaryBox.show{ display:flex; }
+
+    .review{
+      padding:12px;
+      border-radius:16px;
+      background:#f8fafc;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .review h2{
+      margin:0 0 6px 0;
+      font-size:18px;
+      font-weight:1000;
+    }
+    .review ul{
+      margin:0;
+      padding-left:18px;
+      color:#111827;
+      font-weight:800;
+    }
+    .small{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      margin-top:6px;
+    }
+
+    /* Responsive tweaks for small phones */
+    @media (max-width:420px){
+      :root{
+        --titleFont:38px;
+        --choiceFont:20px;
+        --btnH:56px;
+      }
+      .pool{ grid-template-columns:repeat(5, minmax(0,1fr)); }
+      .imgbox.spell{ height:190px; }
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Check Your Learning</h1>
+    <div class="spacer"></div>
+  </header>
 
-<header>
-  <a href="./index.html">← Back</a>
-  <h1>Check Your Learning</h1>
-</header>
+  <main>
+    <div class="wrap">
 
-<main>
-  <section class="card">
+      <div class="toprow">
+        <div class="pill" id="sectionPill">Spelling</div>
+        <div class="barwrap" aria-label="Progress">
+          <div class="bar" id="bar"></div>
+          <div class="bartext" id="barText">1 of 12</div>
+        </div>
+      </div>
 
-    <div class="capital" id="capital">Harrisburg</div>
-    <div class="sub">Tap the letters to spell the state.</div>
+      <section class="card" id="card">
+        <!-- image (used for spelling only) -->
+        <div class="imgbox spell" id="imgbox"><img id="img" alt="" /></div>
 
-    <div class="answer-row" id="answerRow"></div>
+        <div class="qtitle" id="qtitle">Pick the correct spelling</div>
+        <div class="qsub" id="qsub">Tap one answer.</div>
 
-    <div class="pool" id="pool"></div>
+        <!-- Multiple choice answers -->
+        <div class="answers" id="answers"></div>
 
-    <div class="result" id="result>"></div>
+        <!-- Capitals tiles mode -->
+        <div class="tilesWrap" id="tilesWrap">
+          <div class="slots" id="slots"></div>
+          <div class="pool" id="pool"></div>
+          <div class="feedback" id="tileFeedback"></div>
 
-    <div class="actions">
-      <button class="secondary" id="clearBtn">Clear</button>
-      <button class="primary" id="checkBtn">Check</button>
+          <div class="actions" id="tileActions">
+            <button class="btn secondary" id="clearBtn">Clear</button>
+            <button class="btn" id="checkBtn">Check</button>
+          </div>
+        </div>
+
+        <!-- Bottom nav (always visible) -->
+        <div class="actions" id="navActions">
+          <button class="btn secondary" id="exitBtn">Exit</button>
+          <button class="btn" id="nextBtn" disabled>Next</button>
+        </div>
+
+        <!-- Summary -->
+        <div class="summaryBox" id="summaryBox"></div>
+      </section>
+
     </div>
+  </main>
 
-  </section>
-</main>
+  <script>
+    // ====== Week 2 Data ======
+    const WEEK = [
+      { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", img:"./images/pa-f.png" },
+      { state:"New Jersey",   abbrev:"NJ", capital:"Trenton",    img:"./images/nj-f.png" },
+      { state:"New York",     abbrev:"NY", capital:"Albany",     img:"./images/ny-f.png" },
+      { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
+    ];
 
-<script>
-/* ===== DATA ===== */
-const question = {
-  capital:"Harrisburg",
-  answer:"PENNSYLVANIA"
-};
+    // Spelling fakes: ALWAYS same-word variants (no random Colorado nonsense)
+    const SPELLING_FAKES = {
+      "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania"],
+      "New Jersey":["New Jersy","New Jersie","New Jerzee"],
+      "New York":["New Yorc","New Yark","New Yorrk"],
+      "Delaware":["Delawair","Delawere","Della-ware"]
+    };
 
-/* ===== SETUP ===== */
-const answerRow = document.getElementById("answerRow");
-const pool = document.getElementById("pool");
-const result = document.getElementById("result");
-const clearBtn = document.getElementById("clearBtn");
-const checkBtn = document.getElementById("checkBtn");
+    const ABBREV_POOL = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+      "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT",
+      "VT","VA","WA","WV","WI","WY"];
 
-const letters = question.answer.split("");
-let filled = [];
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
 
-/* ===== SIZE LOGIC ===== */
-const len = question.answer.replace(" ","").length;
-if(len <= 8) answerRow.classList.add("large");
-else if(len <= 11) answerRow.classList.add("medium");
-else answerRow.classList.add("small");
+    function pickDistinct(pool, count, excludeSet){
+      const out = [];
+      for(const item of shuffle(pool)){
+        if(excludeSet.has(item)) continue;
+        out.push(item);
+        if(out.length>=count) break;
+      }
+      return out;
+    }
 
-/* ===== BUILD ANSWER SLOTS ===== */
-letters.forEach(l=>{
-  if(l===" "){
-    const s = document.createElement("div");
-    s.className="slot space";
-    answerRow.appendChild(s);
-  }else{
-    const s = document.createElement("div");
-    s.className="slot";
-    answerRow.appendChild(s);
-  }
-});
+    // ====== Build Questions (12 total) ======
+    // Part 1: Spelling (4 questions) - show image, 4 choices (1 correct + 3 same-word fakes)
+    const spellingQuestions = WEEK.map(s => {
+      const correct = s.state;
+      const fakes = shuffle(SPELLING_FAKES[correct] || []).slice(0,3);
+      const choices = shuffle([correct, ...fakes]).slice(0,4);
 
-/* ===== BUILD TILE POOL ===== */
-const shuffled = [...letters].filter(l=>l!==" ").sort(()=>Math.random()-.5);
-shuffled.forEach(l=>{
-  const t = document.createElement("div");
-  t.className="tile";
-  t.textContent=l;
-  t.onclick=()=>placeTile(t,l);
-  pool.appendChild(t);
-});
+      // Safety: ensure correct is included even if fakes missing
+      if(!choices.includes(correct)){
+        choices.pop();
+        choices.push(correct);
+      }
 
-/* ===== FUNCTIONS ===== */
-function placeTile(tile, letter){
-  const slots=[...document.querySelectorAll(".slot")];
-  const empty=slots.find(s=>!s.textContent);
-  if(!empty) return;
-  empty.textContent=letter;
-  tile.classList.add("used");
-  filled.push(letter);
-}
+      return {
+        kind:"mc",
+        section:"Spelling",
+        showImage:true,
+        img:s.img,
+        title:"Pick the correct spelling",
+        subtitle:"Which one is spelled correctly?",
+        correct,
+        choices,
+        reviewKey:`Spelling: ${correct}` // used only in summary
+      };
+    });
 
-function clearAll(){
-  document.querySelectorAll(".slot").forEach(s=>s.textContent="");
-  document.querySelectorAll(".tile").forEach(t=>t.classList.remove("used"));
-  filled=[];
-  result.textContent="";
-}
+    // Part 2: Capitals (4 questions) - tiles input spelling state name from capital
+    const capitalQuestions = WEEK.map(s => ({
+      kind:"tiles",
+      section:"Capitals",
+      showImage:false,
+      img:null,
+      title:s.capital,
+      subtitle:"Tap the letters to spell the state.",
+      correct:s.state,
+      reviewKey:`Capitals: ${s.capital}`
+    }));
 
-function checkAnswer(){
-  const attempt = filled.join("");
-  if(attempt===question.answer.replace(" ","")){
-    result.textContent="✅ Nice job!";
-    result.className="result correct";
-  }else{
-    result.textContent="❌ Almost — try again.";
-    result.className="result wrong";
-  }
-}
+    // Part 3: Abbreviations (4 questions) - MC (state -> abbrev)
+    const abbrevQuestions = WEEK.map(s => {
+      const correct = s.abbrev;
+      const wrongs = pickDistinct(ABBREV_POOL, 3, new Set([correct]));
+      const choices = shuffle([correct, ...wrongs]);
+      return {
+        kind:"mc",
+        section:"Abbreviations",
+        showImage:false,
+        img:null,
+        title:s.state,
+        subtitle:"Which abbreviation matches this state?",
+        correct,
+        choices,
+        reviewKey:`Abbreviations: ${s.state}`
+      };
+    });
 
-clearBtn.onclick=clearAll;
-checkBtn.onclick=checkAnswer;
-</script>
+    const QUESTIONS = [...spellingQuestions, ...capitalQuestions, ...abbrevQuestions];
 
+    // ====== UI hooks ======
+    const sectionPill = document.getElementById("sectionPill");
+    const bar = document.getElementById("bar");
+    const barText = document.getElementById("barText");
+
+    const imgbox = document.getElementById("imgbox");
+    const img = document.getElementById("img");
+    const qtitle = document.getElementById("qtitle");
+    const qsub = document.getElementById("qsub");
+
+    const answersEl = document.getElementById("answers");
+
+    const tilesWrap = document.getElementById("tilesWrap");
+    const slotsEl = document.getElementById("slots");
+    const poolEl = document.getElementById("pool");
+    const tileFeedback = document.getElementById("tileFeedback");
+    const clearBtn = document.getElementById("clearBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
+    const navActions = document.getElementById("navActions");
+    const exitBtn = document.getElementById("exitBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const summaryBox = document.getElementById("summaryBox");
+
+    let idx = 0;
+    let locked = false;      // for MC after selection / for tiles after check
+    let results = [];        // { correct, chosen, reviewKey }
+    let missed = new Set();
+
+    // Tiles state
+    let tileTarget = "";     // correct state name
+    let tileSlots = [];      // array of {type:'letter'|'space', char, filledChar}
+    let tilePool = [];       // array of letters
+    let usedIndices = new Set();
+    let tileChecked = false;
+
+    function setProgress(){
+      const n = QUESTIONS.length;
+      const pos = idx + 1;
+      bar.style.width = Math.round((pos / n) * 100) + "%";
+      barText.textContent = `${pos} of ${n}`;
+      sectionPill.textContent = QUESTIONS[idx].section;
+    }
+
+    function resetModes(){
+      answersEl.style.display = "none";
+      answersEl.innerHTML = "";
+
+      tilesWrap.classList.remove("show");
+      slotsEl.innerHTML = "";
+      poolEl.innerHTML = "";
+      tileFeedback.textContent = "";
+      usedIndices.clear();
+      tileChecked = false;
+
+      summaryBox.classList.remove("show");
+      summaryBox.innerHTML = "";
+
+      nextBtn.disabled = true;
+      locked = false;
+      checkBtn.disabled = false;
+      checkBtn.textContent = "Check";
+    }
+
+    function renderQuestion(){
+      resetModes();
+      setProgress();
+
+      const q = QUESTIONS[idx];
+
+      // image rules (spelling only)
+      if(q.showImage && q.img){
+        imgbox.classList.add("show");
+        img.src = q.img;
+        img.alt = "State picture";
+      } else {
+        imgbox.classList.remove("show");
+        img.src = "";
+        img.alt = "";
+      }
+
+      qtitle.textContent = q.title;
+      qsub.textContent = q.subtitle;
+
+      // show correct UI
+      if(q.kind === "mc"){
+        answersEl.style.display = "flex";
+        answersEl.innerHTML = "";
+        q.choices.forEach(choice => {
+          const b = document.createElement("button");
+          b.className = "choice";
+          b.type = "button";
+          b.textContent = choice;
+          b.addEventListener("click", () => chooseMC(b, choice));
+          answersEl.appendChild(b);
+        });
+      } else {
+        // tiles mode
+        tilesWrap.classList.add("show");
+        buildTilesQuestion(q);
+      }
+
+      // next button label
+      nextBtn.textContent = (idx === QUESTIONS.length - 1) ? "Finish" : "Next";
+    }
+
+    // ====== MC Logic ======
+    function chooseMC(btn, choice){
+      if(locked) return;
+      locked = true;
+
+      const q = QUESTIONS[idx];
+      const isCorrect = (choice === q.correct);
+
+      const btns = Array.from(document.querySelectorAll(".choice"));
+      btns.forEach(b => {
+        if(b.textContent === q.correct) b.classList.add("correct");
+        else if(b.textContent === choice) b.classList.add("wrong");
+        b.disabled = true;
+      });
+
+      if(!isCorrect) missed.add(q.reviewKey);
+
+      results.push({ correct:q.correct, chosen:choice, reviewKey:q.reviewKey });
+
+      nextBtn.disabled = false;
+    }
+
+    // ====== Tiles Logic ======
+    function buildTilesQuestion(q){
+      tileTarget = q.correct;
+
+      // Build slot model: letters + spaces (spaces become fixed gaps)
+      tileSlots = [];
+      for(const ch of tileTarget){
+        if(ch === " "){
+          tileSlots.push({ type:"space", char:" ", filledChar:" " });
+        } else {
+          tileSlots.push({ type:"letter", char:ch.toUpperCase(), filledChar:"" });
+        }
+      }
+
+      // Tile pool: ONLY letters in the state name (no extra junk)
+      tilePool = tileSlots
+        .filter(s => s.type === "letter")
+        .map(s => s.char);
+
+      tilePool = shuffle(tilePool);
+
+      renderSlots();
+      renderPool();
+      tileFeedback.textContent = "";
+      tileChecked = false;
+
+      // In tiles mode, Next remains disabled until a successful Check or any Check attempt (your call).
+      // We’ll enable Next only AFTER Check is pressed (correct OR wrong), so it always “does something.”
+      nextBtn.disabled = true;
+    }
+
+    function renderSlots(){
+      slotsEl.innerHTML = "";
+
+      // Fit one-word states on one line by using smaller slots + no wrap (already)
+      tileSlots.forEach((s, i) => {
+        if(s.type === "space"){
+          const spacer = document.createElement("div");
+          spacer.className = "slot space";
+          slotsEl.appendChild(spacer);
+          return;
+        }
+        const d = document.createElement("div");
+        d.className = "slot" + (s.filledChar ? " filled" : "");
+        d.textContent = s.filledChar || ""; // blanks
+        slotsEl.appendChild(d);
+      });
+    }
+
+    function renderPool(){
+      poolEl.innerHTML = "";
+      tilePool.forEach((letter, i) => {
+        const t = document.createElement("div");
+        t.className = "tile" + (usedIndices.has(i) ? " used" : "");
+        t.textContent = letter;
+        t.addEventListener("click", () => tapTile(i));
+        poolEl.appendChild(t);
+      });
+    }
+
+    function tapTile(poolIndex){
+      if(tileChecked) return;
+
+      // find first empty letter slot
+      const slotIndex = tileSlots.findIndex(s => s.type === "letter" && !s.filledChar);
+      if(slotIndex === -1) return;
+
+      tileSlots[slotIndex].filledChar = tilePool[poolIndex];
+      usedIndices.add(poolIndex);
+
+      renderSlots();
+      renderPool();
+
+      // If all filled, user can check (still optional)
+      tileFeedback.textContent = "";
+    }
+
+    function clearTiles(){
+      if(tileChecked) return;
+      tileSlots.forEach(s => { if(s.type === "letter") s.filledChar = ""; });
+      usedIndices.clear();
+      tileFeedback.textContent = "";
+      renderSlots();
+      renderPool();
+    }
+
+    function currentTilesAnswer(){
+      return tileSlots.map(s => (s.type === "space" ? " " : (s.filledChar || ""))).join("");
+    }
+
+    function canCheckTiles(){
+      // require all letter slots filled
+      return tileSlots.every(s => s.type === "space" || !!s.filledChar);
+    }
+
+    function checkTiles(){
+      if(tileChecked) return;
+
+      if(!canCheckTiles()){
+        tileFeedback.textContent = "Fill all blanks first.";
+        return;
+      }
+
+      const q = QUESTIONS[idx];
+      const attempt = currentTilesAnswer().toUpperCase();
+      const correct = tileTarget.toUpperCase();
+
+      tileChecked = true;
+
+      const isCorrect = (attempt === correct);
+      if(isCorrect){
+        tileFeedback.textContent = "✅ Nice!";
+      } else {
+        tileFeedback.textContent = "❌ Close — try the next one.";
+        missed.add(q.reviewKey);
+      }
+
+      results.push({ correct:q.correct, chosen:attempt, reviewKey:q.reviewKey });
+
+      // IMPORTANT: now Next works
+      nextBtn.disabled = false;
+
+      // lock pool (visual)
+      checkBtn.disabled = true;
+    }
+
+    // ====== Summary ======
+    function showSummary(){
+      resetModes();
+
+      // progress full
+      bar.style.width = "100%";
+      barText.textContent = `${QUESTIONS.length} of ${QUESTIONS.length}`;
+      sectionPill.textContent = "Done";
+
+      const total = results.length;
+      const correctCount = results.filter(r => String(r.chosen).toUpperCase() === String(r.correct).toUpperCase()).length;
+      const pct = Math.round((correctCount / total) * 100);
+
+      imgbox.classList.remove("show");
+
+      qtitle.textContent = `Score: ${pct}%`;
+      qsub.textContent = `You got ${correctCount} out of ${total} correct.`;
+
+      // Summary copy: different if 100%
+      const misses = Array.from(missed);
+
+      let tipText;
+      if(pct === 100){
+        tipText = "Perfect score! Do a quick review tomorrow to keep it locked in.";
+      } else {
+        tipText = "Tip: Study the ones you missed, then try the test again.";
+      }
+
+      summaryBox.classList.add("show");
+      summaryBox.innerHTML = `
+        <div class="review">
+          <h2>${misses.length ? "Review these:" : "Nothing to review — nice work!"}</h2>
+          ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : ""}
+          <div class="small">${tipText}</div>
+        </div>
+      `;
+
+      // Buttons: make Exit become “Back to Week 2”, hide Next
+      exitBtn.textContent = "Back to Week 2";
+      nextBtn.style.display = "none";
+    }
+
+    // ====== Events ======
+    nextBtn.addEventListener("click", () => {
+      // If user somehow clicks next while disabled, ignore
+      if(nextBtn.disabled) return;
+
+      if(idx === QUESTIONS.length - 1){
+        showSummary();
+        return;
+      }
+      idx++;
+      renderQuestion();
+    });
+
+    exitBtn.addEventListener("click", () => {
+      window.location.href = "./index.html";
+    });
+
+    clearBtn.addEventListener("click", clearTiles);
+    checkBtn.addEventListener("click", checkTiles);
+
+    // ====== Start ======
+    renderQuestion();
+  </script>
 </body>
 </html>
