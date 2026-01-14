@@ -34,7 +34,7 @@
       height:100vh;
       display:flex;
       flex-direction:column;
-      overflow:hidden; /* enforce no-scroll */
+      overflow:hidden;
     }
     header{
       padding:10px 14px;
@@ -121,7 +121,6 @@
       pointer-events:none;
     }
 
-    /* Card sizing: designed to avoid scroll on mobile */
     .card{
       background:var(--card);
       border-radius:var(--radius);
@@ -130,7 +129,7 @@
       display:flex;
       flex-direction:column;
       gap:10px;
-      height:calc(100vh - 52px - 24px - 28px); /* header + main padding + toprow-ish */
+      height:calc(100vh - 52px - 24px - 28px);
       max-height:780px;
       overflow:hidden;
       min-height:0;
@@ -144,7 +143,7 @@
       justify-content:center;
       padding:10px;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      height:190px; /* tuned to keep buttons visible */
+      height:190px;
       overflow:hidden;
       flex:0 0 auto;
     }
@@ -170,7 +169,6 @@
       flex:0 0 auto;
     }
 
-    /* Multiple choice */
     .answers{
       display:flex;
       flex-direction:column;
@@ -184,7 +182,7 @@
       border-radius:16px;
       border:2px solid #e5e7eb;
       background:#fff;
-      padding:12px 14px;        /* slightly shorter to reduce scroll */
+      padding:12px 14px;
       font-size:19px;
       font-weight:1000;
       text-align:left;
@@ -200,8 +198,14 @@
       border-color:var(--bad);
       background:#fef2f2;
     }
+    /* keep disabled from going “washed out” on mobile */
+    .choice:disabled{
+      opacity:1;
+      color:inherit;
+      -webkit-text-fill-color: inherit;
+      cursor:default;
+    }
 
-    /* Tiles (Capitals) */
     .tilesArea{
       display:none;
       flex-direction:column;
@@ -286,7 +290,7 @@
       font-size:22px;
       cursor:pointer;
       user-select:none;
-      transition:transform .05s ease, opacity .12s ease, border-color .1s ease, background .1s ease;
+      transition:transform .05s ease, opacity .12s ease;
     }
     .tile:active{ transform:scale(.985); }
     .tile.used{
@@ -294,7 +298,6 @@
       pointer-events:none;
     }
 
-    /* bottom controls */
     .bottom{
       display:flex;
       gap:10px;
@@ -303,7 +306,7 @@
     }
     .btn{
       flex:1;
-      padding:14px 14px;  /* keep big */
+      padding:14px 14px;
       border-radius:14px;
       border:0;
       font-size:16px;
@@ -333,6 +336,16 @@
       flex:0 0 auto;
       min-height:18px;
     }
+
+    .advancing{
+      text-align:center;
+      font-weight:1000;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:-4px;
+      display:none;
+    }
+    .advancing.show{ display:block; }
 
     .review{
       margin-top:6px;
@@ -387,12 +400,10 @@
         <div class="qtitle" id="qtitle"></div>
         <div class="qsub" id="qsub"></div>
 
-        <!-- MC area -->
         <div class="answers" id="answers"></div>
 
-        <!-- Tiles area (Capitals) -->
         <div class="tilesArea" id="tilesArea">
-          <div class="slotsWrap" id="slotsWrap" aria-label="Answer slots">
+          <div class="slotsWrap" id="slotsWrap">
             <div class="slots" id="slots"></div>
           </div>
           <div class="pool" id="pool"></div>
@@ -400,12 +411,11 @@
 
         <div class="bottom" id="bottomRow">
           <button class="btn secondary" id="exitBtn">Exit</button>
-
-          <!-- Tiles-only buttons -->
           <button class="btn secondary" id="clearBtn" style="display:none;">Clear</button>
           <button class="btn" id="checkBtn" style="display:none;">Check</button>
         </div>
 
+        <div class="advancing" id="advancing">…</div>
         <div class="result" id="result"></div>
         <div id="reviewBox" style="display:none;"></div>
       </section>
@@ -413,20 +423,12 @@
   </main>
 
   <script>
-    // ====== Data ======
+    // ===== Data =====
     const WEEK = [
       { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", img:"./images/pa-f.png" },
       { state:"New Jersey",   abbrev:"NJ", capital:"Trenton",    img:"./images/nj-f.png" },
       { state:"New York",     abbrev:"NY", capital:"Albany",     img:"./images/ny-f.png" },
       { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
-    ];
-
-    const ALL_STATES = [
-      "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
-      "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
-      "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey",
-      "New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
-      "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
     ];
 
     const ALL_ABBREVS = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
@@ -451,7 +453,6 @@
       return out;
     }
 
-    // fakes for spelling (always same target word vibe)
     const SPELLING_FAKES = {
       "Pennsylvania":["Pencilvainya","Pensylvainia","Pennsilvanya","Penzylvania","Pennsylvaina"],
       "New Jersey":["New Jerzee","New Jersy","New Jersei","New Jersie","New Jersiey"],
@@ -459,19 +460,14 @@
       "Delaware":["Delawere","Delawair","Della-ware","Delawar","Delawarre"]
     };
 
-    // ====== Question builders ======
-
-    // Spelling (MC): show image, DO NOT show state name
+    // ===== Build questions =====
     const spellingQuestions = WEEK.map(s => {
       const correct = s.state;
       const fakes = shuffle(SPELLING_FAKES[correct] || []).slice(0,3);
-      const choices = shuffle([correct, ...fakes]).slice(0,4);
-
-      // hard guarantee correct included:
+      let choices = shuffle([correct, ...fakes]).slice(0,4);
       if(!choices.includes(correct)){
         choices[Math.floor(Math.random()*choices.length)] = correct;
       }
-
       return {
         type:"mc",
         section:"Spelling",
@@ -485,21 +481,17 @@
       };
     });
 
-    // Capitals (Tiles): prompt is capital, answer is state
-    const capitalsQuestions = WEEK.map(s => {
-      return {
-        type:"tiles",
-        section:"Capitals",
-        showImage:false,
-        img:null,
-        title:s.capital,
-        subtitle:"Tap the letters to spell the state.",
-        correct:s.state,
-        reviewKey:`Capitals: ${s.capital}`
-      };
-    });
+    const capitalsQuestions = WEEK.map(s => ({
+      type:"tiles",
+      section:"Capitals",
+      showImage:false,
+      img:null,
+      title:s.capital,
+      subtitle:"Tap the letters to spell the state.",
+      correct:s.state,
+      reviewKey:`Capitals: ${s.capital}`
+    }));
 
-    // Abbreviations (MC)
     const abbrevQuestions = WEEK.map(s => {
       const correct = s.abbrev;
       const wrongs = pickDistinct(ALL_ABBREVS, 3, new Set([correct]));
@@ -519,7 +511,7 @@
 
     const QUESTIONS = [...spellingQuestions, ...capitalsQuestions, ...abbrevQuestions];
 
-    // ====== UI hooks ======
+    // ===== UI hooks =====
     const sectionPill = document.getElementById("sectionPill");
     const bar = document.getElementById("bar");
     const barText = document.getElementById("barText");
@@ -531,6 +523,7 @@
     const answersEl = document.getElementById("answers");
     const resultEl = document.getElementById("result");
     const reviewBox = document.getElementById("reviewBox");
+    const advancingEl = document.getElementById("advancing");
 
     const tilesArea = document.getElementById("tilesArea");
     const slotsWrap = document.getElementById("slotsWrap");
@@ -541,19 +534,17 @@
     const clearBtn = document.getElementById("clearBtn");
     const checkBtn = document.getElementById("checkBtn");
 
+    // ===== state =====
     let idx = 0;
     let locked = false;
-
     const missed = new Set();
 
     // tiles state
-    let tileTarget = "";
-    let slotChars = [];         // includes " " for spaces
-    let filled = [];            // array of chars for letters, null for empty, " " for spaces
-    let tiles = [];             // objects: {id, ch, used}
+    let slotChars = [];
+    let filled = [];
+    let tiles = [];
 
-    // timing
-    const MC_ADVANCE_MS = 450;
+    const MC_ADVANCE_MS = 500;
     const TILES_ADVANCE_MS = 650;
 
     function setProgress(){
@@ -582,7 +573,6 @@
       tilesArea.classList.remove("show");
       clearBtn.style.display = "none";
       checkBtn.style.display = "none";
-      exitBtn.style.display = "inline-block";
     }
 
     function setModeTiles(){
@@ -590,9 +580,29 @@
       tilesArea.classList.add("show");
       clearBtn.style.display = "inline-block";
       checkBtn.style.display = "inline-block";
-      exitBtn.style.display = "inline-block";
     }
 
+    function autoAdvance(delayMs){
+      advancingEl.classList.add("show");
+      window.setTimeout(() => {
+        try{
+          advancingEl.classList.remove("show");
+          if(idx >= QUESTIONS.length - 1){
+            showSummary();
+          } else {
+            idx++;
+            renderQuestion();
+          }
+        } catch(err){
+          console.error("Advance error:", err);
+          advancingEl.classList.remove("show");
+          locked = false; // fail open so user isn’t stuck
+          resultEl.textContent = "Something glitched — tap again.";
+        }
+      }, delayMs);
+    }
+
+    // ===== MC =====
     function renderMC(q){
       setModeMC();
       answersEl.innerHTML = "";
@@ -601,29 +611,23 @@
         b.className = "choice";
         b.type = "button";
         b.textContent = choice;
-        b.addEventListener("click", () => chooseMC(b, choice, q));
+        b.addEventListener("click", () => chooseMC(choice, q));
         answersEl.appendChild(b);
       });
     }
 
-    function lockMCButtons(){
-      Array.from(document.querySelectorAll(".choice")).forEach(b => b.disabled = true);
-    }
-
-    function chooseMC(btn, choice, q){
+    function chooseMC(choice, q){
       if(locked) return;
       locked = true;
-      lockMCButtons();
 
-      const isCorrect = (choice === q.correct);
-
-      // mark
       const btns = Array.from(document.querySelectorAll(".choice"));
       btns.forEach(b => {
+        b.disabled = true;
         if(b.textContent === q.correct) b.classList.add("correct");
         else if(b.textContent === choice) b.classList.add("wrong");
       });
 
+      const isCorrect = (choice === q.correct);
       if(isCorrect){
         resultEl.textContent = "✅ Nice!";
       } else {
@@ -631,24 +635,20 @@
         missed.add(q.reviewKey);
       }
 
-      // auto-advance
-      setTimeout(() => advanceOrFinish(), MC_ADVANCE_MS);
+      autoAdvance(MC_ADVANCE_MS);
     }
 
-    // ===== Tiles helpers =====
+    // ===== Tiles =====
     function buildTilesTarget(word){
-      tileTarget = word;
-      slotChars = Array.from(word); // includes spaces
+      slotChars = Array.from(word);
       filled = slotChars.map(ch => ch === " " ? " " : null);
 
-      // pool letters: ONLY letters in the target (spaces excluded), shuffled
       const letters = slotChars.filter(ch => ch !== " ");
       tiles = shuffle(letters).map((ch, i) => ({ id: `t${i}`, ch, used:false }));
     }
 
     function renderSlots(){
       slotsEl.innerHTML = "";
-      // smaller "answer" tiles so long one-word states fit on one line
       slotChars.forEach((ch, i) => {
         if(ch === " "){
           const sp = document.createElement("div");
@@ -669,8 +669,6 @@
         const b = document.createElement("div");
         b.className = "tile" + (t.used ? " used" : "");
         b.textContent = t.ch;
-        b.setAttribute("role","button");
-        b.setAttribute("tabindex","0");
         b.addEventListener("click", () => {
           if(locked) return;
           placeTile(t.id);
@@ -710,8 +708,7 @@
       renderPool();
     }
 
-    function currentAnswerString(){
-      // build user string (spaces preserved)
+    function currentAnswer(){
       let out = "";
       for(let i=0;i<slotChars.length;i++){
         if(slotChars[i] === " ") out += " ";
@@ -726,15 +723,15 @@
 
     function checkTiles(q){
       if(locked) return;
+
       if(!allFilled()){
-        // gentle nudge
         resultEl.textContent = "Fill all the spaces first 🙂";
         return;
       }
 
       locked = true;
 
-      const guess = currentAnswerString();
+      const guess = currentAnswer();
       const isCorrect = (guess === q.correct);
 
       slotsWrap.classList.remove("ok","bad");
@@ -747,13 +744,14 @@
         missed.add(q.reviewKey);
       }
 
-      setTimeout(() => advanceOrFinish(), TILES_ADVANCE_MS);
+      autoAdvance(TILES_ADVANCE_MS);
     }
 
-    // ===== Render loop =====
+    // ===== Render =====
     function renderQuestion(){
       locked = false;
       resultEl.textContent = "";
+      advancingEl.classList.remove("show");
       reviewBox.style.display = "none";
       reviewBox.innerHTML = "";
       slotsWrap.classList.remove("ok","bad");
@@ -775,49 +773,34 @@
       }
     }
 
-    function advanceOrFinish(){
-      if(idx >= QUESTIONS.length - 1){
-        showSummary();
-        return;
-      }
-      idx++;
-      renderQuestion();
-    }
-
     function showSummary(){
-      // mark progress done
       sectionPill.textContent = "Done";
       bar.style.width = "100%";
       barText.textContent = `${QUESTIONS.length} of ${QUESTIONS.length}`;
 
-      // compute score: total questions, correct = total - missedCount? (missed is per-question key)
-      // safer: track correctness by missed keys against questions:
-      const total = QUESTIONS.length;
-      const missedCount = missed.size;
-      const correct = total - missedCount;
-      const pct = Math.round((correct / total) * 100);
-
-      // summary layout (avoid huge whitespace)
       imgbox.classList.remove("show");
       answersEl.style.display = "none";
       tilesArea.classList.remove("show");
       clearBtn.style.display = "none";
       checkBtn.style.display = "none";
 
+      const total = QUESTIONS.length;
+      const missedCount = missed.size;
+      const correct = total - missedCount;
+      const pct = Math.round((correct / total) * 100);
+
       qtitle.textContent = `Score: ${pct}%`;
       qsub.textContent = `You got ${correct} out of ${total} correct.`;
 
-      // build message
       let tipLine = "";
       if(pct === 100){
-        tipLine = "Perfect score! 🎉 Nice work — doing a quick review tomorrow will lock it in.";
+        tipLine = "Perfect score! 🎉 Nice work — do a quick review tomorrow to lock it in.";
       } else if(pct >= 80){
         tipLine = "Nice work! Review the ones below, then you’ll crush it next time.";
       } else {
         tipLine = "Good effort. Review these, then try again after a quick study session.";
       }
 
-      // review list
       const misses = Array.from(missed);
       const reviewHtml = `
         <div class="review">
@@ -829,9 +812,7 @@
       reviewBox.style.display = "block";
       reviewBox.innerHTML = reviewHtml;
 
-      // buttons
       exitBtn.textContent = "Back to Week 2";
-      exitBtn.style.display = "inline-block";
       resultEl.textContent = (pct === 100) ? "✅ Awesome!" : "✅ Nice!";
     }
 
@@ -841,12 +822,8 @@
     });
 
     clearBtn.addEventListener("click", clearTiles);
-    checkBtn.addEventListener("click", () => {
-      const q = QUESTIONS[idx];
-      checkTiles(q);
-    });
+    checkBtn.addEventListener("click", () => checkTiles(QUESTIONS[idx]));
 
-    // initial
     renderQuestion();
   </script>
 </body>
