@@ -24,7 +24,14 @@
 
       --ok:#22c55e;
       --bad:#ef4444;
+
+      /* default answer-slot sizing (will be overridden dynamically) */
+      --slotW:30px;
+      --slotH:38px;
+      --slotGap:8px;
+      --slotFont:18px;
     }
+
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -169,6 +176,7 @@
       flex:0 0 auto;
     }
 
+    /* MC answers */
     .answers{
       display:flex;
       flex-direction:column;
@@ -205,6 +213,7 @@
       cursor:default;
     }
 
+    /* tiles mode */
     .tilesArea{
       display:none;
       flex-direction:column;
@@ -225,33 +234,35 @@
       align-items:center;
       flex:0 0 auto;
       min-height:74px;
+      overflow:hidden; /* keep clean (no scroll) */
     }
     .slots{
       display:flex;
       flex-wrap:nowrap;
-      gap:8px;
+      gap:var(--slotGap);
       align-items:center;
       justify-content:center;
       width:100%;
-      overflow:hidden;
+      overflow:hidden; /* safe now because we auto-shrink */
     }
     .slot{
-      width:30px;
-      height:38px;
+      width:var(--slotW);
+      height:var(--slotH);
       border-radius:12px;
       border:2px dashed rgba(15,23,42,.25);
       display:flex;
       align-items:center;
       justify-content:center;
       font-weight:1000;
-      font-size:18px;
+      font-size:var(--slotFont);
       color:#0f172a;
       background:transparent;
       flex:0 0 auto;
       user-select:none;
+      text-transform:uppercase;
     }
     .slot.space{
-      width:16px;
+      width:calc(var(--slotW) * 0.55);
       height:10px;
       border:none;
       background:transparent;
@@ -276,7 +287,6 @@
       padding:4px 2px;
       min-height:0;
     }
-    /* make tiles buttons for reliable mobile taps */
     .tilebtn{
       width:60px;
       height:58px;
@@ -292,6 +302,7 @@
       user-select:none;
       transition:transform .05s ease, opacity .12s ease, border-color .12s ease;
       -webkit-tap-highlight-color: transparent;
+      text-transform:uppercase;
     }
     .tilebtn:active{ transform:scale(.985); }
     .tilebtn.used{
@@ -340,7 +351,6 @@
       flex:0 0 auto;
       min-height:18px;
     }
-
     .advancing{
       text-align:center;
       font-weight:1000;
@@ -590,19 +600,12 @@
     function autoAdvance(delayMs){
       advancingEl.classList.add("show");
       window.setTimeout(() => {
-        try{
-          advancingEl.classList.remove("show");
-          if(idx >= QUESTIONS.length - 1){
-            showSummary();
-          } else {
-            idx++;
-            renderQuestion();
-          }
-        } catch(err){
-          console.error("Advance error:", err);
-          advancingEl.classList.remove("show");
-          locked = false;
-          resultEl.textContent = "Something glitched — tap again.";
+        advancingEl.classList.remove("show");
+        if(idx >= QUESTIONS.length - 1){
+          showSummary();
+        } else {
+          idx++;
+          renderQuestion();
         }
       }, delayMs);
     }
@@ -639,12 +642,38 @@
       autoAdvance(MC_ADVANCE_MS);
     }
 
-    // ===== Tiles (ALL CAPS + reliable taps) =====
-    function buildTilesTarget(word){
-      // keep spaces, but display/compare in ALL CAPS
-      correctUpper = word.toUpperCase();
+    // ===== Tiles (CAPS + auto-fit slots) =====
+    function setSlotSizingForWord(targetUpper){
+      // count letters excluding spaces
+      const lettersCount = targetUpper.replace(/ /g,"").length;
 
-      slotChars = Array.from(correctUpper);               // includes spaces
+      // defaults (short words)
+      let slotW = 30, slotH = 38, gap = 8, font = 18;
+
+      // tune for longer one-word states
+      // (Pennsylvania=12, Mississippi=11, Massachusetts=13, etc.)
+      if(lettersCount >= 11){
+        slotW = 24; slotH = 34; gap = 6; font = 15;
+      }
+      if(lettersCount >= 13){
+        slotW = 21; slotH = 32; gap = 5; font = 14;
+      }
+      if(lettersCount >= 15){
+        slotW = 19; slotH = 30; gap = 4; font = 13;
+      }
+
+      // apply to CSS variables on the card so it affects only this page
+      document.documentElement.style.setProperty("--slotW", slotW + "px");
+      document.documentElement.style.setProperty("--slotH", slotH + "px");
+      document.documentElement.style.setProperty("--slotGap", gap + "px");
+      document.documentElement.style.setProperty("--slotFont", font + "px");
+    }
+
+    function buildTilesTarget(word){
+      correctUpper = word.toUpperCase();
+      setSlotSizingForWord(correctUpper);
+
+      slotChars = Array.from(correctUpper); // includes spaces
       filled = slotChars.map(ch => ch === " " ? " " : null);
 
       const letters = slotChars.filter(ch => ch !== " ");
@@ -673,7 +702,7 @@
         const b = document.createElement("button");
         b.type = "button";
         b.className = "tilebtn" + (t.used ? " used" : "");
-        b.textContent = t.ch;                 // already uppercase
+        b.textContent = t.ch;               // already CAPS
         b.disabled = t.used || locked;
 
         b.addEventListener("click", () => {
@@ -740,7 +769,6 @@
 
       locked = true;
 
-      // compare uppercase to uppercase (robust)
       const guess = currentAnswer().toUpperCase();
       const isCorrect = (guess === correctUpper);
 
@@ -754,7 +782,7 @@
         missed.add(q.reviewKey);
       }
 
-      renderPool(); // lock buttons visually
+      renderPool();
       autoAdvance(TILES_ADVANCE_MS);
     }
 
