@@ -198,7 +198,6 @@
       border-color:var(--bad);
       background:#fef2f2;
     }
-    /* keep disabled from going “washed out” on mobile */
     .choice:disabled{
       opacity:1;
       color:inherit;
@@ -277,7 +276,8 @@
       padding:4px 2px;
       min-height:0;
     }
-    .tile{
+    /* make tiles buttons for reliable mobile taps */
+    .tilebtn{
       width:60px;
       height:58px;
       border-radius:16px;
@@ -290,11 +290,15 @@
       font-size:22px;
       cursor:pointer;
       user-select:none;
-      transition:transform .05s ease, opacity .12s ease;
+      transition:transform .05s ease, opacity .12s ease, border-color .12s ease;
+      -webkit-tap-highlight-color: transparent;
     }
-    .tile:active{ transform:scale(.985); }
-    .tile.used{
+    .tilebtn:active{ transform:scale(.985); }
+    .tilebtn.used{
       opacity:.35;
+      cursor:default;
+    }
+    .tilebtn:disabled{
       pointer-events:none;
     }
 
@@ -543,6 +547,7 @@
     let slotChars = [];
     let filled = [];
     let tiles = [];
+    let correctUpper = "";
 
     const MC_ADVANCE_MS = 500;
     const TILES_ADVANCE_MS = 650;
@@ -596,7 +601,7 @@
         } catch(err){
           console.error("Advance error:", err);
           advancingEl.classList.remove("show");
-          locked = false; // fail open so user isn’t stuck
+          locked = false;
           resultEl.textContent = "Something glitched — tap again.";
         }
       }, delayMs);
@@ -628,23 +633,22 @@
       });
 
       const isCorrect = (choice === q.correct);
-      if(isCorrect){
-        resultEl.textContent = "✅ Nice!";
-      } else {
-        resultEl.textContent = "❌ Almost — keep going.";
-        missed.add(q.reviewKey);
-      }
+      resultEl.textContent = isCorrect ? "✅ Nice!" : "❌ Almost — keep going.";
+      if(!isCorrect) missed.add(q.reviewKey);
 
       autoAdvance(MC_ADVANCE_MS);
     }
 
-    // ===== Tiles =====
+    // ===== Tiles (ALL CAPS + reliable taps) =====
     function buildTilesTarget(word){
-      slotChars = Array.from(word);
+      // keep spaces, but display/compare in ALL CAPS
+      correctUpper = word.toUpperCase();
+
+      slotChars = Array.from(correctUpper);               // includes spaces
       filled = slotChars.map(ch => ch === " " ? " " : null);
 
       const letters = slotChars.filter(ch => ch !== " ");
-      tiles = shuffle(letters).map((ch, i) => ({ id: `t${i}`, ch, used:false }));
+      tiles = shuffle(letters).map((ch, i) => ({ idx:i, ch, used:false }));
     }
 
     function renderSlots(){
@@ -665,14 +669,18 @@
 
     function renderPool(){
       poolEl.innerHTML = "";
-      tiles.forEach(t => {
-        const b = document.createElement("div");
-        b.className = "tile" + (t.used ? " used" : "");
-        b.textContent = t.ch;
+      tiles.forEach((t, poolIndex) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "tilebtn" + (t.used ? " used" : "");
+        b.textContent = t.ch;                 // already uppercase
+        b.disabled = t.used || locked;
+
         b.addEventListener("click", () => {
           if(locked) return;
-          placeTile(t.id);
+          placeTile(poolIndex);
         });
+
         poolEl.appendChild(b);
       });
     }
@@ -685,10 +693,11 @@
       return -1;
     }
 
-    function placeTile(tileId){
+    function placeTile(poolIndex){
       const i = firstEmptyIndex();
       if(i === -1) return;
-      const t = tiles.find(x => x.id === tileId);
+
+      const t = tiles[poolIndex];
       if(!t || t.used) return;
 
       filled[i] = t.ch;
@@ -731,8 +740,9 @@
 
       locked = true;
 
-      const guess = currentAnswer();
-      const isCorrect = (guess === q.correct);
+      // compare uppercase to uppercase (robust)
+      const guess = currentAnswer().toUpperCase();
+      const isCorrect = (guess === correctUpper);
 
       slotsWrap.classList.remove("ok","bad");
       slotsWrap.classList.add(isCorrect ? "ok" : "bad");
@@ -740,10 +750,11 @@
       if(isCorrect){
         resultEl.textContent = "✅ Nice!";
       } else {
-        resultEl.textContent = `❌ Almost — it was ${q.correct}.`;
+        resultEl.textContent = `❌ Almost — it was ${correctUpper}.`;
         missed.add(q.reviewKey);
       }
 
+      renderPool(); // lock buttons visually
       autoAdvance(TILES_ADVANCE_MS);
     }
 
