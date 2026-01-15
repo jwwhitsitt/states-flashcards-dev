@@ -140,21 +140,24 @@
        - overlay, no layout impact
        - pointer-events none
        ============================ */
-    .kitimus{
-  position:absolute;
-  right:12px;
-  top: calc(100% + 10px);
-
-  /* no upward pull */
-  transform:none;
+  .kitimus{
+  /* 3rd child in the .toprow grid */
+  justify-self:end;
+  align-self:center;
 
   width: clamp(52px, 10vw, 76px);
   height: clamp(52px, 10vw, 76px);
 
-  z-index:5;
   pointer-events:none;
   user-select:none;
 }
+.kitimus img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
     .card{
       background:var(--card);
       border-radius:var(--radius);
