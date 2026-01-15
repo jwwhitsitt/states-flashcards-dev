@@ -17,23 +17,35 @@
       --btn:#0f172a;
       --btn2:#e5e7eb;
       --btn2text:#111827;
+
+      /* NEW: layout tuning (responsive) */
+      --topbarH: 56px;
+      --pagePad: clamp(10px, 2.4vw, 14px);
+      --panelPad: clamp(10px, 2.6vw, 14px);
+      --gap: clamp(8px, 2vw, 12px);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
+
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg);
       color:var(--text);
-      height:100vh;
+
+      /* CHANGED: better mobile viewport behavior */
+      height:100svh;
       display:flex;
       flex-direction:column;
+
       overflow:hidden; /* no page scroll */
     }
 
     header{
       flex:0 0 auto;
-      padding:10px 14px;
+      height:var(--topbarH);
+      padding:10px var(--pagePad);
       background:#fff;
       box-shadow:0 1px 10px rgba(0,0,0,.06);
       display:flex;
@@ -61,17 +73,22 @@
       display:flex;
       justify-content:center;
       align-items:stretch;
-      padding:12px;
+
+      /* CHANGED: responsive padding + safe area */
+      padding:var(--pagePad);
+      padding-bottom:calc(var(--pagePad) + env(safe-area-inset-bottom, 0px));
+
       overflow:hidden;
     }
+
     .wrap{
       width:100%;
-      max-width:720px;
+      max-width:760px; /* slightly wider so the card can feel "week 1 big" */
       min-height:0;
       display:flex;
       flex-direction:column;
       justify-content:center;
-      gap:12px;
+      gap:var(--gap);
     }
 
     /* big outer card */
@@ -79,28 +96,47 @@
       background:var(--card);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:14px;
+
+      /* CHANGED: responsive padding */
+      padding:var(--panelPad);
+
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:var(--gap);
       overflow:hidden;
+
+      /* NEW: ensure panel doesn't exceed available height */
+      min-height:0;
     }
 
     /* 3D flip scene */
     .scene{
       width:100%;
-      height:min(52vh, 420px);
-      min-height:280px;
+
+      /*
+        CHANGED: let the card take as much height as possible
+        without pushing controls off-screen.
+      */
+      height: min(62svh, 520px);
+      min-height: clamp(220px, 42svh, 340px);
+
       perspective:1200px;
       display:flex;
       align-items:center;
       justify-content:center;
       user-select:none;
+
+      /* NEW: allow the scene to shrink inside the panel */
+      min-height:0;
     }
+
     .flip{
       width:100%;
       height:100%;
-      max-width:560px;
+
+      /* CHANGED: allow bigger card on big screens */
+      max-width: min(680px, 100%);
+
       position:relative;
       transform-style:preserve-3d;
       transition:transform .55s cubic-bezier(.2,.8,.2,1);
@@ -123,16 +159,31 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:10px;
+
+      /* CHANGED: slightly tighter padding so image is bigger */
+      padding:8px;
     }
+
     .face img{
       width:100%;
       height:100%;
       object-fit:contain;
       border-radius:14px;
     }
+
     .back{
       transform:rotateY(180deg);
+    }
+
+    /* small hint text */
+    .hint{
+      text-align:center;
+      color:var(--muted);
+      font-weight:800;
+
+      /* CHANGED: responsive size + tighter spacing */
+      font-size: clamp(12px, 2.8vw, 13px);
+      margin-top:-2px;
     }
 
     /* controls */
@@ -140,23 +191,28 @@
       display:flex;
       gap:10px;
     }
+
     .btn{
       flex:1;
-      padding:12px 14px;
+
+      /* CHANGED: responsive padding & text size (bigger on big screens, safe on small) */
+      padding: clamp(10px, 2.8vw, 14px) clamp(12px, 3.2vw, 16px);
       border-radius:14px;
       border:0;
-      font-size:16px;
+      font-size: clamp(14px, 3.6vw, 16px);
       font-weight:1000;
       cursor:pointer;
       background:var(--btn);
       color:#fff;
       box-shadow:0 10px 20px rgba(0,0,0,.10);
     }
+
     .btn.secondary{
       background:var(--btn2);
       color:var(--btn2text);
       box-shadow:none;
     }
+
     .btn:disabled{
       opacity:.45;
       cursor:not-allowed;
@@ -167,23 +223,32 @@
       text-align:center;
       color:var(--muted);
       font-weight:900;
-      font-size:14px;
+      font-size: clamp(12px, 3.2vw, 14px);
       margin-top:-2px;
     }
 
-    /* small hint text */
-    .hint{
-      text-align:center;
-      color:var(--muted);
-      font-weight:800;
-      font-size:13px;
-      margin-top:-6px;
+    /* Short screens (iPhone SE-ish): keep everything on screen */
+    @media (max-height: 700px){
+      :root{ --topbarH: 52px; }
+
+      .scene{
+        height: min(56svh, 420px);
+        min-height: 220px;
+      }
+
+      .hint{
+        font-size:12px;
+      }
     }
 
-    /* short screens: shrink height slightly */
-    @media (max-height: 700px){
-      .scene{ height:min(48vh, 360px); min-height:250px; }
-      .btn{ padding:10px 12px; font-size:15px; }
+    /* Very short screens: shrink just a bit more to avoid any cutoff */
+    @media (max-height: 620px){
+      .scene{
+        height: min(52svh, 380px);
+        min-height: 210px;
+      }
+      .controls{ gap:8px; }
+      .btn{ border-radius:12px; }
     }
   </style>
 </head>
