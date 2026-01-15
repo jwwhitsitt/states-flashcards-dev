@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Week 2 – Check Your Learning</title>
 
+  <!-- Kitimus preload (prevents flicker) -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+
   <style>
     :root{
       --bg:#f4f6fb;
@@ -83,6 +88,7 @@
     }
 
     .toprow{
+      position:relative; /* NEW: anchor for mascot */
       display:flex;
       align-items:center;
       gap:10px;
@@ -126,6 +132,36 @@
       font-size:14px;
       text-shadow:0 1px 0 rgba(255,255,255,.75);
       pointer-events:none;
+    }
+
+    /* ============================
+       Kitimus perch (testing UI only)
+       - overlay, no layout impact
+       - pointer-events none
+       ============================ */
+    .kitimus{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      width:76px;
+      height:76px;
+      z-index:5;
+      pointer-events:none;
+      user-select:none;
+      opacity:1;
+    }
+    .kitimus img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 8px 12px rgba(15,23,42,.18));
+    }
+
+    /* smaller devices: tuck it a bit */
+    @media (max-width: 380px){
+      .kitimus{ width:64px; height:64px; right:10px; }
     }
 
     .card{
@@ -377,6 +413,11 @@
           <div class="bar" id="bar"></div>
           <div class="bartext" id="barText">1 of 12</div>
         </div>
+
+        <!-- Kitimus perch (overlay, does not affect layout) -->
+        <div class="kitimus" aria-hidden="true">
+          <img id="kitimusImg" src="/mascots/kitimus/kitimus-neutral.png" alt="">
+        </div>
       </div>
 
       <section class="card" id="card">
@@ -515,6 +556,27 @@
     const clearBtn = document.getElementById("clearBtn");
     const checkBtn = document.getElementById("checkBtn");
 
+    /* ============================
+       Kitimus state machine (minimal)
+       ============================ */
+    const kitimusImg = document.getElementById("kitimusImg");
+    const KITIMUS = {
+      neutral: "/mascots/kitimus/kitimus-neutral.png",
+      squint: "/mascots/kitimus/kitimus-squint.png",
+      celebrate: "/mascots/kitimus/kitimus-celebrate.png"
+    };
+    function setKitimus(state){
+      if(!kitimusImg) return;
+      const src = KITIMUS[state] || KITIMUS.neutral;
+      if(kitimusImg.getAttribute("src") !== src){
+        kitimusImg.setAttribute("src", src);
+      }
+    }
+    function kitimusWrongPulse(){
+      // small intentional delay, then brief squint, then back to neutral on next render/advance
+      setTimeout(() => setKitimus("squint"), 200);
+    }
+
     let idx = 0;
     let locked = false;
 
@@ -538,6 +600,9 @@
       resultEl.textContent = "";
       reviewBox.style.display = "none";
       reviewBox.innerHTML = "";
+
+      // mascot default (neutral most of the time)
+      setKitimus("neutral");
 
       // image
       if(q.showImage && q.img){
@@ -588,9 +653,11 @@
 
           if(ok){
             resultEl.textContent = "✅ Nice!";
+            // correct stays neutral
           } else {
             resultEl.textContent = "❌ Almost — keep going.";
             missed.add(q.reviewLabel);
+            kitimusWrongPulse();
           }
 
           results.push({ q, ok });
@@ -704,9 +771,11 @@
 
         if(ok){
           resultEl.textContent = "✅ Nice!";
+          // correct stays neutral
         } else {
           resultEl.textContent = "❌ Almost — keep going.";
           missed.add(q.reviewLabel);
+          kitimusWrongPulse();
         }
         results.push({ q, ok });
 
@@ -775,6 +844,14 @@
       // progress bar full
       bar.style.width = "100%";
       barText.textContent = `${total} of ${total}`;
+
+      // End-of-test mascot rule:
+      // Celebrate only if 100%, otherwise neutral.
+      if(pct === 100){
+        setTimeout(() => setKitimus("celebrate"), 200);
+      } else {
+        setKitimus("neutral");
+      }
 
       // Exit button becomes "Back to Week 2"
       exitBtn.textContent = "Back to Week 2";
