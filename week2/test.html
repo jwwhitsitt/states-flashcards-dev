@@ -2,16 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Week 2 – Check Your Learning</title>
-
-  <!--
-    test.html — v2.3 (dev)
-    Only agreed changes included:
-    - Capitals (Q2) uses UNDERSCORE slots (already in your working build)
-    - Two-word states display on TWO centered lines (no space tile)
-    - Keep everything else as-is: auto-advance after feedback, big buttons, all-caps letters
-  -->
 
   <style>
     :root{
@@ -30,26 +22,34 @@
       --bar:#c7d2fe;
       --barbg:#e5e7eb;
 
-      --ok:#22c55e;
+      --good:#22c55e;
       --bad:#ef4444;
 
-      --slot:#9aa4b2;
-      --tileBorder:#e5e7eb;
+      /* responsive type */
+      --h1: clamp(26px, 5.6vw, 44px);
+      --h2: clamp(14px, 3.8vw, 18px);
+      --choice: clamp(16px, 4.2vw, 20px);
+      --pill: clamp(12px, 3.2vw, 14px);
+
+      --pad: 12px;
+      --gap: 10px;
     }
 
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg);
       color:var(--text);
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
+      /* Allow scroll as a safety valve on smaller devices (iPhone SE, etc.) */
+      overflow:auto;
     }
 
     header{
+      position:sticky;
+      top:0;
+      z-index:10;
       padding:10px 14px;
       background:#fff;
       box-shadow:0 1px 10px rgba(0,0,0,.06);
@@ -73,17 +73,13 @@
     header .spacer{ width:52px; }
 
     main{
-      flex:1;
+      padding:12px;
       display:flex;
       justify-content:center;
-      align-items:flex-start;
-      padding:12px;
-      overflow:hidden;
     }
     .wrap{
       width:100%;
       max-width:720px;
-      min-height:0;
     }
 
     .toprow{
@@ -98,7 +94,7 @@
       font-weight:1000;
       border-radius:999px;
       padding:8px 12px;
-      font-size:14px;
+      font-size:var(--pill);
       min-width:92px;
       text-align:center;
       white-space:nowrap;
@@ -136,25 +132,23 @@
       background:var(--card);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:14px;
+      padding:var(--pad);
       display:flex;
       flex-direction:column;
-      gap:10px;
-      height:calc(100vh - 62px - 24px - 34px);
-      max-height:760px;
+      gap:var(--gap);
       overflow:hidden;
     }
 
-    /* ===== shared image box for spelling ===== */
+    /* Image (Spelling only) */
     .imgbox{
       border-radius:16px;
       background:#fff;
       display:none;
       align-items:center;
       justify-content:center;
-      padding:10px;
+      padding:8px;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      height:210px;
+      height:220px;
       overflow:hidden;
     }
     .imgbox.show{ display:flex; }
@@ -166,35 +160,30 @@
     }
 
     .qtitle{
-      font-size:44px;
+      font-size:var(--h1);
       font-weight:1000;
       line-height:1.05;
       margin-top:2px;
-      letter-spacing:-.5px;
     }
     .qsub{
       color:var(--muted);
-      font-weight:900;
-      font-size:22px;
+      font-weight:800;
       margin-bottom:2px;
+      font-size:var(--h2);
     }
 
-    /* ===== Q1/Q3 multiple choice ===== */
+    /* Multiple choice answers (Spelling + Abbrev) */
     .answers{
       display:flex;
       flex-direction:column;
-      gap:12px;
-      flex:1;
-      min-height:0;
-      overflow:hidden;
-      justify-content:flex-start;
+      gap:10px;
     }
     .choice{
-      border-radius:18px;
+      border-radius:16px;
       border:2px solid #e5e7eb;
       background:#fff;
-      padding:18px 16px;
-      font-size:26px;
+      padding:14px 14px;
+      font-size:var(--choice);
       font-weight:1000;
       text-align:left;
       cursor:pointer;
@@ -202,117 +191,110 @@
     }
     .choice:active{ transform:scale(.995); }
     .choice.correct{
-      border-color:var(--ok);
+      border-color:var(--good);
       background:#ecfdf5;
     }
     .choice.wrong{
       border-color:var(--bad);
       background:#fef2f2;
     }
-    .choice:disabled{
-      color:#9ca3af;
-    }
 
-    /* ===== Q2 capitals tiles ===== */
+    /* Capitals (tiles) */
     .capWrap{
       display:none;
       flex-direction:column;
       gap:12px;
-      flex:1;
-      min-height:0;
-      overflow:hidden;
     }
     .capWrap.show{ display:flex; }
 
-    /* Slots container (changed to support 2 centered lines) */
     .slots{
       width:100%;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      padding:10px 10px;
       border-radius:16px;
       background:#fff;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      overflow:hidden;
-      transition: box-shadow .15s ease;
-    }
-    .slots.ok{
-      box-shadow: inset 0 0 0 2px rgba(34,197,94,.75);
-    }
-    .slots.bad{
-      box-shadow: inset 0 0 0 2px rgba(239,68,68,.75);
-    }
-
-    /* A row of slots for each word */
-    .slotRow{
-      display:grid;
-      grid-auto-flow:column;
-      grid-auto-columns:minmax(10px, 1fr);
+      padding:14px 12px;
+      display:flex;
+      flex-direction:column;
       gap:10px;
-      width:fit-content;
-      max-width:100%;
+      align-items:center; /* centered */
       justify-content:center;
+      overflow:hidden;
     }
-
-    /* Individual underscore slot */
+    .slotRow{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      width:100%;
+      flex-wrap:nowrap;
+    }
     .slot{
-      width:auto;
-      min-width:22px;
+      min-width:0;
+      width: auto;
+      flex: 0 0 auto;
       text-align:center;
-      border-bottom:4px solid var(--slot);
-      padding-bottom:6px;
-      line-height:1;
       font-weight:1000;
-      font-size:20px;
+      font-size:18px;
+      line-height:1;
       color:#111827;
       user-select:none;
+
+      /* underline */
+      padding:0 2px 6px 2px;
+      border-bottom:4px solid #94a3b8;
+      min-height:28px;
+
+      /* keep letters from "touching" */
+      letter-spacing:.5px;
     }
-    .slot.empty{ color:transparent; }
+    .slot.empty{
+      color:transparent;
+    }
+    .slot.space{
+      border-bottom:0;
+      width:14px;
+      padding:0;
+    }
 
     .tileGrid{
       width:100%;
       display:grid;
       grid-template-columns:repeat(6, minmax(0, 1fr));
-      gap:12px;
+      gap:10px;
       justify-content:center;
       align-content:start;
-      padding:6px 4px;
-      overflow:hidden;
+      padding:4px 2px;
     }
-
     .tile{
       border-radius:18px;
-      border:2px solid var(--tileBorder);
+      border:2px solid #e5e7eb;
       background:#fff;
       padding:14px 0;
-      font-size:26px;
+      font-size:22px;
       font-weight:1000;
       text-align:center;
       cursor:pointer;
       user-select:none;
-      transition:transform .05s ease, opacity .12s ease, border-color .12s ease;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
     }
     .tile:active{ transform:scale(.99); }
     .tile.used{
-      opacity:.25;
-      pointer-events:none;
+      opacity:.35;
+      cursor:not-allowed;
     }
 
-    /* Bottom buttons (big) */
+    /* Buttons */
     .bottom{
       display:flex;
-      gap:12px;
-      margin-top:2px;
+      gap:10px;
+      flex-wrap:wrap;
     }
     .btn{
       flex:1;
-      padding:18px 16px;
-      border-radius:18px;
+      min-width:140px;
+      padding:14px 14px; /* bigger buttons */
+      border-radius:16px;
       border:0;
-      font-size:22px;
+      font-size:16px;
       font-weight:1000;
       cursor:pointer;
       background:var(--btn);
@@ -339,14 +321,13 @@
       min-height:18px;
     }
 
+    /* Summary */
     .review{
-      margin-top:10px;
+      margin-top:6px;
       padding:12px;
       border-radius:16px;
       background:#f8fafc;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-      overflow:auto;
-      max-height:220px;
     }
     .review h2{
       margin:0 0 6px 0;
@@ -363,7 +344,20 @@
       font-size:13px;
       color:var(--muted);
       font-weight:800;
-      margin-top:6px;
+      margin-top:8px;
+      line-height:1.35;
+    }
+
+    /* Extra tightening for very short screens */
+    @media (max-height: 700px){
+      :root{ --pad: 10px; --gap: 8px; }
+      .imgbox{ height:190px; }
+      .choice{ padding:12px 12px; }
+      .tile{ padding:12px 0; font-size:20px; }
+      .btn{ padding:12px 14px; }
+    }
+    @media (max-height: 620px){
+      .imgbox{ height:160px; }
     }
   </style>
 </head>
@@ -377,7 +371,6 @@
 
   <main>
     <div class="wrap">
-
       <div class="toprow">
         <div class="pill" id="sectionPill">Spelling</div>
         <div class="barwrap" aria-label="Progress">
@@ -387,31 +380,24 @@
       </div>
 
       <section class="card" id="card">
-        <!-- Spelling image -->
         <div class="imgbox" id="imgbox"><img id="img" alt="" /></div>
 
-        <!-- Titles -->
         <div class="qtitle" id="qtitle"></div>
         <div class="qsub" id="qsub"></div>
 
-        <!-- Q1/Q3 answers -->
+        <!-- Multiple choice -->
         <div class="answers" id="answers"></div>
 
-        <!-- Q2 capitals UI -->
+        <!-- Capitals tiles -->
         <div class="capWrap" id="capWrap">
           <div class="slots" id="slots"></div>
           <div class="tileGrid" id="tileGrid"></div>
-
-          <div class="bottom">
-            <button class="btn secondary" id="capClearBtn" type="button">Clear</button>
-            <button class="btn" id="capCheckBtn" type="button">Check</button>
-          </div>
         </div>
 
-        <!-- Bottom controls (Q1/Q3 only; auto-advance means Next stays hidden) -->
-        <div class="bottom" id="bottomRow">
-          <button class="btn secondary" id="exitBtn" type="button">Exit</button>
-          <button class="btn" id="nextBtn" type="button" disabled>Next</button>
+        <div class="bottom" id="bottomBtns">
+          <button class="btn secondary" id="exitBtn">Exit</button>
+          <button class="btn secondary" id="clearBtn" style="display:none;">Clear</button>
+          <button class="btn" id="checkBtn" style="display:none;">Check</button>
         </div>
 
         <div class="result" id="result"></div>
@@ -421,6 +407,10 @@
   </main>
 
   <script>
+    // =========================================================
+    // Version: Week2 Test - Option 1 (single file, modular renderers)
+    // =========================================================
+
     // ====== Data ======
     const WEEK = [
       { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", img:"./images/pa-f.png" },
@@ -428,18 +418,6 @@
       { state:"New York",     abbrev:"NY", capital:"Albany",     img:"./images/ny-f.png" },
       { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
     ];
-
-    // Spelling fakes (must ALWAYS include correct spelling among 4 choices)
-    const SPELLING_FAKES = {
-      "Pennsylvania":["Pensylvainia","Pencilvainya","Penzylvania"],
-      "New Jersey":["New Jerzee","New Jersie","New Jersei"],
-      "New York":["New Yorc","New Yark","Nu York"],
-      "Delaware":["Delawair","Delawere","Della-ware"]
-    };
-
-    const ABBREV_POOL = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-                         "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-                         "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
     function shuffle(arr){
       const a = arr.slice();
@@ -449,62 +427,67 @@
       }
       return a;
     }
-    function pickDistinct(pool, count, excludeSet){
-      const out = [];
-      const p = shuffle(pool).filter(x => !excludeSet.has(x));
-      for(const item of p){
-        if(out.length>=count) break;
-        out.push(item);
-      }
-      return out;
-    }
 
-    // ====== Build questions (12 total: 4 spelling, 4 capitals tiles, 4 abbreviations) ======
+    // Spelling fakes MUST look like the same word (no random state names)
+    const SPELLING_FAKES = {
+      "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania"],
+      "New Jersey":["New Jerzee","New Jersy","New Jersei"],
+      "New York":["New Yorc","New Yark","New Yrok"],
+      "Delaware":["Della-ware","Delawair","Delawere"]
+    };
+
+    // ====== Build test (12 questions: 4 spelling, 4 capitals, 4 abbrev) ======
     const spellingQuestions = WEEK.map(s => {
       const correct = s.state;
-      const fakes = shuffle(SPELLING_FAKES[correct] || []).slice(0,3);
-      const choices = shuffle([correct, ...fakes]).slice(0,4); // ensure 4
-      // safety: if somehow correct got chopped (shouldn't), force it in
-      if(!choices.includes(correct)){
-        choices[0] = correct;
+      const fakes = (SPELLING_FAKES[correct] || []).slice(0,3);
+      // ensure we always have 3 fakes; if not, pad with safe variants
+      while(fakes.length < 3){
+        fakes.push(correct.replace(/a/ig,"e").slice(0, Math.max(3, correct.length)));
       }
+      const choices = shuffle([correct, ...fakes.slice(0,3)]);
       return {
-        type:"spelling",
         section:"Spelling",
+        type:"mc",
         showImage:true,
         img:s.img,
         title:"Pick the correct spelling",
         subtitle:"Which one is spelled correctly?",
         correct,
-        choices
+        choices,
+        reviewLabel:`Spelling: ${s.state}` // only used at summary
       };
     });
 
     const capitalQuestions = WEEK.map(s => {
       return {
-        type:"capitals",
         section:"Capitals",
+        type:"tiles",
         showImage:false,
         img:null,
         title:s.capital,
         subtitle:"Tap the letters to spell the state.",
-        correct:s.state
+        correct:s.state,
+        reviewLabel:`Capitals: ${s.capital}`
       };
     });
 
     const abbrevQuestions = WEEK.map(s => {
       const correct = s.abbrev;
-      const wrongs = pickDistinct(ABBREV_POOL, 3, new Set([correct]));
+      const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+      const wrongs = shuffle(pool.filter(x => x !== correct)).slice(0,3);
       const choices = shuffle([correct, ...wrongs]);
       return {
-        type:"abbrev",
         section:"Abbreviations",
+        type:"mc",
         showImage:false,
         img:null,
         title:s.state,
         subtitle:"Which abbreviation matches this state?",
         correct,
-        choices
+        choices,
+        reviewLabel:`Abbreviations: ${s.state}`
       };
     });
 
@@ -519,60 +502,44 @@
     const img = document.getElementById("img");
     const qtitle = document.getElementById("qtitle");
     const qsub = document.getElementById("qsub");
+
     const answersEl = document.getElementById("answers");
-    const resultEl = document.getElementById("result");
-    const reviewBox = document.getElementById("reviewBox");
-
-    const bottomRow = document.getElementById("bottomRow");
-    const exitBtn = document.getElementById("exitBtn");
-    const nextBtn = document.getElementById("nextBtn");
-
     const capWrap = document.getElementById("capWrap");
     const slotsEl = document.getElementById("slots");
     const tileGrid = document.getElementById("tileGrid");
-    const capClearBtn = document.getElementById("capClearBtn");
-    const capCheckBtn = document.getElementById("capCheckBtn");
 
-    // ====== State ======
+    const resultEl = document.getElementById("result");
+    const reviewBox = document.getElementById("reviewBox");
+
+    const exitBtn = document.getElementById("exitBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
     let idx = 0;
     let locked = false;
 
-    const results = []; // {q, chosen, correct, ok}
+    const results = []; // { q, ok }
     const missed = new Set();
 
-    // capitals working state
-    let capAnswer = [];      // array of letters filled (no spaces)
-    let capTarget = "";      // target letters (no spaces)
-    let capTiles = [];       // tile letters (upper)
-    let capUsed = [];        // bools
-    let capWordParts = [];   // ["NEW","YORK"] or ["DELAWARE"]
-
-    const AUTO_DELAY = 500; // agreed: quick feedback then auto-advance
+    // Capitals state
+    let tileState = null; // { targetWords, targetLetters, filled, tiles, used }
 
     function setProgress(){
       const n = QUESTIONS.length;
-      const pos = Math.min(idx + 1, n);
+      const pos = idx + 1;
       const pct = Math.round((pos / n) * 100);
       bar.style.width = pct + "%";
       barText.textContent = `${pos} of ${n}`;
       sectionPill.textContent = QUESTIONS[idx].section;
     }
 
-    function resetFeedback(){
-      resultEl.textContent = "";
-      slotsEl.classList.remove("ok","bad");
-    }
-
-    function renderQuestion(){
+    function resetCommonUI(q){
       locked = false;
-      resetFeedback();
+      resultEl.textContent = "";
       reviewBox.style.display = "none";
       reviewBox.innerHTML = "";
 
-      const q = QUESTIONS[idx];
-      setProgress();
-
-      // image rules (spelling only)
+      // image
       if(q.showImage && q.img){
         imgbox.classList.add("show");
         img.src = q.img;
@@ -586,202 +553,185 @@
       qtitle.textContent = q.title;
       qsub.textContent = q.subtitle;
 
-      // show/hide sections
+      // hide/show containers
       answersEl.style.display = "none";
       capWrap.classList.remove("show");
-      bottomRow.style.display = "none";
+      clearBtn.style.display = "none";
+      checkBtn.style.display = "none";
+    }
+
+    // =========================================================
+    // Renderer: Multiple Choice (Spelling + Abbrev)
+    // =========================================================
+    function renderMC(q){
+      answersEl.style.display = "flex";
       answersEl.innerHTML = "";
 
-      if(q.type === "spelling" || q.type === "abbrev"){
-        // MC mode
-        answersEl.style.display = "flex";
-        bottomRow.style.display = "flex";
-        nextBtn.disabled = true; // auto-advance, so keep disabled
-        nextBtn.style.display = "none"; // hide Next (agreed: no user tap Next)
-        exitBtn.style.display = "block";
+      q.choices.forEach(choice => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.type = "button";
+        b.textContent = choice;
+        b.addEventListener("click", () => {
+          if(locked) return;
+          locked = true;
 
-        q.choices.forEach(choice => {
-          const b = document.createElement("button");
-          b.className = "choice";
-          b.type = "button";
-          b.textContent = choice;
-          b.addEventListener("click", () => chooseMC(choice));
-          answersEl.appendChild(b);
+          const ok = (choice === q.correct);
+
+          // mark
+          const btns = Array.from(answersEl.querySelectorAll(".choice"));
+          btns.forEach(x => {
+            if(x.textContent === q.correct) x.classList.add("correct");
+            else if(x.textContent === choice) x.classList.add("wrong");
+            x.disabled = true;
+          });
+
+          if(ok){
+            resultEl.textContent = "✅ Nice!";
+          } else {
+            resultEl.textContent = "❌ Almost — keep going.";
+            missed.add(q.reviewLabel);
+          }
+
+          results.push({ q, ok });
+
+          // auto-advance
+          setTimeout(() => advance(), 450);
         });
-      }
-
-      if(q.type === "capitals"){
-        // Capitals tiles mode
-        capWrap.classList.add("show");
-        bottomRow.style.display = "none"; // uses its own buttons (Clear/Check)
-        buildCapitalsUI(q.correct);
-      }
-    }
-
-    function chooseMC(choice){
-      if(locked) return;
-      locked = true;
-
-      const q = QUESTIONS[idx];
-      const ok = (choice === q.correct);
-
-      const btns = Array.from(document.querySelectorAll(".choice"));
-      btns.forEach(b => {
-        if(b.textContent === q.correct) b.classList.add("correct");
-        else if(b.textContent === choice) b.classList.add("wrong");
-        b.disabled = true;
+        answersEl.appendChild(b);
       });
-
-      if(ok){
-        resultEl.textContent = "✅ Nice!";
-      } else {
-        resultEl.textContent = "❌ Almost — keep going.";
-        missed.add(`${q.section}: ${q.title}`);
-      }
-
-      results.push({ q, chosen: choice, correct: q.correct, ok });
-
-      setTimeout(() => {
-        advanceOrSummary();
-      }, AUTO_DELAY);
     }
 
-    // ====== Capitals tiles (underscore slots) ======
-    function buildCapitalsUI(stateName){
-      // agreed: ALL CAPS display for tiles/slots
-      capWordParts = stateName.trim().toUpperCase().split(/\s+/); // words only
-      capTarget = capWordParts.join(""); // no spaces
-      capAnswer = Array.from({length: capTarget.length}, () => "");
-      capTiles = shuffle(capTarget.split("")); // ONLY letters in the name
-      capUsed = capTiles.map(() => false);
+    // =========================================================
+    // Renderer: Capitals Tiles (underscores + 2-line for 2 words)
+    // =========================================================
+    function buildTileState(stateName){
+      const words = stateName.toUpperCase().split(" "); // ["NEW","JERSEY"] or ["PENNSYLVANIA"]
+      const letters = words.join("").split(""); // no spaces
+      const tiles = shuffle(letters.map((ch, i) => ({ ch, id: i })));
+      return {
+        targetWords: words,
+        targetLetters: letters,
+        filled: new Array(letters.length).fill(""),
+        tiles,
+        used: new Array(tiles.length).fill(false)
+      };
+    }
 
-      // build slots as 1 row or 2 rows depending on words (agreed: 2 lines for 2-word states)
-      slotsEl.classList.remove("ok","bad");
+    function renderSlotsFromState(ts){
       slotsEl.innerHTML = "";
 
-      // create one row per word, centered
-      let globalIndex = 0;
-      capWordParts.forEach(word => {
+      const words = ts.targetWords;
+      const isTwoWords = (words.length === 2);
+
+      // always centered; two words get 2 rows
+      const rows = isTwoWords ? words : [words[0]];
+      let cursor = 0;
+
+      rows.forEach((w) => {
         const row = document.createElement("div");
         row.className = "slotRow";
-        for(let i=0;i<word.length;i++){
-          const s = document.createElement("div");
-          s.className = "slot empty";
-          s.dataset.slotIndex = String(globalIndex);
-          s.textContent = "_";            // will be hidden via transparent when empty
-          s.classList.add("empty");
-          s.textContent = "A";            // placeholder for height consistency; hidden when empty
-          s.classList.add("empty");
-          row.appendChild(s);
-          globalIndex++;
+
+        for(let i=0;i<w.length;i++){
+          const slot = document.createElement("div");
+          slot.className = "slot";
+          const v = ts.filled[cursor] || "";
+          if(!v) slot.classList.add("empty");
+          slot.textContent = v || "·";
+          row.appendChild(slot);
+          cursor++;
         }
         slotsEl.appendChild(row);
       });
-
-      // render tiles (6 columns)
-      renderTileGrid();
-
-      // wire buttons
-      capClearBtn.disabled = false;
-      capCheckBtn.disabled = false;
-
-      // initial paint of slots
-      repaintSlots();
     }
 
-    function renderTileGrid(){
+    function renderTiles(ts){
       tileGrid.innerHTML = "";
-      capTiles.forEach((ch, i) => {
-        const t = document.createElement("button");
-        t.type = "button";
-        t.className = "tile" + (capUsed[i] ? " used" : "");
-        t.textContent = ch;
-        t.addEventListener("click", () => onTileTap(i));
-        tileGrid.appendChild(t);
-      });
-    }
+      ts.tiles.forEach((t, index) => {
+        const b = document.createElement("button");
+        b.className = "tile";
+        b.type = "button";
+        b.textContent = t.ch;
 
-    function nextEmptySlotIndex(){
-      for(let i=0;i<capAnswer.length;i++){
-        if(!capAnswer[i]) return i;
-      }
-      return -1;
-    }
-
-    function onTileTap(tileIndex){
-      if(locked) return;
-      if(capUsed[tileIndex]) return;
-
-      const slotIndex = nextEmptySlotIndex();
-      if(slotIndex === -1) return;
-
-      capAnswer[slotIndex] = capTiles[tileIndex];
-      capUsed[tileIndex] = true;
-
-      repaintSlots();
-      renderTileGrid();
-    }
-
-    function repaintSlots(){
-      // fill each slot by global index (across rows)
-      const allSlots = slotsEl.querySelectorAll(".slot");
-      allSlots.forEach(slotEl => {
-        const i = Number(slotEl.dataset.slotIndex);
-        const v = capAnswer[i] || "";
-        if(v){
-          slotEl.textContent = v;
-          slotEl.classList.remove("empty");
-        } else {
-          slotEl.textContent = "A"; // keep height; hidden by empty class
-          slotEl.classList.add("empty");
+        if(ts.used[index]){
+          b.classList.add("used");
+          b.disabled = true;
         }
+
+        b.addEventListener("click", () => {
+          if(locked) return;
+          if(ts.used[index]) return;
+
+          // find next empty slot
+          const next = ts.filled.findIndex(x => x === "");
+          if(next === -1) return;
+
+          ts.filled[next] = t.ch;
+          ts.used[index] = true;
+
+          renderSlotsFromState(ts);
+          renderTiles(ts);
+        });
+
+        tileGrid.appendChild(b);
       });
     }
 
-    function clearCapitals(){
-      if(locked) return;
-      capAnswer = capAnswer.map(() => "");
-      capUsed = capUsed.map(() => false);
-      slotsEl.classList.remove("ok","bad");
-      repaintSlots();
-      renderTileGrid();
-      resetFeedback();
+    function renderTilesQuestion(q){
+      capWrap.classList.add("show");
+      clearBtn.style.display = "inline-block";
+      checkBtn.style.display = "inline-block";
+
+      tileState = buildTileState(q.correct);
+      renderSlotsFromState(tileState);
+      renderTiles(tileState);
+
+      clearBtn.onclick = () => {
+        if(locked) return;
+        tileState = buildTileState(q.correct);
+        renderSlotsFromState(tileState);
+        renderTiles(tileState);
+      };
+
+      checkBtn.onclick = () => {
+        if(locked) return;
+        locked = true;
+
+        const attempt = tileState.filled.join("");
+        const target = tileState.targetLetters.join("");
+
+        const ok = (attempt === target);
+
+        if(ok){
+          resultEl.textContent = "✅ Nice!";
+        } else {
+          resultEl.textContent = "❌ Almost — keep going.";
+          missed.add(q.reviewLabel);
+        }
+        results.push({ q, ok });
+
+        // auto-advance after feedback
+        setTimeout(() => advance(), 650);
+      };
     }
 
-    function checkCapitals(){
-      if(locked) return;
+    // =========================================================
+    // Main render + advance + summary
+    // =========================================================
+    const RENDERERS = {
+      "mc": renderMC,
+      "tiles": renderTilesQuestion
+    };
 
-      // if not fully filled, treat as incorrect (but still show feedback)
-      const attempt = capAnswer.join("");
-      const ok = (attempt === capTarget);
-
-      locked = true;
-
-      if(ok){
-        slotsEl.classList.add("ok");
-        resultEl.textContent = "✅ Nice!";
-      } else {
-        slotsEl.classList.add("bad");
-        resultEl.textContent = "❌ Almost — keep going.";
-        const q = QUESTIONS[idx];
-        missed.add(`${q.section}: ${q.title}`);
-      }
-
+    function renderQuestion(){
       const q = QUESTIONS[idx];
-      results.push({ q, chosen: attempt, correct: capTarget, ok });
-
-      setTimeout(() => {
-        locked = false; // allow next screen interactions
-        advanceOrSummary();
-      }, AUTO_DELAY);
+      setProgress();
+      resetCommonUI(q);
+      RENDERERS[q.type](q);
     }
 
-    capClearBtn.addEventListener("click", clearCapitals);
-    capCheckBtn.addEventListener("click", checkCapitals);
-
-    // ====== Advance / Summary ======
-    function advanceOrSummary(){
-      if(idx >= QUESTIONS.length - 1){
+    function advance(){
+      if(idx === QUESTIONS.length - 1){
         showSummary();
         return;
       }
@@ -790,31 +740,26 @@
     }
 
     function showSummary(){
-      // compute score
       const total = results.length;
       const correct = results.filter(r => r.ok).length;
-      const pct = Math.round((correct / Math.max(1,total)) * 100);
+      const pct = total ? Math.round((correct / total) * 100) : 0;
 
-      // wipe interactive areas
+      // reset UI to summary view
       imgbox.classList.remove("show");
-      answersEl.innerHTML = "";
       answersEl.style.display = "none";
       capWrap.classList.remove("show");
-      bottomRow.style.display = "none";
+      clearBtn.style.display = "none";
+      checkBtn.style.display = "none";
 
-      // titles
       qtitle.textContent = `Score: ${pct}%`;
       qsub.textContent = `You got ${correct} out of ${total} correct.`;
 
       const misses = Array.from(missed);
 
-      // tip text: special case for 100%
-      let tip;
-      if(pct === 100){
-        tip = "Perfect score! Keep it up — a quick review later helps it stick.";
-      } else {
-        tip = "Tip: Go back to Study, then try again.";
-      }
+      // Tip text changes when 100%
+      const tip = (pct === 100)
+        ? "Perfect score! Nice work. Do a quick study run later to lock it in."
+        : "Tip: Study the ones you missed, then try again to beat your score.";
 
       const reviewHtml = `
         <div class="review">
@@ -827,32 +772,19 @@
       reviewBox.style.display = "block";
       reviewBox.innerHTML = reviewHtml;
 
-      // Put the main button near the top (reduces huge white space on tall screens)
-      const topButton = document.createElement("div");
-      topButton.className = "bottom";
-      topButton.style.marginTop = "8px";
-      topButton.innerHTML = `<button class="btn secondary" type="button" id="backToWeekBtn">Back to Week 2</button>`;
-      reviewBox.prepend(topButton);
-
-      document.getElementById("backToWeekBtn").addEventListener("click", () => {
-        window.location.href = "./index.html";
-      });
-
       // progress bar full
       bar.style.width = "100%";
       barText.textContent = `${total} of ${total}`;
-      sectionPill.textContent = "Done";
+
+      // Exit button becomes "Back to Week 2"
+      exitBtn.textContent = "Back to Week 2";
     }
 
-    // Exit always returns to week menu
     exitBtn.addEventListener("click", () => {
       window.location.href = "./index.html";
     });
 
-    // (Next hidden; kept only as fallback)
-    nextBtn.addEventListener("click", () => advanceOrSummary());
-
-    // start
+    // kick off
     renderQuestion();
   </script>
 </body>
