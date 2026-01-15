@@ -88,12 +88,13 @@
     }
 
     .toprow{
-      position:relative; /* NEW: anchor for mascot */
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-    }
+  position:relative; 
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
     .pill{
       background:#dbeafe;
       color:#1e3a8a;
@@ -142,28 +143,18 @@
     .kitimus{
   position:absolute;
   right:12px;
-  top:125px;
-  transform:translateY(-50%);
-  margin-top:clamp(6px, 1.2vh, 14px);
-  width:76px;
-  height:76px;
+  top: calc(100% + 10px);
+
+  /* no upward pull */
+  transform:none;
+
+  width: clamp(52px, 10vw, 76px);
+  height: clamp(52px, 10vw, 76px);
+
   z-index:5;
   pointer-events:none;
   user-select:none;
 }
-    .kitimus img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      display:block;
-      filter: drop-shadow(0 8px 12px rgba(15,23,42,.18));
-    }
-
-    /* smaller devices: tuck it a bit */
-    @media (max-width: 380px){
-      .kitimus{ width:64px; height:64px; right:10px; }
-    }
-
     .card{
       background:var(--card);
       border-radius:var(--radius);
