@@ -685,7 +685,7 @@
         tiles,
         used: new Array(tiles.length).fill(false)
       };
-
+    }
 
     function renderSlotsFromState(ts){
       slotsEl.innerHTML = "";
@@ -884,6 +884,10 @@
       } else {
         setKitimus("neutral");
       }
+       // summary should not show tiles buttons
+      bottomBtns.style.display = "none";
+      backspaceBtn.style.display = "none";
+    }
       
     // kick off
     renderQuestion();
