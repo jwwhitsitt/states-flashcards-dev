@@ -630,26 +630,6 @@ function kitimusWrongPulse(){
 }
 
 
-function startKitimusIdle(){
-  stopKitimusIdle();
-
-  // start in your default squint
-  setKitimus("squint");
-
-  // every ~2.2s: glance L/R sometimes, blink sometimes, otherwise squint
-  kitimusIdleTimer = setInterval(() => {
-    // don't animate if we are locked (showing feedback)
-    if(locked) return;
-
-    const r = Math.random();
-
-    if(r < 0.22){
-      // blink quickly
-      setKitimus("blink");
-      setTimeout(() => setKitimus("squint"), 140);
-      return;
-    }
-
     if(r < 0.55){
       // glance left or right briefly
       const dir = (Math.random() < 0.5) ? "squintLeft" : "squintRight";
