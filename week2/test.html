@@ -559,6 +559,9 @@
     const KITIMUS = {
       neutral: "/mascots/kitimus/kitimus-neutral.png",
       squint: "/mascots/kitimus/kitimus-squint.png",
+      squintLeft: "/mascots/kitimus/kitimus-squint-left.png",
+      squintRight: "/mascots/kitimus/kitimus-squint-right.png",
+      blink: "/mascots/kitimus/kitimus-blink.png",
       celebrate: "/mascots/kitimus/kitimus-celebrate.png"
     };
     function setKitimus(state){
@@ -569,8 +572,50 @@
       }
     }
     function kitimusWrongPulse(){
+      let kitimusIdleTimer = null;
+
+function stopKitimusIdle(){
+  if(kitimusIdleTimer){
+    clearInterval(kitimusIdleTimer);
+    kitimusIdleTimer = null;
+  }
+}
+
+function startKitimusIdle(){
+  stopKitimusIdle();
+
+  // start in your default squint
+  setKitimus("squint");
+
+  // every ~2.2s: glance L/R sometimes, blink sometimes, otherwise squint
+  kitimusIdleTimer = setInterval(() => {
+    // don't animate if we are locked (showing feedback)
+    if(locked) return;
+
+    const r = Math.random();
+
+    if(r < 0.22){
+      // blink quickly
+      setKitimus("blink");
+      setTimeout(() => setKitimus("squint"), 140);
+      return;
+    }
+
+    if(r < 0.55){
+      // glance left or right briefly
+      const dir = (Math.random() < 0.5) ? "squintLeft" : "squintRight";
+      setKitimus(dir);
+      setTimeout(() => setKitimus("squint"), 220);
+      return;
+    }
+
+    // default
+    setKitimus("squint");
+  }, 2200);
+}
+
       // small intentional delay, then brief squint, then back to neutral on next render/advance
-      setTimeout(() => setKitimus("squint"), 200);
+      setTimeout(() => setKitimus("neutral"), 200);
     }
 
     let idx = 0;
@@ -598,7 +643,7 @@
       reviewBox.innerHTML = "";
 
       // mascot default (neutral most of the time)
-      setKitimus("neutral");
+      setKitimus("squint");
 
       // image
       if(q.showImage && q.img){
@@ -828,12 +873,14 @@
       const q = QUESTIONS[idx];
       setProgress();
       resetCommonUI(q);
+      startKitimusIdle();
       RENDERERS[q.type](q);
     }
 
     function advance(){
       if(idx === QUESTIONS.length - 1){
         showSummary();
+        stopKitimusIdle();
         return;
       }
       idx++;
@@ -888,7 +935,15 @@
       bottomBtns.style.display = "none";
       backspaceBtn.style.display = "none";
     }
-      
+      document.addEventListener("pointerdown", () => {
+  // only blink if we're mid-quiz (not summary) and not locked in feedback
+  if(!kitimusImg) return;
+  if(locked) return;
+
+  setKitimus("blink");
+  setTimeout(() => setKitimus("squint"), 120);
+}, { passive:true });
+
     // kick off
     renderQuestion();
   </script>
