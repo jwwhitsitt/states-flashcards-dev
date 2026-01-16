@@ -922,14 +922,14 @@ function startKitimusIdle(){
       const q = QUESTIONS[idx];
       setProgress();
       resetCommonUI(q);
-      startKitimusIdle();
+      if(typeof startKitimusIdle === "function") startKitimusIdle();
       RENDERERS[q.type](q);
     }
 
     function advance(){
       if(idx === QUESTIONS.length - 1){
         showSummary();
-        stopKitimusIdle();
+        if(typeof stopKitimusIdle === "function") stopKitimusIdle();
         return;
       }
       idx++;
