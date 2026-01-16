@@ -9,6 +9,10 @@
   <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
   <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
   <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+
 
   <style>
     :root{
@@ -571,23 +575,25 @@
     /* ============================
        Kitimus state machine (minimal)
        ============================ */
-    const kitimusImg = document.getElementById("kitimusImg");
-    const KITIMUS = {
-      neutral: "/mascots/kitimus/kitimus-neutral.png",
-      squint: "/mascots/kitimus/kitimus-squint.png",
-      squintLeft: "/mascots/kitimus/kitimus-squint-left.png",
-      squintRight: "/mascots/kitimus/kitimus-squint-right.png",
-      blink: "/mascots/kitimus/kitimus-blink.png",
-      celebrate: "/mascots/kitimus/kitimus-celebrate.png"
-    };
-    function setKitimus(state){
-      if(!kitimusImg) return;
-      const src = KITIMUS[state] || KITIMUS.neutral;
-      if(kitimusImg.getAttribute("src") !== src){
-        kitimusImg.setAttribute("src", src);
-      }
-    }
-   let kitimusIdleTimer = null;
+  const kitimusImg = document.getElementById("kitimusImg");
+const KITIMUS = {
+  neutral: "/mascots/kitimus/kitimus-neutral.png",
+  squint: "/mascots/kitimus/kitimus-squint.png",
+  squintLeft: "/mascots/kitimus/kitimus-squint-left.png",
+  squintRight: "/mascots/kitimus/kitimus-squint-right.png",
+  blink: "/mascots/kitimus/kitimus-blink.png",
+  celebrate: "/mascots/kitimus/kitimus-celebrate.png"
+};
+
+function setKitimus(state){
+  if(!kitimusImg) return;
+  const src = KITIMUS[state] || KITIMUS.neutral;
+  if(kitimusImg.getAttribute("src") !== src){
+    kitimusImg.setAttribute("src", src);
+  }
+}
+
+let kitimusIdleTimer = null;
 
 function stopKitimusIdle(){
   if(kitimusIdleTimer){
@@ -598,8 +604,6 @@ function stopKitimusIdle(){
 
 function startKitimusIdle(){
   stopKitimusIdle();
-
-  // default pose while idle
   setKitimus("squint");
 
   kitimusIdleTimer = setInterval(() => {
@@ -625,8 +629,9 @@ function startKitimusIdle(){
 }
 
 function kitimusWrongPulse(){
-  // wrong answer reaction (brief neutral)
-  setTimeout(() => setKitimus("neutral"), 200);
+  // wrong answer reaction: briefly neutral, then back to squint
+  setTimeout(() => setKitimus("neutral"), 150);
+  setTimeout(() => setKitimus("squint"), 650);
 }
 
 
@@ -643,10 +648,7 @@ function kitimusWrongPulse(){
   }, 2200);
 }
 
-      // small intentional delay, then brief squint, then back to neutral on next render/advance
-      setTimeout(() => setKitimus("neutral"), 200);
-    }
-
+  
     let idx = 0;
     let locked = false;
 
