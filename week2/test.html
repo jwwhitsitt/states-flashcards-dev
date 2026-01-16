@@ -634,21 +634,6 @@ function kitimusWrongPulse(){
   setTimeout(() => setKitimus("squint"), 650);
 }
 
-
-    if(r < 0.55){
-      // glance left or right briefly
-      const dir = (Math.random() < 0.5) ? "squintLeft" : "squintRight";
-      setKitimus(dir);
-      setTimeout(() => setKitimus("squint"), 220);
-      return;
-    }
-
-    // default
-    setKitimus("squint");
-  }, 2200);
-}
-
-  
     let idx = 0;
     let locked = false;
 
