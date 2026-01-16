@@ -429,11 +429,12 @@
           <div class="tileGrid" id="tileGrid"></div>
         </div>
 
-        <div class="bottom" id="bottomBtns">
-          <button class="btn secondary" id="exitBtn">Exit</button>
-          <button class="btn secondary" id="clearBtn" style="display:none;">Clear</button>
-          <button class="btn" id="checkBtn" style="display:none;">Check</button>
-        </div>
+        <div class="bottom" id="bottomBtns" style="display:none;">
+  <button class="btn secondary" id="backspaceBtn" style="display:none;">Backspace</button>
+  <button class="btn secondary" id="clearBtn" style="display:none;">Clear</button>
+  <button class="btn" id="checkBtn" style="display:none;">Check</button>
+</div>
+
 
         <div class="result" id="result"></div>
         <div id="reviewBox" style="display:none;"></div>
@@ -546,7 +547,8 @@
     const resultEl = document.getElementById("result");
     const reviewBox = document.getElementById("reviewBox");
 
-    const exitBtn = document.getElementById("exitBtn");
+    const bottomBtns = document.getElementById("bottomBtns");
+    const backspaceBtn = document.getElementById("backspaceBtn");
     const clearBtn = document.getElementById("clearBtn");
     const checkBtn = document.getElementById("checkBtn");
 
@@ -617,6 +619,11 @@
       capWrap.classList.remove("show");
       clearBtn.style.display = "none";
       checkBtn.style.display = "none";
+      
+      // default: no bottom buttons unless tiles section
+      bottomBtns.style.display = "none";
+      backspaceBtn.style.display = "none";
+
     }
 
     // =========================================================
@@ -674,10 +681,11 @@
         targetWords: words,
         targetLetters: letters,
         filled: new Array(letters.length).fill(""),
+        filledTileIndex: new Array(letters.length).fill(-1),
         tiles,
         used: new Array(tiles.length).fill(false)
       };
-    }
+
 
     function renderSlotsFromState(ts){
       slotsEl.innerHTML = "";
@@ -728,6 +736,7 @@
           if(next === -1) return;
 
           ts.filled[next] = t.ch;
+          ts.filledTileIndex[next] = index;
           ts.used[index] = true;
 
           renderSlotsFromState(ts);
@@ -740,6 +749,8 @@
 
     function renderTilesQuestion(q){
       capWrap.classList.add("show");
+      bottomBtns.style.display = "flex";
+      backspaceBtn.style.display = "inline-block";
       clearBtn.style.display = "inline-block";
       checkBtn.style.display = "inline-block";
 
@@ -753,6 +764,33 @@
         renderSlotsFromState(tileState);
         renderTiles(tileState);
       };
+
+      backspaceBtn.onclick = () => {
+        if(locked) return;
+
+  // find rightmost filled slot
+        let last = -1;
+        for(let i = tileState.filled.length - 1; i >= 0; i--){
+          if(tileState.filled[i] !== ""){
+            last = i;
+            break;
+          }
+        }
+        if(last === -1) return;
+
+  // free the tile that originally filled this slot
+  const tileIdx = tileState.filledTileIndex[last];
+  tileState.filled[last] = "";
+  tileState.filledTileIndex[last] = -1;
+
+  if(tileIdx !== -1){
+    tileState.used[tileIdx] = false;
+  }
+
+  renderSlotsFromState(tileState);
+  renderTiles(tileState);
+};
+
 
       checkBtn.onclick = () => {
         if(locked) return;
@@ -846,15 +884,7 @@
       } else {
         setKitimus("neutral");
       }
-
-      // Exit button becomes "Back to Week 2"
-      exitBtn.textContent = "Back to Week 2";
-    }
-
-    exitBtn.addEventListener("click", () => {
-      window.location.href = "./index.html";
-    });
-
+      
     // kick off
     renderQuestion();
   </script>
