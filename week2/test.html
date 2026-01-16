@@ -571,8 +571,7 @@
         kitimusImg.setAttribute("src", src);
       }
     }
-    function kitimusWrongPulse(){
-      let kitimusIdleTimer = null;
+   let kitimusIdleTimer = null;
 
 function stopKitimusIdle(){
   if(kitimusIdleTimer){
@@ -580,6 +579,40 @@ function stopKitimusIdle(){
     kitimusIdleTimer = null;
   }
 }
+
+function startKitimusIdle(){
+  stopKitimusIdle();
+
+  // default pose while idle
+  setKitimus("squint");
+
+  kitimusIdleTimer = setInterval(() => {
+    if(locked) return;
+
+    const r = Math.random();
+
+    if(r < 0.22){
+      setKitimus("blink");
+      setTimeout(() => setKitimus("squint"), 140);
+      return;
+    }
+
+    if(r < 0.55){
+      const dir = (Math.random() < 0.5) ? "squintLeft" : "squintRight";
+      setKitimus(dir);
+      setTimeout(() => setKitimus("squint"), 220);
+      return;
+    }
+
+    setKitimus("squint");
+  }, 2200);
+}
+
+function kitimusWrongPulse(){
+  // wrong answer reaction (brief neutral)
+  setTimeout(() => setKitimus("neutral"), 200);
+}
+
 
 function startKitimusIdle(){
   stopKitimusIdle();
@@ -891,6 +924,9 @@ function startKitimusIdle(){
       const total = results.length;
       const correct = results.filter(r => r.ok).length;
       const pct = total ? Math.round((correct / total) * 100) : 0;
+
+      stopKitimusIdle();
+
 
       // reset UI to summary view
       imgbox.classList.remove("show");
