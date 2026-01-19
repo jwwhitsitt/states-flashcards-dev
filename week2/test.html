@@ -731,6 +731,20 @@ function kitimusWrongPulse(){
 
     let idx = 0;
     let locked = false;
+function resetMark(){
+  if(!markEl) return;
+  markEl.textContent = "";
+  markEl.classList.remove("good","bad");
+  markEl.style.visibility = "hidden";
+}
+
+function showMark(ok){
+  if(!markEl) return;
+  markEl.style.visibility = "visible";
+  markEl.textContent = ok ? "✓" : "✕";
+  markEl.classList.toggle("good", ok);
+  markEl.classList.toggle("bad", !ok);
+}
 
     const results = []; // { q, ok }
     const missed = new Set();
