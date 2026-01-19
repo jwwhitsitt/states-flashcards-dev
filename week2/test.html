@@ -468,12 +468,13 @@
     // =========================================================
 
     // ====== Data ======
-    const WEEK = [
-      { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", img:"./images/pa-f.png" },
-      { state:"New Jersey",   abbrev:"NJ", capital:"Trenton",    img:"./images/nj-f.png" },
-      { state:"New York",     abbrev:"NY", capital:"Albany",     img:"./images/ny-f.png" },
-      { state:"Delaware",     abbrev:"DE", capital:"Dover",      img:"./images/de-f.png" }
-    ];
+  const WEEK = [
+  { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", map:"./images/pa.png" },
+  { state:"New Jersey",   abbrev:"NJ", capital:"Trenton",    map:"./images/nj.png" },
+  { state:"New York",     abbrev:"NY", capital:"Albany",     map:"./images/ny.png" },
+  { state:"Delaware",     abbrev:"DE", capital:"Dover",      map:"./images/de.png" }
+];
+
 
     function shuffle(arr){
       const a = arr.slice();
@@ -505,7 +506,7 @@
         section:"Spelling",
         type:"mc",
         showImage:true,
-        img:s.img,
+        img:s.map,
         title:"Pick the correct spelling",
         subtitle:"Which one is spelled correctly?",
         correct,
@@ -518,8 +519,8 @@
       return {
         section:"Capitals",
         type:"tiles",
-        showImage:false,
-        img:null,
+        showImage:true,
+        img:s.map,
         title:s.capital,
         subtitle:"Tap the letters to spell the state.",
         correct:s.state,
@@ -605,8 +606,8 @@ const abbrevQuestions = WEEK.map(s => {
   return {
     section:"Abbreviations",
     type:"mc",
-    showImage:false,
-    img:null,
+    showImage:true,
+    img:s.map,
     title:s.state,
     subtitle:"Which abbreviation matches this state?",
     correct,
