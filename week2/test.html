@@ -1147,6 +1147,7 @@ qsub.textContent = message;
       barText.textContent = `${total} of ${total}`;
 
      // End-of-test mascot + corner indicator rule:
+// End-of-test mascot + corner indicator rule:
 // 100% = celebrate + green check
 // 80-99% = green check
 // 0-79% = red X
@@ -1161,7 +1162,11 @@ if(pct === 100){
   showCorner("bad");        // ❌
 }
 
-      document.addEventListener("pointerdown", () => {
+} // <-- END showSummary()
+
+
+
+document.addEventListener("pointerdown", () => {
   // only blink if we're mid-quiz (not summary) and not locked in feedback
   if(!kitimusImg) return;
   if(locked) return;
@@ -1170,8 +1175,9 @@ if(pct === 100){
   setTimeout(() => setKitimus("squint"), 120);
 }, { passive:true });
 
-    // kick off
-    renderQuestion();
+
+// kick off
+renderQuestion();
   </script>
 </body>
 </html>
