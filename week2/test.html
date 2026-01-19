@@ -1061,6 +1061,22 @@ showMark(ok);
       "mc": renderMC,
       "tiles": renderTilesQuestion
     };
+// Corner indicator helper (right-side ✓ / ✕)
+function showCorner(mode){
+  // mode: "ok" | "bad" | "hide"
+  const el = document.getElementById("cornerMark");
+  if(!el) return;
+
+  if(mode === "hide"){
+    el.style.display = "none";
+    return;
+  }
+
+  el.style.display = "block";
+  el.textContent = (mode === "ok") ? "✓" : "✕";
+  el.classList.toggle("ok", mode === "ok");
+  el.classList.toggle("bad", mode === "bad");
+}
 
     function renderQuestion(){
       const q = QUESTIONS[idx];
@@ -1120,17 +1136,21 @@ showMark(ok);
       bar.style.width = "100%";
       barText.textContent = `${total} of ${total}`;
 
-      // End-of-test mascot rule:
-      // Celebrate only if 100%, otherwise neutral.
-      if(pct === 100){
-        setTimeout(() => setKitimus("celebrate"), 200);
-      } else {
-        setKitimus("neutral");
-      }
-       // summary should not show tiles buttons
-      bottomBtns.style.display = "none";
-      backspaceBtn.style.display = "none";
-    }
+     // End-of-test mascot + corner indicator rule:
+// 100% = celebrate + green check
+// 80-99% = green check
+// 0-79% = red X
+if(pct === 100){
+  setTimeout(() => setKitimus("celebrate"), 200);
+  showCorner("ok");         // ✅
+} else if(pct >= 80){
+  setKitimus("squint");
+  showCorner("ok");         // ✅
+} else {
+  setKitimus("neutral");
+  showCorner("bad");        // ❌
+}
+
       document.addEventListener("pointerdown", () => {
   // only blink if we're mid-quiz (not summary) and not locked in feedback
   if(!kitimusImg) return;
