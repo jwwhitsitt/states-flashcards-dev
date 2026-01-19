@@ -163,6 +163,7 @@
 }
 
     .card{
+       position:relative;
       background:var(--card);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
@@ -172,6 +173,21 @@
       gap:var(--gap);
       overflow:hidden;
     }
+/* Right-side ✓ / ✕ indicator */
+.cornerMark{
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-10%);
+  font-size:64px;
+  font-weight:1000;
+  line-height:1;
+  display:none;         /* hidden by default */
+  user-select:none;
+  pointer-events:none;
+}
+.cornerMark.ok{ color: var(--good); display:block; }
+.cornerMark.bad{ color: var(--bad); display:block; }
 
     /* Image (Spelling only) */
     .imgbox{
@@ -455,6 +471,8 @@
   <div class="mark" id="mark" aria-hidden="true"></div>
 </div>
 <div class="qsub" id="qsub"></div>
+        <div id="cornerMark" class="cornerMark" aria-hidden="true"></div>
+
 
 
         <!-- Multiple choice -->
@@ -671,6 +689,30 @@ const abbrevQuestions = WEEK.map(s => {
     const resultEl = document.getElementById("result");
     const reviewBox = document.getElementById("reviewBox");
 
+    const cornerMark = document.getElementById("cornerMark");
+
+function setCornerMark(state){
+  // state: null | true | false
+  if(!cornerMark) return;
+
+  cornerMark.classList.remove("ok","bad");
+  if(state === null){
+    cornerMark.style.display = "none";
+    cornerMark.textContent = "";
+    return;
+  }
+
+  cornerMark.style.display = "block";
+  if(state){
+    cornerMark.classList.add("ok");
+    cornerMark.textContent = "✓";
+  } else {
+    cornerMark.classList.add("bad");
+    cornerMark.textContent = "✕";
+  }
+}
+
+
     const bottomBtns = document.getElementById("bottomBtns");
     const backspaceBtn = document.getElementById("backspaceBtn");
     const clearBtn = document.getElementById("clearBtn");
@@ -774,6 +816,8 @@ function showMark(ok){
       locked = false;
       resetMark();
       resultEl.textContent = "";
+      setCornerMark(null);
+
       reviewBox.style.display = "none";
       reviewBox.innerHTML = "";
 
@@ -984,6 +1028,8 @@ showMark(ok);
   const attempt = tileState.filled.join("");
   const target = tileState.targetLetters.join("");
   const ok = (attempt === target);
+      setCornerMark(ok);
+
 
   // color the button itself (green/red)
   checkBtn.classList.remove("good","bad");
