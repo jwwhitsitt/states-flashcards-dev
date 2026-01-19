@@ -527,25 +527,93 @@
       };
     });
 
-    const abbrevQuestions = WEEK.map(s => {
-      const correct = s.abbrev;
-      const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-                    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-                    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-      const wrongs = shuffle(pool.filter(x => x !== correct)).slice(0,3);
-      const choices = shuffle([correct, ...wrongs]);
-      return {
-        section:"Abbreviations",
-        type:"mc",
-        showImage:false,
-        img:null,
-        title:s.state,
-        subtitle:"Which abbreviation matches this state?",
-        correct,
-        choices,
-        reviewLabel:`Abbreviations: ${s.state}`
-      };
-    });
+  // ===== Abbreviation choices (harder) =====
+// Rule:
+// 1) Prefer REAL abbreviations that start with the same first letter as the state.
+// 2) If there aren’t enough real ones, generate FAKE ones using letters from the state name.
+// 3) Never generate a fake that matches a real abbreviation in the pool.
+// 4) Always include the correct answer.
+
+function uniqueLettersFromState(stateName){
+  // "New York" -> ["N","E","W","Y","O","R","K"]
+  const letters = stateName.toUpperCase().replace(/[^A-Z]/g, "").split("");
+  return Array.from(new Set(letters));
+}
+
+function buildFakeAbbrevs(stateName, correct, pool, needed){
+  const poolSet = new Set(pool);
+  const out = [];
+
+  const first = stateName.trim().toUpperCase()[0];      // first letter of state
+  const correctSecond = correct[1];                     // second letter of real abbrev
+
+  const letters = uniqueLettersFromState(stateName)
+    .filter(ch => ch !== first && ch !== correctSecond); // avoid using correct second letter
+
+  // If state name is weird and we have no letters left, fallback to alphabet
+  const fallback = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+    .filter(ch => ch !== first && ch !== correctSecond);
+
+  let guard = 0;
+  while(out.length < needed && guard < 200){
+    guard++;
+
+    const secondPool = letters.length ? letters : fallback;
+    const second = secondPool[Math.floor(Math.random() * secondPool.length)];
+
+    const fake = (first + second);
+
+    // Reject if:
+    // - equals correct
+    // - already picked
+    // - is a REAL abbreviation in the pool
+    if(fake === correct) continue;
+    if(out.includes(fake)) continue;
+    if(poolSet.has(fake)) continue;
+
+    out.push(fake);
+  }
+
+  return out;
+}
+
+const abbrevQuestions = WEEK.map(s => {
+  const correct = s.abbrev;
+
+  const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+
+  const first = s.state.trim().toUpperCase()[0];
+
+  // 1) Prefer real same-first-letter distractors
+  const realSameFirst = shuffle(
+    pool.filter(x => x !== correct && x[0] === first)
+  );
+
+  const wrongs = realSameFirst.slice(0, 3);
+
+  // 2) If we still need more, add fake ones (built from letters in the state name)
+  const stillNeed = 3 - wrongs.length;
+  if(stillNeed > 0){
+    const fakes = buildFakeAbbrevs(s.state, correct, pool, stillNeed);
+    wrongs.push(...fakes);
+  }
+
+  const choices = shuffle([correct, ...wrongs]);
+
+  return {
+    section:"Abbreviations",
+    type:"mc",
+    showImage:false,
+    img:null,
+    title:s.state,
+    subtitle:"Which abbreviation matches this state?",
+    correct,
+    choices,
+    reviewLabel:`Abbreviations: ${s.state}`
+  };
+});
 
     const QUESTIONS = [...spellingQuestions, ...capitalQuestions, ...abbrevQuestions];
 
