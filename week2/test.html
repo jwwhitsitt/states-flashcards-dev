@@ -365,6 +365,15 @@
       cursor:not-allowed;
       box-shadow:none;
     }
+/* Check button feedback colors (Capitals section) */
+.btn.good{
+  background: var(--good) !important;
+  color:#fff !important;
+}
+.btn.bad{
+  background: var(--bad) !important;
+  color:#fff !important;
+}
 
     .result{
       text-align:center;
@@ -794,6 +803,10 @@ function showMark(ok){
       // default: no bottom buttons unless tiles section
       bottomBtns.style.display = "none";
       backspaceBtn.style.display = "none";
+// reset check button feedback state
+checkBtn.classList.remove("good","bad");
+checkBtn.disabled = false;
+checkBtn.textContent = "Check";
 
     }
 
@@ -964,29 +977,32 @@ showMark(ok);
 };
 
 
-      checkBtn.onclick = () => {
-        if(locked) return;
-        locked = true;
+    checkBtn.onclick = () => {
+  if(locked) return;
+  locked = true;
 
-        const attempt = tileState.filled.join("");
-        const target = tileState.targetLetters.join("");
+  const attempt = tileState.filled.join("");
+  const target = tileState.targetLetters.join("");
+  const ok = (attempt === target);
 
-        const ok = (attempt === target);
-showMark(ok);
+  // color the button itself (green/red)
+  checkBtn.classList.remove("good","bad");
+  checkBtn.classList.add(ok ? "good" : "bad");
+  checkBtn.disabled = true;
 
-        if(ok){
-          resultEl.textContent = "✅ Nice!";
-          // correct stays neutral
-        } else {
-          resultEl.textContent = "❌ Almost — keep going.";
-          missed.add(q.reviewLabel);
-          kitimusWrongPulse();
-        }
-        results.push({ q, ok });
+  if(ok){
+    resultEl.textContent = "✅ Nice!";
+    // (keep mascot behavior you already have)
+  } else {
+    resultEl.textContent = "❌ Almost — keep going.";
+    missed.add(q.reviewLabel);
+    kitimusWrongPulse();
+  }
 
-        // auto-advance after feedback
-        setTimeout(() => advance(), 650);
-      };
+  results.push({ q, ok });
+
+  setTimeout(() => advance(), 650);
+};
     }
 
     // =========================================================
