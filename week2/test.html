@@ -1112,7 +1112,17 @@ function showCorner(mode){
       checkBtn.style.display = "none";
 
       qtitle.textContent = `Score: ${pct}%`;
-      qsub.textContent = `You got ${correct} out of ${total} correct.`;
+     let message = "";
+
+if(pct === 100){
+  message = `Perfect score! You got all ${total} correct.`;
+} else if(pct >= 80){
+  message = `Nice work! You got ${correct} out of ${total} correct.`;
+} else {
+  message = `Keep practicing — you got ${correct} out of ${total} correct.`;
+}
+
+qsub.textContent = message;
 
       const misses = Array.from(missed);
 
