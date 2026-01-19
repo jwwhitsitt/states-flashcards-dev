@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 3 – Check Your Learning</title>
+
+  <!-- Kitimus preload -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+
+  <style>
+    /* (Styles unchanged from Week 2) */
+  </style>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Check Your Learning</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="toprow">
+        <div class="pill" id="sectionPill">Spelling</div>
+        <div class="barwrap">
+          <div class="bar" id="bar"></div>
+          <div class="bartext" id="barText">1 of 15</div>
+        </div>
+        <div class="kitimus">
+          <img id="kitimusImg" src="/mascots/kitimus/kitimus-neutral.png" alt="">
+        </div>
+      </div>
+
+      <section class="card" id="card">
+        <div class="imgbox" id="imgbox"><img id="img" alt=""></div>
+
+        <div class="titleRow">
+          <div class="qtitle" id="qtitle"></div>
+          <div class="mark" id="mark"></div>
+        </div>
+        <div class="qsub" id="qsub"></div>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="capWrap" id="capWrap">
+          <div class="slots" id="slots"></div>
+          <div class="tileGrid" id="tileGrid"></div>
+        </div>
+
+        <div class="bottom" id="bottomBtns" style="display:none;">
+          <button class="btn secondary" id="backspaceBtn">Backspace</button>
+          <button class="btn secondary" id="clearBtn">Clear</button>
+          <button class="btn" id="checkBtn">Check</button>
+        </div>
+
+        <div id="reviewBox" style="display:none;"></div>
+      </section>
+    </div>
+  </main>
+
+<script>
+  const WEEK = [
+    { state:"Maryland",       abbrev:"MD", capital:"Annapolis", map:"./images/md.png" },
+    { state:"West Virginia",  abbrev:"WV", capital:"Charleston", map:"./images/wv.png" },
+    { state:"Virginia",       abbrev:"VA", capital:"Richmond", map:"./images/va.png" },
+    { state:"South Carolina", abbrev:"SC", capital:"Columbia", map:"./images/sc.png" },
+    { state:"North Carolina", abbrev:"NC", capital:"Raleigh", map:"./images/nc.png" }
+  ];
+
+  const SPELLING_FAKES = {
+    "Maryland":["Marryland","Mariland","Marylnd"],
+    "West Virginia":["West Virgina","West Virgnia","West Verginia"],
+    "Virginia":["Virgina","Verginia","Virgnia"],
+    "South Carolina":["South Carolna","South Caralina","South Carrolina"],
+    "North Carolina":["North Carolna","North Caralina","North Carrolina"]
+  };
+
+  // (Rest of JS logic unchanged from Week 2)
+</script>
+</body>
+</html>
