@@ -928,17 +928,6 @@
 
     const RENDERERS = { mc: renderMC, tiles: renderTilesQuestion };
 
-    function showCorner(mode){
-      if(mode === "hide"){
-        cornerMark.style.display = "none";
-        return;
-      }
-      cornerMark.style.display = "block";
-      cornerMark.textContent = (mode === "ok") ? "✓" : "✕";
-      cornerMark.classList.toggle("ok", mode === "ok");
-      cornerMark.classList.toggle("bad", mode === "bad");
-    }
-
     function renderQuestion(){
       const q = QUESTIONS[idx];
       setProgress();
@@ -999,15 +988,16 @@
       barText.textContent = `${total} of ${total}`;
 
       if(pct === 100){
-        setTimeout(() => setKitimus("celebrate"), 200);
-        showCorner("ok");
-      } else if(pct >= 80){
-        setKitimus("squint");
-        showCorner("ok");
-      } else {
-        setKitimus("neutral");
-        showCorner("bad");
-      }
+  setTimeout(() => setKitimus("celebrate"), 200);
+  showMark(true);
+} else if(pct >= 80){
+  setKitimus("squint");
+  showMark(true);
+} else {
+  setKitimus("neutral");
+  showMark(false);
+}
+
     }
 
     document.addEventListener("pointerdown", () => {
