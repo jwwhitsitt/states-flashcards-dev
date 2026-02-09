@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Week 3 – Study Flashcards</title>
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+      --btn:#0f172a;
+      --btn2:#e5e7eb;
+      --btn2text:#111827;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden; /* no page scroll */
+    }
+
+    header{
+      flex:0 0 auto;
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    header a{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .spacer{ width:52px; }
+
+    main{
+      flex:1 1 auto;
+      min-height:0;
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      padding:12px;
+      overflow:hidden;
+    }
+    .wrap{
+      width:100%;
+      max-width:720px;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:12px;
+    }
+
+    /* big outer card */
+    .panel{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      overflow:hidden;
+    }
+
+    /* 3D flip scene */
+    .scene{
+      width:100%;
+      height:min(52vh, 420px);
+      min-height:280px;
+      perspective:1200px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .flip{
+      width:100%;
+      height:100%;
+      max-width:560px;
+      position:relative;
+      transform-style:preserve-3d;
+      transition:transform .55s cubic-bezier(.2,.8,.2,1);
+      border-radius:20px;
+      cursor:pointer;
+    }
+    .flip.is-flipped{
+      transform:rotateY(180deg);
+    }
+
+    .face{
+      position:absolute;
+      inset:0;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      border-radius:20px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+    }
+    .face img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      border-radius:14px;
+    }
+    .back{
+      transform:rotateY(180deg);
+    }
+
+    /* controls */
+    .controls{
+      display:flex;
+      gap:10px;
+    }
+    .btn{
+      flex:1;
+      padding:12px 14px;
+      border-radius:14px;
+      border:0;
+      font-size:16px;
+      font-weight:1000;
+      cursor:pointer;
+      background:var(--btn);
+      color:#fff;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
+    }
+    .btn.secondary{
+      background:var(--btn2);
+      color:var(--btn2text);
+      box-shadow:none;
+    }
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+
+    .meta{
+      text-align:center;
+      color:var(--muted);
+      font-weight:900;
+      font-size:14px;
+      margin-top:-2px;
+    }
+
+    /* small hint text */
+    .hint{
+      text-align:center;
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+      margin-top:-6px;
+    }
+
+    /* short screens: shrink height slightly */
+    @media (max-height: 700px){
+      .scene{ height:min(48vh, 360px); min-height:250px; }
+      .btn{ padding:10px 12px; font-size:15px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Study Flashcards</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="panel">
+        <div class="scene" aria-label="Flashcard">
+          <div class="flip" id="flipCard" role="button" aria-label="Tap to flip the card" tabindex="0">
+            <div class="face front">
+              <img id="frontImg" alt="Flashcard front" />
+            </div>
+            <div class="face back">
+              <img id="backImg" alt="Flashcard back" />
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">Tap the card (or Flip) to turn it over.</div>
+
+        <div class="controls">
+          <button class="btn secondary" id="backBtn">Back</button>
+          <button class="btn secondary" id="flipBtn">Flip</button>
+          <button class="btn" id="nextBtn">Next</button>
+        </div>
+
+        <div class="meta" id="metaText">Card 1 of 5</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Week 3 set
+    const CARDS = [
+      { key:"md" }, // md-f.png / md-b.png
+      { key:"wv" }, // wv-f.png / wv-b.png
+      { key:"va" }, // va-f.png / va-b.png
+      { key:"sc" }, // sc-f.png / sc-b.png
+      { key:"nc" }  // nc-f.png / nc-b.png
+    ];
+
+    const flipCard = document.getElementById("flipCard");
+    const frontImg = document.getElementById("frontImg");
+    const backImg  = document.getElementById("backImg");
+
+    const backBtn = document.getElementById("backBtn");
+    const flipBtn = document.getElementById("flipBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const metaText = document.getElementById("metaText");
+
+    let i = 0;
+    let flipped = false;
+
+    function setImages(){
+      const k = CARDS[i].key;
+      frontImg.src = `./images/${k}-f.png`;
+      backImg.src  = `./images/${k}-b.png`;
+    }
+
+    function setMeta(){
+      metaText.textContent = `Card ${i + 1} of ${CARDS.length}`;
+      backBtn.disabled = (i === 0);
+      nextBtn.disabled = (i === CARDS.length - 1);
+    }
+
+    function setFlip(state){
+      flipped = state;
+      flipCard.classList.toggle("is-flipped", flipped);
+    }
+
+    function flip(){
+      setFlip(!flipped);
+    }
+
+    function next(){
+      if(i >= CARDS.length - 1) return;
+      i++;
+      setFlip(false);
+      setImages();
+      setMeta();
+    }
+
+    function prev(){
+      if(i <= 0) return;
+      i--;
+      setFlip(false);
+      setImages();
+      setMeta();
+    }
+
+    // Click card to flip
+    flipCard.addEventListener("click", flip);
+
+    // Keyboard accessibility (enter/space flips)
+    flipCard.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        flip();
+      }
+    });
+
+    flipBtn.addEventListener("click", flip);
+    nextBtn.addEventListener("click", next);
+    backBtn.addEventListener("click", prev);
+
+    // init
+    setImages();
+    setMeta();
+    setFlip(false);
+  </script>
+</body>
+</html>

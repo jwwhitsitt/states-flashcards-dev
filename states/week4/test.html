@@ -1,0 +1,1025 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 4 – Check Your Learning</title>
+
+  <!-- Kitimus preload (prevents flicker) -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+
+      --btn:#0f172a;
+      --btn2:#e5e7eb;
+      --btn2text:#111827;
+
+      --bar:#c7d2fe;
+      --barbg:#e5e7eb;
+
+      --good:#22c55e;
+      --bad:#ef4444;
+
+      /* responsive type */
+      --h1: clamp(26px, 5.6vw, 44px);
+      --h2: clamp(14px, 3.8vw, 18px);
+      --choice: clamp(16px, 4.2vw, 20px);
+      --pill: clamp(12px, 3.2vw, 14px);
+
+      --pad: 12px;
+      --gap: 10px;
+    }
+
+    /* Hide the bottom "✅ Nice!" / "❌ Almost" line */
+    #result{ display:none !important; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      /* Allow scroll as a safety valve on smaller devices (iPhone SE, etc.) */
+      overflow:auto;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    header a{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .spacer{ width:52px; }
+
+    main{
+      padding:12px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:720px;
+    }
+
+    .toprow{
+      position:relative; 
+      display:grid;
+      grid-template-columns: auto 1fr auto;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .pill{
+      background:#dbeafe;
+      color:#1e3a8a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:var(--pill);
+      min-width:92px;
+      text-align:center;
+      white-space:nowrap;
+    }
+    .barwrap{
+      flex:1;
+      height:18px;
+      background:var(--barbg);
+      border-radius:999px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:var(--bar);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      color:#111827;
+      font-size:14px;
+      text-shadow:0 1px 0 rgba(255,255,255,.75);
+      pointer-events:none;
+    }
+
+    /* Kitimus perch */
+    .kitimus{
+      justify-self:end;
+      align-self:center;
+
+      width: clamp(52px, 10vw, 76px);
+      height: clamp(52px, 10vw, 76px);
+
+      pointer-events:none;
+      user-select:none;
+    }
+    .kitimus img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      position:relative;
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:var(--pad);
+      display:flex;
+      flex-direction:column;
+      gap:var(--gap);
+      overflow:hidden;
+    }
+
+    /* Right-side ✓ / ✕ indicator */
+    .cornerMark{
+      position:absolute;
+      right:18px;
+      top:50%;
+      transform:translateY(-10%);
+      font-size:64px;
+      font-weight:1000;
+      line-height:1;
+      display:none;
+      user-select:none;
+      pointer-events:none;
+    }
+    .cornerMark.ok{ color: var(--good); display:block; }
+    .cornerMark.bad{ color: var(--bad); display:block; }
+
+    /* Image */
+    .imgbox{
+      border-radius:16px;
+      background:#fff;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      height:220px;
+      overflow:hidden;
+    }
+    .imgbox.show{ display:flex; }
+    .imgbox img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      border-radius:12px;
+    }
+
+    .qtitle{
+      font-size:var(--h1);
+      font-weight:1000;
+      line-height:1.05;
+      margin-top:2px;
+    }
+    .titleRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .mark{
+      visibility:hidden;
+      font-weight:1000;
+      line-height:1;
+      font-size: clamp(34px, 9vw, 70px);
+      min-width: 44px;
+      text-align:right;
+      user-select:none;
+    }
+    .mark.good{ color: var(--good); }
+    .mark.bad{  color: var(--bad);  }
+
+    .qsub{
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:2px;
+      font-size:var(--h2);
+    }
+
+    /* MC answers */
+    .answers{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .choice{
+      border-radius:16px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      padding:14px 14px;
+      font-size:var(--choice);
+      font-weight:1000;
+      text-align:left;
+      cursor:pointer;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
+    }
+    .choice:active{ transform:scale(.995); }
+    .choice.correct{
+      border-color:var(--good);
+      background:#ecfdf5;
+    }
+    .choice.wrong{
+      border-color:var(--bad);
+      background:#fef2f2;
+    }
+
+    /* Capitals (tiles) */
+    .capWrap{
+      display:none;
+      flex-direction:column;
+      gap:12px;
+    }
+    .capWrap.show{ display:flex; }
+
+    .slots{
+      width:100%;
+      border-radius:16px;
+      background:#fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      padding:14px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .slotRow{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      width:100%;
+      flex-wrap:nowrap;
+    }
+    .slot{
+      min-width:0;
+      width:auto;
+      flex:0 0 auto;
+      text-align:center;
+      font-weight:1000;
+      font-size:18px;
+      line-height:1;
+      color:#111827;
+      user-select:none;
+
+      padding:0 2px 6px 2px;
+      border-bottom:4px solid #94a3b8;
+      min-height:28px;
+      letter-spacing:.5px;
+    }
+    .slot.empty{ color:transparent; }
+    .slot.space{
+      border-bottom:0;
+      width:14px;
+      padding:0;
+    }
+
+    .tileGrid{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(6, minmax(0, 1fr));
+      gap:10px;
+      justify-content:center;
+      align-content:start;
+      padding:4px 2px;
+    }
+    .tile{
+      border-radius:18px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      padding:14px 0;
+      font-size:22px;
+      font-weight:1000;
+      text-align:center;
+      cursor:pointer;
+      user-select:none;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
+    }
+    .tile:active{ transform:scale(.99); }
+    .tile.used{
+      opacity:.35;
+      cursor:not-allowed;
+    }
+
+    /* Buttons */
+    .bottom{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      flex:1;
+      min-width:140px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:0;
+      font-size:16px;
+      font-weight:1000;
+      cursor:pointer;
+      background:var(--btn);
+      color:#fff;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
+    }
+    .btn.secondary{
+      background:var(--btn2);
+      color:var(--btn2text);
+      box-shadow:none;
+    }
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+    .btn.good{ background: var(--good) !important; color:#fff !important; }
+    .btn.bad{  background: var(--bad)  !important; color:#fff !important; }
+
+    .result{
+      text-align:center;
+      font-weight:1000;
+      color:var(--muted);
+      font-size:14px;
+      margin-top:2px;
+      min-height:18px;
+    }
+
+    /* Summary */
+    .review{
+      margin-top:6px;
+      padding:12px;
+      border-radius:16px;
+      background:#f8fafc;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .review h2{
+      margin:0 0 6px 0;
+      font-size:16px;
+      font-weight:1000;
+    }
+    .review ul{
+      margin:0;
+      padding-left:18px;
+      color:#111827;
+      font-weight:800;
+    }
+    .small{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      margin-top:8px;
+      line-height:1.35;
+    }
+
+    @media (max-height: 700px){
+      :root{ --pad: 10px; --gap: 8px; }
+      .imgbox{ height:190px; }
+      .choice{ padding:12px 12px; }
+      .tile{ padding:12px 0; font-size:20px; }
+      .btn{ padding:12px 14px; }
+    }
+    @media (max-height: 620px){
+      .imgbox{ height:160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Check Your Learning</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="toprow">
+        <div class="pill" id="sectionPill">Spelling</div>
+        <div class="barwrap" aria-label="Progress">
+          <div class="bar" id="bar"></div>
+          <div class="bartext" id="barText">1 of 15</div>
+        </div>
+
+        <div class="kitimus" aria-hidden="true">
+          <img id="kitimusImg" src="/mascots/kitimus/kitimus-neutral.png" alt="">
+        </div>
+      </div>
+
+      <section class="card" id="card">
+        <div class="cornerMark" id="cornerMark" aria-hidden="true"></div>
+
+        <div class="imgbox" id="imgbox"><img id="img" alt="" /></div>
+
+        <div class="titleRow">
+          <div class="qtitle" id="qtitle"></div>
+          <div class="mark" id="mark" aria-hidden="true"></div>
+        </div>
+        <div class="qsub" id="qsub"></div>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="capWrap" id="capWrap">
+          <div class="slots" id="slots"></div>
+          <div class="tileGrid" id="tileGrid"></div>
+        </div>
+
+        <div class="bottom" id="bottomBtns" style="display:none;">
+          <button class="btn secondary" id="backspaceBtn" style="display:none;">Backspace</button>
+          <button class="btn secondary" id="clearBtn" style="display:none;">Clear</button>
+          <button class="btn" id="checkBtn" style="display:none;">Check</button>
+        </div>
+
+        <div class="result" id="result"></div>
+        <div id="reviewBox" style="display:none;"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // =========================================================
+    // Week 4 Test - SAME ENGINE as Week 3. Content updated only.
+    // =========================================================
+
+    const WEEK = [
+      { state:"Michigan",  abbrev:"MI", capital:"Lansing",      map:"./images/mi.png" },
+      { state:"Indiana",   abbrev:"IN", capital:"Indianapolis", map:"./images/in.png" },
+      { state:"Ohio",      abbrev:"OH", capital:"Columbus",     map:"./images/oh.png" },
+      { state:"Kentucky",  abbrev:"KY", capital:"Frankfort",    map:"./images/ky.png" },
+      { state:"Tennessee", abbrev:"TN", capital:"Nashville",    map:"./images/tn.png" }
+    ];
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+
+    const SPELLING_FAKES = {
+      "Michigan":["Michegan","Michigen","Michigun"],
+      "Indiana":["Indianna","Indiena","Indana"],
+      "Ohio":["Ohiio","Ohia","Ohiao"],
+      "Kentucky":["Kentuky","Kentuckey","Kentukky"],
+      "Tennessee":["Tennesee","Tenessee","Tennesse"]
+    };
+
+    const spellingQuestions = WEEK.map(s => {
+      const correct = s.state;
+      const fakes = (SPELLING_FAKES[correct] || []).slice(0,3);
+      while(fakes.length < 3){
+        fakes.push(correct.replace(/a/ig,"e").slice(0, Math.max(3, correct.length)));
+      }
+      const choices = shuffle([correct, ...fakes.slice(0,3)]);
+      return {
+        section:"Spelling",
+        type:"mc",
+        showImage:true,
+        img:s.map,
+        title:"Pick the correct spelling",
+        subtitle:"Which one is spelled correctly?",
+        correct,
+        choices,
+        reviewLabel:`Spelling: ${s.state}`
+      };
+    });
+
+    const capitalQuestions = WEEK.map(s => ({
+      section:"Capitals",
+      type:"tiles",
+      showImage:true,
+      img:s.map,
+      title:s.capital,
+      subtitle:"Tap the letters to spell the state.",
+      correct:s.state,
+      reviewLabel:`Capitals: ${s.capital}`
+    }));
+
+    function uniqueLettersFromState(stateName){
+      const letters = stateName.toUpperCase().replace(/[^A-Z]/g, "").split("");
+      return Array.from(new Set(letters));
+    }
+
+    function buildFakeAbbrevs(stateName, correct, pool, needed){
+      const poolSet = new Set(pool);
+      const out = [];
+
+      const first = stateName.trim().toUpperCase()[0];
+      const correctSecond = correct[1];
+
+      const letters = uniqueLettersFromState(stateName)
+        .filter(ch => ch !== first && ch !== correctSecond);
+
+      const fallback = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+        .filter(ch => ch !== first && ch !== correctSecond);
+
+      let guard = 0;
+      while(out.length < needed && guard < 200){
+        guard++;
+
+        const secondPool = letters.length ? letters : fallback;
+        const second = secondPool[Math.floor(Math.random() * secondPool.length)];
+        const fake = (first + second);
+
+        if(fake === correct) continue;
+        if(out.includes(fake)) continue;
+        if(poolSet.has(fake)) continue;
+
+        out.push(fake);
+      }
+
+      return out;
+    }
+
+    const abbrevQuestions = WEEK.map(s => {
+      const correct = s.abbrev;
+
+      const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+
+      const first = s.state.trim().toUpperCase()[0];
+      const realSameFirst = shuffle(pool.filter(x => x !== correct && x[0] === first));
+      const wrongs = realSameFirst.slice(0, 3);
+
+      const stillNeed = 3 - wrongs.length;
+      if(stillNeed > 0){
+        wrongs.push(...buildFakeAbbrevs(s.state, correct, pool, stillNeed));
+      }
+
+      return {
+        section:"Abbreviations",
+        type:"mc",
+        showImage:true,
+        img:s.map,
+        title:s.state,
+        subtitle:"Which abbreviation matches this state?",
+        correct,
+        choices: shuffle([correct, ...wrongs]),
+        reviewLabel:`Abbreviations: ${s.state}`
+      };
+    });
+
+    const QUESTIONS = [...spellingQuestions, ...capitalQuestions, ...abbrevQuestions];
+
+    // ====== UI hooks ======
+    const sectionPill = document.getElementById("sectionPill");
+    const bar = document.getElementById("bar");
+    const barText = document.getElementById("barText");
+
+    const imgbox = document.getElementById("imgbox");
+    const img = document.getElementById("img");
+    const qtitle = document.getElementById("qtitle");
+    const qsub = document.getElementById("qsub");
+    const markEl = document.getElementById("mark");
+
+    const answersEl = document.getElementById("answers");
+    const capWrap = document.getElementById("capWrap");
+    const slotsEl = document.getElementById("slots");
+    const tileGrid = document.getElementById("tileGrid");
+
+    const resultEl = document.getElementById("result");
+    const reviewBox = document.getElementById("reviewBox");
+
+    const cornerMark = document.getElementById("cornerMark");
+
+    const bottomBtns = document.getElementById("bottomBtns");
+    const backspaceBtn = document.getElementById("backspaceBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
+    // ===== Kitimus =====
+    const kitimusImg = document.getElementById("kitimusImg");
+    const KITIMUS = {
+      neutral: "/mascots/kitimus/kitimus-neutral.png",
+      squint: "/mascots/kitimus/kitimus-squint.png",
+      squintLeft: "/mascots/kitimus/kitimus-squint-left.png",
+      squintRight: "/mascots/kitimus/kitimus-squint-right.png",
+      blink: "/mascots/kitimus/kitimus-blink.png",
+      celebrate: "/mascots/kitimus/kitimus-celebrate.png"
+    };
+
+    function setKitimus(state){
+      if(!kitimusImg) return;
+      const src = KITIMUS[state] || KITIMUS.neutral;
+      if(kitimusImg.getAttribute("src") !== src){
+        kitimusImg.setAttribute("src", src);
+      }
+    }
+
+    let kitimusIdleTimer = null;
+    function stopKitimusIdle(){
+      if(kitimusIdleTimer){
+        clearInterval(kitimusIdleTimer);
+        kitimusIdleTimer = null;
+      }
+    }
+    function startKitimusIdle(){
+      stopKitimusIdle();
+      setKitimus("squint");
+
+      kitimusIdleTimer = setInterval(() => {
+        if(locked) return;
+
+        const r = Math.random();
+
+        if(r < 0.22){
+          setKitimus("blink");
+          setTimeout(() => setKitimus("squint"), 140);
+          return;
+        }
+
+        if(r < 0.55){
+          const dir = (Math.random() < 0.5) ? "squintLeft" : "squintRight";
+          setKitimus(dir);
+          setTimeout(() => setKitimus("squint"), 220);
+          return;
+        }
+
+        setKitimus("squint");
+      }, 2200);
+    }
+
+    function kitimusWrongPulse(){
+      setTimeout(() => setKitimus("neutral"), 150);
+      setTimeout(() => setKitimus("squint"), 650);
+    }
+
+    // ===== State =====
+    let idx = 0;
+    let locked = false;
+    const results = [];
+    const missed = new Set();
+    let tileState = null;
+
+    function resetMark(){
+      markEl.textContent = "";
+      markEl.classList.remove("good","bad");
+      markEl.style.visibility = "hidden";
+    }
+    function showMark(ok){
+      markEl.style.visibility = "visible";
+      markEl.textContent = ok ? "✓" : "✕";
+      markEl.classList.toggle("good", ok);
+      markEl.classList.toggle("bad", !ok);
+    }
+
+    function setProgress(){
+      const n = QUESTIONS.length;
+      const pos = idx + 1;
+      const pct = Math.round((pos / n) * 100);
+      bar.style.width = pct + "%";
+      barText.textContent = `${pos} of ${n}`;
+      sectionPill.textContent = QUESTIONS[idx].section;
+    }
+
+    function resetCommonUI(q){
+      locked = false;
+      resetMark();
+      resultEl.textContent = "";
+
+      reviewBox.style.display = "none";
+      reviewBox.innerHTML = "";
+
+      setKitimus("squint");
+
+      if(q.showImage && q.img){
+        imgbox.classList.add("show");
+        img.src = q.img;
+        img.alt = "State flashcard";
+      } else {
+        imgbox.classList.remove("show");
+        img.src = "";
+        img.alt = "";
+      }
+
+      qtitle.textContent = q.title;
+      qsub.textContent = q.subtitle;
+
+      answersEl.style.display = "none";
+      capWrap.classList.remove("show");
+
+      bottomBtns.style.display = "none";
+      backspaceBtn.style.display = "none";
+      clearBtn.style.display = "none";
+      checkBtn.style.display = "none";
+
+      checkBtn.classList.remove("good","bad");
+      checkBtn.disabled = false;
+      checkBtn.textContent = "Check";
+
+      // hide summary corner
+      cornerMark.style.display = "none";
+      cornerMark.classList.remove("ok","bad");
+      cornerMark.textContent = "";
+    }
+
+    // ===== MC =====
+    function renderMC(q){
+      answersEl.style.display = "flex";
+      answersEl.innerHTML = "";
+
+      q.choices.forEach(choice => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.type = "button";
+        b.textContent = choice;
+
+        b.addEventListener("click", () => {
+          if(locked) return;
+          locked = true;
+
+          const ok = (choice === q.correct);
+          showMark(ok);
+
+          const btns = Array.from(answersEl.querySelectorAll(".choice"));
+          btns.forEach(x => {
+            if(x.textContent === q.correct) x.classList.add("correct");
+            else if(x.textContent === choice) x.classList.add("wrong");
+            x.disabled = true;
+          });
+
+          if(!ok){
+            missed.add(q.reviewLabel);
+            kitimusWrongPulse();
+          }
+
+          results.push({ q, ok });
+          setTimeout(() => advance(), 450);
+        });
+
+        answersEl.appendChild(b);
+      });
+    }
+
+    // ===== Tiles =====
+    function buildTileState(stateName){
+      const words = stateName.toUpperCase().split(" ");
+      const letters = words.join("").split("");
+      const tiles = shuffle(letters.map((ch, i) => ({ ch, id: i })));
+      return {
+        targetWords: words,
+        targetLetters: letters,
+        filled: new Array(letters.length).fill(""),
+        filledTileIndex: new Array(letters.length).fill(-1),
+        tiles,
+        used: new Array(tiles.length).fill(false)
+      };
+    }
+
+    function renderSlotsFromState(ts){
+      slotsEl.innerHTML = "";
+      const words = ts.targetWords;
+      const rows = (words.length === 2) ? words : [words[0]];
+      let cursor = 0;
+
+      rows.forEach((w) => {
+        const row = document.createElement("div");
+        row.className = "slotRow";
+
+        for(let i=0;i<w.length;i++){
+          const slot = document.createElement("div");
+          slot.className = "slot";
+          const v = ts.filled[cursor] || "";
+          if(!v) slot.classList.add("empty");
+          slot.textContent = v || "·";
+          row.appendChild(slot);
+          cursor++;
+        }
+
+        slotsEl.appendChild(row);
+      });
+    }
+
+    function renderTiles(ts){
+      tileGrid.innerHTML = "";
+      ts.tiles.forEach((t, index) => {
+        const b = document.createElement("button");
+        b.className = "tile";
+        b.type = "button";
+        b.textContent = t.ch;
+
+        if(ts.used[index]){
+          b.classList.add("used");
+          b.disabled = true;
+        }
+
+        b.addEventListener("click", () => {
+          if(locked) return;
+          if(ts.used[index]) return;
+
+          const next = ts.filled.findIndex(x => x === "");
+          if(next === -1) return;
+
+          ts.filled[next] = t.ch;
+          ts.filledTileIndex[next] = index;
+          ts.used[index] = true;
+
+          renderSlotsFromState(ts);
+          renderTiles(ts);
+        });
+
+        tileGrid.appendChild(b);
+      });
+    }
+
+    function renderTilesQuestion(q){
+      capWrap.classList.add("show");
+      bottomBtns.style.display = "flex";
+      backspaceBtn.style.display = "inline-block";
+      clearBtn.style.display = "inline-block";
+      checkBtn.style.display = "inline-block";
+
+      tileState = buildTileState(q.correct);
+      renderSlotsFromState(tileState);
+      renderTiles(tileState);
+
+      clearBtn.onclick = () => {
+        if(locked) return;
+        tileState = buildTileState(q.correct);
+        renderSlotsFromState(tileState);
+        renderTiles(tileState);
+      };
+
+      backspaceBtn.onclick = () => {
+        if(locked) return;
+
+        let last = -1;
+        for(let i = tileState.filled.length - 1; i >= 0; i--){
+          if(tileState.filled[i] !== ""){ last = i; break; }
+        }
+        if(last === -1) return;
+
+        const tileIdx = tileState.filledTileIndex[last];
+        tileState.filled[last] = "";
+        tileState.filledTileIndex[last] = -1;
+
+        if(tileIdx !== -1) tileState.used[tileIdx] = false;
+
+        renderSlotsFromState(tileState);
+        renderTiles(tileState);
+      };
+
+      checkBtn.onclick = () => {
+        if(locked) return;
+        locked = true;
+
+        const attempt = tileState.filled.join("");
+        const target = tileState.targetLetters.join("");
+        const ok = (attempt === target);
+
+        showMark(ok);
+
+        checkBtn.classList.remove("good","bad");
+        checkBtn.classList.add(ok ? "good" : "bad");
+        checkBtn.disabled = true;
+
+        if(!ok){
+          missed.add(q.reviewLabel);
+          kitimusWrongPulse();
+        }
+
+        results.push({ q, ok });
+        setTimeout(() => advance(), 650);
+      };
+    }
+
+    const RENDERERS = { mc: renderMC, tiles: renderTilesQuestion };
+
+    function showCorner(mode){
+      if(mode === "hide"){
+        cornerMark.style.display = "none";
+        return;
+      }
+      cornerMark.style.display = "block";
+      cornerMark.textContent = (mode === "ok") ? "✓" : "✕";
+      cornerMark.classList.toggle("ok", mode === "ok");
+      cornerMark.classList.toggle("bad", mode === "bad");
+    }
+
+    function renderQuestion(){
+      const q = QUESTIONS[idx];
+      setProgress();
+      resetCommonUI(q);
+      startKitimusIdle();
+      RENDERERS[q.type](q);
+    }
+
+    function advance(){
+      if(idx === QUESTIONS.length - 1){
+        showSummary();
+        stopKitimusIdle();
+        return;
+      }
+      idx++;
+      renderQuestion();
+    }
+
+    function showSummary(){
+      const total = results.length;
+      const correct = results.filter(r => r.ok).length;
+      const pct = total ? Math.round((correct / total) * 100) : 0;
+
+      stopKitimusIdle();
+
+      imgbox.classList.remove("show");
+      answersEl.style.display = "none";
+      capWrap.classList.remove("show");
+      bottomBtns.style.display = "none";
+
+      qtitle.textContent = `Score: ${pct}%`;
+
+      let message = "";
+      if(pct === 100){
+        message = `Perfect score! You got all ${total} correct.`;
+      } else if(pct >= 80){
+        message = `Nice work! You got ${correct} out of ${total} correct.`;
+      } else {
+        message = `Keep practicing — you got ${correct} out of ${total} correct.`;
+      }
+      qsub.textContent = message;
+
+      const misses = Array.from(missed);
+      const tip = (pct === 100)
+        ? "Perfect score! Nice work. Do a quick study run later to lock it in."
+        : "Tip: Study the ones you missed, then try again to beat your score.";
+
+      reviewBox.style.display = "block";
+      reviewBox.innerHTML = `
+        <div class="review">
+          <h2>${misses.length ? "Review these:" : "Nothing to review — nice work!"}</h2>
+          ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : ""}
+          <div class="small">${tip}</div>
+        </div>
+      `;
+
+      bar.style.width = "100%";
+      barText.textContent = `${total} of ${total}`;
+
+      if(pct === 100){
+        setTimeout(() => setKitimus("celebrate"), 200);
+        showCorner("ok");
+      } else if(pct >= 80){
+        setKitimus("squint");
+        showCorner("ok");
+      } else {
+        setKitimus("neutral");
+        showCorner("bad");
+      }
+    }
+
+    document.addEventListener("pointerdown", () => {
+      if(locked) return;
+      setKitimus("blink");
+      setTimeout(() => setKitimus("squint"), 120);
+    }, { passive:true });
+
+    renderQuestion();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 2 – Check Your Learning</title>
+
+  <!-- Kitimus preload (prevents flicker) -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+
+      --btn:#0f172a;
+      --btn2:#e5e7eb;
+      --btn2text:#111827;
+
+      --bar:#c7d2fe;
+      --barbg:#e5e7eb;
+
+      --good:#22c55e;
+      --bad:#ef4444;
+
+      /* responsive type */
+      --h1: clamp(26px, 5.6vw, 44px);
+      --h2: clamp(14px, 3.8vw, 18px);
+      --choice: clamp(16px, 4.2vw, 20px);
+      --pill: clamp(12px, 3.2vw, 14px);
+
+      --pad: 12px;
+      --gap: 10px;
+    }
+
+    /* Hide the bottom "✅ Nice!" / "❌ Almost" line */
+#result{ display:none !important; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      /* Allow scroll as a safety valve on smaller devices (iPhone SE, etc.) */
+      overflow:auto;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    header a{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .spacer{ width:52px; }
+
+    main{
+      padding:12px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:720px;
+    }
+
+    .toprow{
+  position:relative; 
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+    .pill{
+      background:#dbeafe;
+      color:#1e3a8a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:var(--pill);
+      min-width:92px;
+      text-align:center;
+      white-space:nowrap;
+    }
+    .barwrap{
+      flex:1;
+      height:18px;
+      background:var(--barbg);
+      border-radius:999px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:var(--bar);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      color:#111827;
+      font-size:14px;
+      text-shadow:0 1px 0 rgba(255,255,255,.75);
+      pointer-events:none;
+    }
+
+    /* ============================
+       Kitimus perch (testing UI only)
+       - overlay, no layout impact
+       - pointer-events none
+       ============================ */
+  .kitimus{
+  /* 3rd child in the .toprow grid */
+  justify-self:end;
+  align-self:center;
+
+  width: clamp(52px, 10vw, 76px);
+  height: clamp(52px, 10vw, 76px);
+
+  pointer-events:none;
+  user-select:none;
+}
+.kitimus img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+    .card{
+       position:relative;
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:var(--pad);
+      display:flex;
+      flex-direction:column;
+      gap:var(--gap);
+      overflow:hidden;
+    }
+/* Right-side ✓ / ✕ indicator */
+.cornerMark{
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-10%);
+  font-size:64px;
+  font-weight:1000;
+  line-height:1;
+  display:none;         /* hidden by default */
+  user-select:none;
+  pointer-events:none;
+}
+.cornerMark.ok{ color: var(--good); display:block; }
+.cornerMark.bad{ color: var(--bad); display:block; }
+
+    /* Image (Spelling only) */
+    .imgbox{
+      border-radius:16px;
+      background:#fff;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      height:220px;
+      overflow:hidden;
+    }
+    .imgbox.show{ display:flex; }
+    .imgbox img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      border-radius:12px;
+    }
+
+    .qtitle{
+      font-size:var(--h1);
+      font-weight:1000;
+      line-height:1.05;
+      margin-top:2px;
+    }
+    .titleRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.mark{
+  visibility:hidden;      /* hidden until we show ✓/✕ */
+  font-weight:1000;
+  line-height:1;
+  font-size: clamp(34px, 9vw, 70px);
+  min-width: 44px;
+  text-align:right;
+  user-select:none;
+}
+
+.mark.good{ color: var(--good); }
+.mark.bad{  color: var(--bad);  }
+
+    .qsub{
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:2px;
+      font-size:var(--h2);
+    }
+
+    /* Multiple choice answers (Spelling + Abbrev) */
+    .answers{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .choice{
+      border-radius:16px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      padding:14px 14px;
+      font-size:var(--choice);
+      font-weight:1000;
+      text-align:left;
+      cursor:pointer;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
+    }
+    .choice:active{ transform:scale(.995); }
+    .choice.correct{
+      border-color:var(--good);
+      background:#ecfdf5;
+    }
+    .choice.wrong{
+      border-color:var(--bad);
+      background:#fef2f2;
+    }
+
+    /* Capitals (tiles) */
+    .capWrap{
+      display:none;
+      flex-direction:column;
+      gap:12px;
+    }
+    .capWrap.show{ display:flex; }
+
+    .slots{
+      width:100%;
+      border-radius:16px;
+      background:#fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      padding:14px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center; /* centered */
+      justify-content:center;
+      overflow:hidden;
+    }
+    .slotRow{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      width:100%;
+      flex-wrap:nowrap;
+    }
+    .slot{
+      min-width:0;
+      width: auto;
+      flex: 0 0 auto;
+      text-align:center;
+      font-weight:1000;
+      font-size:18px;
+      line-height:1;
+      color:#111827;
+      user-select:none;
+
+      /* underline */
+      padding:0 2px 6px 2px;
+      border-bottom:4px solid #94a3b8;
+      min-height:28px;
+
+      /* keep letters from "touching" */
+      letter-spacing:.5px;
+    }
+    .slot.empty{
+      color:transparent;
+    }
+    .slot.space{
+      border-bottom:0;
+      width:14px;
+      padding:0;
+    }
+
+    .tileGrid{
+      width:100%;
+      display:grid;
+      grid-template-columns:repeat(6, minmax(0, 1fr));
+      gap:10px;
+      justify-content:center;
+      align-content:start;
+      padding:4px 2px;
+    }
+    .tile{
+      border-radius:18px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      padding:14px 0;
+      font-size:22px;
+      font-weight:1000;
+      text-align:center;
+      cursor:pointer;
+      user-select:none;
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
+    }
+    .tile:active{ transform:scale(.99); }
+    .tile.used{
+      opacity:.35;
+      cursor:not-allowed;
+    }
+
+    /* Buttons */
+    .bottom{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      flex:1;
+      min-width:140px;
+      padding:14px 14px; /* bigger buttons */
+      border-radius:16px;
+      border:0;
+      font-size:16px;
+      font-weight:1000;
+      cursor:pointer;
+      background:var(--btn);
+      color:#fff;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
+    }
+    .btn.secondary{
+      background:var(--btn2);
+      color:var(--btn2text);
+      box-shadow:none;
+    }
+    .btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+/* Check button feedback colors (Capitals section) */
+.btn.good{
+  background: var(--good) !important;
+  color:#fff !important;
+}
+.btn.bad{
+  background: var(--bad) !important;
+  color:#fff !important;
+}
+
+    .result{
+      text-align:center;
+      font-weight:1000;
+      color:var(--muted);
+      font-size:14px;
+      margin-top:2px;
+      min-height:18px;
+    }
+
+    /* Summary */
+    .review{
+      margin-top:6px;
+      padding:12px;
+      border-radius:16px;
+      background:#f8fafc;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .review h2{
+      margin:0 0 6px 0;
+      font-size:16px;
+      font-weight:1000;
+    }
+    .review ul{
+      margin:0;
+      padding-left:18px;
+      color:#111827;
+      font-weight:800;
+    }
+    .small{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      margin-top:8px;
+      line-height:1.35;
+    }
+
+    /* Extra tightening for very short screens */
+    @media (max-height: 700px){
+      :root{ --pad: 10px; --gap: 8px; }
+      .imgbox{ height:190px; }
+      .choice{ padding:12px 12px; }
+      .tile{ padding:12px 0; font-size:20px; }
+      .btn{ padding:12px 14px; }
+    }
+    @media (max-height: 620px){
+      .imgbox{ height:160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Check Your Learning</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="toprow">
+        <div class="pill" id="sectionPill">Spelling</div>
+        <div class="barwrap" aria-label="Progress">
+          <div class="bar" id="bar"></div>
+          <div class="bartext" id="barText">1 of 12</div>
+        </div>
+
+        <!-- Kitimus perch (overlay, does not affect layout) -->
+        <div class="kitimus" aria-hidden="true">
+          <img id="kitimusImg" src="/mascots/kitimus/kitimus-neutral.png" alt="">
+        </div>
+      </div>
+
+      <section class="card" id="card">
+        <div class="imgbox" id="imgbox"><img id="img" alt="" /></div>
+
+       <div class="titleRow">
+  <div class="qtitle" id="qtitle"></div>
+  <div class="mark" id="mark" aria-hidden="true"></div>
+</div>
+<div class="qsub" id="qsub"></div>
+    
+
+
+
+        <!-- Multiple choice -->
+        <div class="answers" id="answers"></div>
+
+        <!-- Capitals tiles -->
+        <div class="capWrap" id="capWrap">
+          <div class="slots" id="slots"></div>
+          <div class="tileGrid" id="tileGrid"></div>
+        </div>
+
+        <div class="bottom" id="bottomBtns" style="display:none;">
+  <button class="btn secondary" id="backspaceBtn" style="display:none;">Backspace</button>
+  <button class="btn secondary" id="clearBtn" style="display:none;">Clear</button>
+  <button class="btn" id="checkBtn" style="display:none;">Check</button>
+</div>
+
+
+        <div class="result" id="result"></div>
+        <div id="reviewBox" style="display:none;"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ===== DEBUG: show JS errors on the page (remove after fixed) =====
+(function(){
+  const box = document.createElement("div");
+  box.id = "errBox";
+  box.style.cssText = "position:fixed;left:10px;right:10px;bottom:10px;z-index:99999;background:#111827;color:#fff;padding:10px 12px;border-radius:10px;font:12px/1.3 system-ui;white-space:pre-wrap;max-height:40vh;overflow:auto;display:none;";
+  document.addEventListener("DOMContentLoaded", () => document.body.appendChild(box));
+  window.addEventListener("error", (e) => {
+    box.style.display = "block";
+    box.textContent =
+      "JS ERROR:\n" +
+      (e.message || "unknown") + "\n\n" +
+      (e.filename ? e.filename.split("/").pop() : "") + ":" + (e.lineno || "") + ":" + (e.colno || "") + "\n\n" +
+      (e.error && e.error.stack ? e.error.stack : "");
+  });
+})();
+
+    // =========================================================
+    // Version: Week2 Test - Option 1 (single file, modular renderers)
+    // =========================================================
+
+    // ====== Data ======
+  const WEEK = [
+  { state:"Pennsylvania", abbrev:"PA", capital:"Harrisburg", map:"./images/pa.png" },
+  { state:"New Jersey",   abbrev:"NJ", capital:"Trenton",    map:"./images/nj.png" },
+  { state:"New York",     abbrev:"NY", capital:"Albany",     map:"./images/ny.png" },
+  { state:"Delaware",     abbrev:"DE", capital:"Dover",      map:"./images/de.png" }
+];
+
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+
+    // Spelling fakes MUST look like the same word (no random state names)
+    const SPELLING_FAKES = {
+      "Pennsylvania":["Pencilvainya","Pensylvainia","Penzylvania"],
+      "New Jersey":["New Jerzee","New Jersy","New Jersei"],
+      "New York":["New Yorc","New Yark","New Yrok"],
+      "Delaware":["Della-ware","Delawair","Delawere"]
+    };
+
+    // ====== Build test (12 questions: 4 spelling, 4 capitals, 4 abbrev) ======
+    const spellingQuestions = WEEK.map(s => {
+      const correct = s.state;
+      const fakes = (SPELLING_FAKES[correct] || []).slice(0,3);
+      // ensure we always have 3 fakes; if not, pad with safe variants
+      while(fakes.length < 3){
+        fakes.push(correct.replace(/a/ig,"e").slice(0, Math.max(3, correct.length)));
+      }
+      const choices = shuffle([correct, ...fakes.slice(0,3)]);
+      return {
+        section:"Spelling",
+        type:"mc",
+        showImage:true,
+        img:s.map,
+        title:"Pick the correct spelling",
+        subtitle:"Which one is spelled correctly?",
+        correct,
+        choices,
+        reviewLabel:`Spelling: ${s.state}` // only used at summary
+      };
+    });
+
+    const capitalQuestions = WEEK.map(s => {
+      return {
+        section:"Capitals",
+        type:"tiles",
+        showImage:true,
+        img:s.map,
+        title:s.capital,
+        subtitle:"Tap the letters to spell the state.",
+        correct:s.state,
+        reviewLabel:`Capitals: ${s.capital}`
+      };
+    });
+
+  // ===== Abbreviation choices (harder) =====
+// Rule:
+// 1) Prefer REAL abbreviations that start with the same first letter as the state.
+// 2) If there aren’t enough real ones, generate FAKE ones using letters from the state name.
+// 3) Never generate a fake that matches a real abbreviation in the pool.
+// 4) Always include the correct answer.
+
+function uniqueLettersFromState(stateName){
+  // "New York" -> ["N","E","W","Y","O","R","K"]
+  const letters = stateName.toUpperCase().replace(/[^A-Z]/g, "").split("");
+  return Array.from(new Set(letters));
+}
+
+function buildFakeAbbrevs(stateName, correct, pool, needed){
+  const poolSet = new Set(pool);
+  const out = [];
+
+  const first = stateName.trim().toUpperCase()[0];      // first letter of state
+  const correctSecond = correct[1];                     // second letter of real abbrev
+
+  const letters = uniqueLettersFromState(stateName)
+    .filter(ch => ch !== first && ch !== correctSecond); // avoid using correct second letter
+
+  // If state name is weird and we have no letters left, fallback to alphabet
+  const fallback = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+    .filter(ch => ch !== first && ch !== correctSecond);
+
+  let guard = 0;
+  while(out.length < needed && guard < 200){
+    guard++;
+
+    const secondPool = letters.length ? letters : fallback;
+    const second = secondPool[Math.floor(Math.random() * secondPool.length)];
+
+    const fake = (first + second);
+
+    // Reject if:
+    // - equals correct
+    // - already picked
+    // - is a REAL abbreviation in the pool
+    if(fake === correct) continue;
+    if(out.includes(fake)) continue;
+    if(poolSet.has(fake)) continue;
+
+    out.push(fake);
+  }
+
+  return out;
+}
+
+const abbrevQuestions = WEEK.map(s => {
+  const correct = s.abbrev;
+
+  const pool = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+
+  const first = s.state.trim().toUpperCase()[0];
+
+  // 1) Prefer real same-first-letter distractors
+  const realSameFirst = shuffle(
+    pool.filter(x => x !== correct && x[0] === first)
+  );
+
+  const wrongs = realSameFirst.slice(0, 3);
+
+  // 2) If we still need more, add fake ones (built from letters in the state name)
+  const stillNeed = 3 - wrongs.length;
+  if(stillNeed > 0){
+    const fakes = buildFakeAbbrevs(s.state, correct, pool, stillNeed);
+    wrongs.push(...fakes);
+  }
+
+  const choices = shuffle([correct, ...wrongs]);
+
+  return {
+    section:"Abbreviations",
+    type:"mc",
+    showImage:true,
+    img:s.map,
+    title:s.state,
+    subtitle:"Which abbreviation matches this state?",
+    correct,
+    choices,
+    reviewLabel:`Abbreviations: ${s.state}`
+  };
+});
+
+    const QUESTIONS = [...spellingQuestions, ...capitalQuestions, ...abbrevQuestions];
+
+    // ====== UI hooks ======
+    const sectionPill = document.getElementById("sectionPill");
+    const bar = document.getElementById("bar");
+    const barText = document.getElementById("barText");
+
+    const imgbox = document.getElementById("imgbox");
+    const img = document.getElementById("img");
+    const qtitle = document.getElementById("qtitle");
+    const qsub = document.getElementById("qsub");
+    const markEl = document.getElementById("mark");
+
+
+    const answersEl = document.getElementById("answers");
+    const capWrap = document.getElementById("capWrap");
+    const slotsEl = document.getElementById("slots");
+    const tileGrid = document.getElementById("tileGrid");
+
+    const resultEl = document.getElementById("result");
+    const reviewBox = document.getElementById("reviewBox");
+
+    const cornerMark = document.getElementById("cornerMark");
+
+function setCornerMark(state){
+  // state: null | true | false
+  if(!cornerMark) return;
+
+  cornerMark.classList.remove("ok","bad");
+  if(state === null){
+    cornerMark.style.display = "none";
+    cornerMark.textContent = "";
+    return;
+  }
+
+  cornerMark.style.display = "block";
+  if(state){
+    cornerMark.classList.add("ok");
+    cornerMark.textContent = "✓";
+  } else {
+    cornerMark.classList.add("bad");
+    cornerMark.textContent = "✕";
+  }
+}
+
+
+    const bottomBtns = document.getElementById("bottomBtns");
+    const backspaceBtn = document.getElementById("backspaceBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
+    /* ============================
+       Kitimus state machine (minimal)
+       ============================ */
+  const kitimusImg = document.getElementById("kitimusImg");
+const KITIMUS = {
+  neutral: "/mascots/kitimus/kitimus-neutral.png",
+  squint: "/mascots/kitimus/kitimus-squint.png",
+  squintLeft: "/mascots/kitimus/kitimus-squint-left.png",
+  squintRight: "/mascots/kitimus/kitimus-squint-right.png",
+  blink: "/mascots/kitimus/kitimus-blink.png",
+  celebrate: "/mascots/kitimus/kitimus-celebrate.png"
+};
+
+function setKitimus(state){
+  if(!kitimusImg) return;
+  const src = KITIMUS[state] || KITIMUS.neutral;
+  if(kitimusImg.getAttribute("src") !== src){
+    kitimusImg.setAttribute("src", src);
+  }
+}
+
+let kitimusIdleTimer = null;
+
+function stopKitimusIdle(){
+  if(kitimusIdleTimer){
+    clearInterval(kitimusIdleTimer);
+    kitimusIdleTimer = null;
+  }
+}
+
+function startKitimusIdle(){
+  stopKitimusIdle();
+  setKitimus("squint");
+
+  kitimusIdleTimer = setInterval(() => {
+    if(locked) return;
+
+    const r = Math.random();
+
+    if(r < 0.22){
+      setKitimus("blink");
+      setTimeout(() => setKitimus("squint"), 140);
+      return;
+    }
+
+    if(r < 0.55){
+      const dir = (Math.random() < 0.5) ? "squintLeft" : "squintRight";
+      setKitimus(dir);
+      setTimeout(() => setKitimus("squint"), 220);
+      return;
+    }
+
+    setKitimus("squint");
+  }, 2200);
+}
+
+function kitimusWrongPulse(){
+  // wrong answer reaction: briefly neutral, then back to squint
+  setTimeout(() => setKitimus("neutral"), 150);
+  setTimeout(() => setKitimus("squint"), 650);
+}
+
+    let idx = 0;
+    let locked = false;
+function resetMark(){
+  if(!markEl) return;
+  markEl.textContent = "";
+  markEl.classList.remove("good","bad");
+  markEl.style.visibility = "hidden";
+}
+
+function showMark(ok){
+  if(!markEl) return;
+  markEl.style.visibility = "visible";
+  markEl.textContent = ok ? "✓" : "✕";
+  markEl.classList.toggle("good", ok);
+  markEl.classList.toggle("bad", !ok);
+}
+
+    const results = []; // { q, ok }
+    const missed = new Set();
+
+    // Capitals state
+    let tileState = null; // { targetWords, targetLetters, filled, tiles, used }
+
+    function setProgress(){
+      const n = QUESTIONS.length;
+      const pos = idx + 1;
+      const pct = Math.round((pos / n) * 100);
+      bar.style.width = pct + "%";
+      barText.textContent = `${pos} of ${n}`;
+      sectionPill.textContent = QUESTIONS[idx].section;
+    }
+
+    function resetCommonUI(q){
+      locked = false;
+      resetMark();
+      resultEl.textContent = "";
+  //    setCornerMark(null);
+
+      reviewBox.style.display = "none";
+      reviewBox.innerHTML = "";
+
+      // mascot default (neutral most of the time)
+      setKitimus("squint");
+
+      // image
+      if(q.showImage && q.img){
+        imgbox.classList.add("show");
+        img.src = q.img;
+        img.alt = "State flashcard";
+      } else {
+        imgbox.classList.remove("show");
+        img.src = "";
+        img.alt = "";
+      }
+
+      qtitle.textContent = q.title;
+      qsub.textContent = q.subtitle;
+
+      // hide/show containers
+      answersEl.style.display = "none";
+      capWrap.classList.remove("show");
+      clearBtn.style.display = "none";
+      checkBtn.style.display = "none";
+      
+      // default: no bottom buttons unless tiles section
+      bottomBtns.style.display = "none";
+      backspaceBtn.style.display = "none";
+// reset check button feedback state
+checkBtn.classList.remove("good","bad");
+checkBtn.disabled = false;
+checkBtn.textContent = "Check";
+
+    }
+
+    // =========================================================
+    // Renderer: Multiple Choice (Spelling + Abbrev)
+    // =========================================================
+    function renderMC(q){
+      answersEl.style.display = "flex";
+      answersEl.innerHTML = "";
+
+      q.choices.forEach(choice => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.type = "button";
+        b.textContent = choice;
+        b.addEventListener("click", () => {
+          if(locked) return;
+          locked = true;
+
+          const ok = (choice === q.correct);
+showMark(ok);
+
+          // mark
+          const btns = Array.from(answersEl.querySelectorAll(".choice"));
+          btns.forEach(x => {
+            if(x.textContent === q.correct) x.classList.add("correct");
+            else if(x.textContent === choice) x.classList.add("wrong");
+            x.disabled = true;
+          });
+
+          if(ok){
+            resultEl.textContent = "✅ Nice!";
+            // correct stays neutral
+          } else {
+            resultEl.textContent = "❌ Almost — keep going.";
+            missed.add(q.reviewLabel);
+            kitimusWrongPulse();
+          }
+
+          results.push({ q, ok });
+
+          // auto-advance
+          setTimeout(() => advance(), 450);
+        });
+        answersEl.appendChild(b);
+      });
+    }
+
+    // =========================================================
+    // Renderer: Capitals Tiles (underscores + 2-line for 2 words)
+    // =========================================================
+    function buildTileState(stateName){
+      const words = stateName.toUpperCase().split(" "); // ["NEW","JERSEY"] or ["PENNSYLVANIA"]
+      const letters = words.join("").split(""); // no spaces
+      const tiles = shuffle(letters.map((ch, i) => ({ ch, id: i })));
+      return {
+        targetWords: words,
+        targetLetters: letters,
+        filled: new Array(letters.length).fill(""),
+        filledTileIndex: new Array(letters.length).fill(-1),
+        tiles,
+        used: new Array(tiles.length).fill(false)
+      };
+    }
+
+    function renderSlotsFromState(ts){
+      slotsEl.innerHTML = "";
+
+      const words = ts.targetWords;
+      const isTwoWords = (words.length === 2);
+
+      // always centered; two words get 2 rows
+      const rows = isTwoWords ? words : [words[0]];
+      let cursor = 0;
+
+      rows.forEach((w) => {
+        const row = document.createElement("div");
+        row.className = "slotRow";
+
+        for(let i=0;i<w.length;i++){
+          const slot = document.createElement("div");
+          slot.className = "slot";
+          const v = ts.filled[cursor] || "";
+          if(!v) slot.classList.add("empty");
+          slot.textContent = v || "·";
+          row.appendChild(slot);
+          cursor++;
+        }
+        slotsEl.appendChild(row);
+      });
+    }
+
+    function renderTiles(ts){
+      tileGrid.innerHTML = "";
+      ts.tiles.forEach((t, index) => {
+        const b = document.createElement("button");
+        b.className = "tile";
+        b.type = "button";
+        b.textContent = t.ch;
+
+        if(ts.used[index]){
+          b.classList.add("used");
+          b.disabled = true;
+        }
+
+        b.addEventListener("click", () => {
+          if(locked) return;
+          if(ts.used[index]) return;
+
+          // find next empty slot
+          const next = ts.filled.findIndex(x => x === "");
+          if(next === -1) return;
+
+          ts.filled[next] = t.ch;
+          ts.filledTileIndex[next] = index;
+          ts.used[index] = true;
+
+          renderSlotsFromState(ts);
+          renderTiles(ts);
+        });
+
+        tileGrid.appendChild(b);
+      });
+    }
+
+    function renderTilesQuestion(q){
+      capWrap.classList.add("show");
+      bottomBtns.style.display = "flex";
+      backspaceBtn.style.display = "inline-block";
+      clearBtn.style.display = "inline-block";
+      checkBtn.style.display = "inline-block";
+
+      tileState = buildTileState(q.correct);
+      renderSlotsFromState(tileState);
+      renderTiles(tileState);
+
+      clearBtn.onclick = () => {
+        if(locked) return;
+        tileState = buildTileState(q.correct);
+        renderSlotsFromState(tileState);
+        renderTiles(tileState);
+      };
+
+      backspaceBtn.onclick = () => {
+        if(locked) return;
+
+  // find rightmost filled slot
+        let last = -1;
+        for(let i = tileState.filled.length - 1; i >= 0; i--){
+          if(tileState.filled[i] !== ""){
+            last = i;
+            break;
+          }
+        }
+        if(last === -1) return;
+
+  // free the tile that originally filled this slot
+  const tileIdx = tileState.filledTileIndex[last];
+  tileState.filled[last] = "";
+  tileState.filledTileIndex[last] = -1;
+
+  if(tileIdx !== -1){
+    tileState.used[tileIdx] = false;
+  }
+
+  renderSlotsFromState(tileState);
+  renderTiles(tileState);
+};
+
+
+    checkBtn.onclick = () => {
+  if(locked) return;
+  locked = true;
+
+  const attempt = tileState.filled.join("");
+  const target = tileState.targetLetters.join("");
+  const ok = (attempt === target);
+      showMark(ok);
+
+
+
+  // color the button itself (green/red)
+  checkBtn.classList.remove("good","bad");
+  checkBtn.classList.add(ok ? "good" : "bad");
+  checkBtn.disabled = true;
+
+  if(ok){
+    resultEl.textContent = "✅ Nice!";
+    // (keep mascot behavior you already have)
+  } else {
+    resultEl.textContent = "❌ Almost — keep going.";
+    missed.add(q.reviewLabel);
+    kitimusWrongPulse();
+  }
+
+  results.push({ q, ok });
+
+  setTimeout(() => advance(), 650);
+};
+    }
+
+    // =========================================================
+    // Main render + advance + summary
+    // =========================================================
+    const RENDERERS = {
+      "mc": renderMC,
+      "tiles": renderTilesQuestion
+    };
+// Corner indicator helper (right-side ✓ / ✕)
+function showCorner(mode){
+  // mode: "ok" | "bad" | "hide"
+  const el = document.getElementById("cornerMark");
+  if(!el) return;
+
+  if(mode === "hide"){
+    el.style.display = "none";
+    return;
+  }
+
+  el.style.display = "block";
+  el.textContent = (mode === "ok") ? "✓" : "✕";
+  el.classList.toggle("ok", mode === "ok");
+  el.classList.toggle("bad", mode === "bad");
+}
+
+    function renderQuestion(){
+      const q = QUESTIONS[idx];
+      setProgress();
+      resetCommonUI(q);
+      if(typeof startKitimusIdle === "function") startKitimusIdle();
+      RENDERERS[q.type](q);
+    }
+
+    function advance(){
+      if(idx === QUESTIONS.length - 1){
+        showSummary();
+        if(typeof stopKitimusIdle === "function") stopKitimusIdle();
+        return;
+      }
+      idx++;
+      renderQuestion();
+    }
+
+    function showSummary(){
+      const total = results.length;
+      const correct = results.filter(r => r.ok).length;
+      const pct = total ? Math.round((correct / total) * 100) : 0;
+
+      stopKitimusIdle();
+
+
+      // reset UI to summary view
+      imgbox.classList.remove("show");
+      answersEl.style.display = "none";
+      capWrap.classList.remove("show");
+      clearBtn.style.display = "none";
+      checkBtn.style.display = "none";
+
+      qtitle.textContent = `Score: ${pct}%`;
+     let message = "";
+
+if(pct === 100){
+  message = `Perfect score! You got all ${total} correct.`;
+} else if(pct >= 80){
+  message = `Nice work! You got ${correct} out of ${total} correct.`;
+} else {
+  message = `Keep practicing — you got ${correct} out of ${total} correct.`;
+}
+
+qsub.textContent = message;
+
+      const misses = Array.from(missed);
+
+      // Tip text changes when 100%
+      const tip = (pct === 100)
+        ? "Perfect score! Nice work. Do a quick study run later to lock it in."
+        : "Tip: Study the ones you missed, then try again to beat your score.";
+
+      const reviewHtml = `
+        <div class="review">
+          <h2>${misses.length ? "Review these:" : "Nothing to review — nice work!"}</h2>
+          ${misses.length ? `<ul>${misses.map(m => `<li>${m}</li>`).join("")}</ul>` : ""}
+          <div class="small">${tip}</div>
+        </div>
+      `;
+
+      reviewBox.style.display = "block";
+      reviewBox.innerHTML = reviewHtml;
+
+      // progress bar full
+      bar.style.width = "100%";
+      barText.textContent = `${total} of ${total}`;
+
+     // End-of-test mascot + corner indicator rule:
+// End-of-test mascot + corner indicator rule:
+// 100% = celebrate + green check
+// 80-99% = green check
+// 0-79% = red X
+if(pct === 100){
+  setTimeout(() => setKitimus("celebrate"), 200);
+  showCorner("ok");         // ✅
+} else if(pct >= 80){
+  setKitimus("squint");
+  showCorner("ok");         // ✅
+} else {
+  setKitimus("neutral");
+  showCorner("bad");        // ❌
+}
+
+} // <-- END showSummary()
+
+
+
+document.addEventListener("pointerdown", () => {
+  // only blink if we're mid-quiz (not summary) and not locked in feedback
+  if(!kitimusImg) return;
+  if(locked) return;
+
+  setKitimus("blink");
+  setTimeout(() => setKitimus("squint"), 120);
+}, { passive:true });
+
+
+// kick off
+renderQuestion();
+  </script>
+</body>
+</html>

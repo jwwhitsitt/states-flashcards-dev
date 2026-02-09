@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Week 2 Quiz 2 – Capital → State</title>
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #f4f6fb; }
+    header { padding: 14px 16px; background: white; box-shadow: 0 1px 10px rgba(0,0,0,.06); }
+    h1 { margin: 0; font-size: 16px; }
+
+    .wrap { padding: 16px; display: grid; gap: 12px; justify-items: center; }
+
+    .meta {
+      width: min(92vw, 420px);
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: .7;
+    }
+
+    .promptBox {
+      width: min(92vw, 420px);
+      background: white;
+      border-radius: 18px;
+      padding: 18px 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.14);
+      text-align: center;
+      display: grid;
+      gap: 8px;
+    }
+
+    .label { font-weight: 800; opacity: .7; }
+    .capital { font-size: 28px; font-weight: 1000; letter-spacing: .5px; }
+
+    .row {
+      width: min(92vw, 420px);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    input {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 2px solid #d7dbe6;
+      font-size: 16px;
+      font-weight: 900;
+      background: white;
+    }
+
+    button {
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 10px 20px rgba(0,0,0,.10);
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .controls {
+      width: min(92vw, 420px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .msg {
+      width: min(92vw, 420px);
+      text-align: center;
+      font-weight: 800;
+      min-height: 22px;
+    }
+
+    .ok { color: #1b7f3a; }
+    .no { color: #b42318; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Week 2 Quiz 2 – Capital → State</h1>
+  </header>
+
+  <div class="wrap">
+    <div class="meta">
+      <div id="hint"></div>
+      <div id="count"></div>
+    </div>
+
+    <div class="promptBox">
+      <div class="label">Which state has the capital…</div>
+      <div class="capital" id="capital">—</div>
+    </div>
+
+    <div class="row">
+      <input id="answer" placeholder="Type the state name" autocomplete="off" />
+      <button id="submit">Submit</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="controls">
+      <button id="back">Back</button>
+      <button id="skip">Next</button>
+    </div>
+  </div>
+
+  <script>
+    // Week 2 capitals (verify spelling)
+    const items = [
+      { capital: "Harrisburg", state: "Pennsylvania" },
+      { capital: "Trenton", state: "New Jersey" },
+      { capital: "Albany", state: "New York" },
+      { capital: "Dover", state: "Delaware" }
+    ];
+
+    let i = 0;
+    let tries = 0;
+
+    const capitalEl = document.getElementById("capital");
+    const answerEl = document.getElementById("answer");
+    const msgEl = document.getElementById("msg");
+    const countEl = document.getElementById("count");
+    const hintEl = document.getElementById("hint");
+
+    function norm(s) {
+      return (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function render() {
+      tries = 0;
+      msgEl.textContent = "";
+      msgEl.className = "msg";
+      hintEl.textContent = "";
+      answerEl.value = "";
+
+      const q = items[i];
+      capitalEl.textContent = q.capital;
+      countEl.textContent = `${i + 1} / ${items.length}`;
+      answerEl.focus();
+    }
+
+    function next() {
+      i = (i + 1) % items.length;
+      render();
+    }
+
+    function check() {
+      const q = items[i];
+      const val = norm(answerEl.value);
+      const correct = norm(q.state);
+
+      if (!val) {
+        msgEl.textContent = "Type an answer 🙂";
+        msgEl.className = "msg no";
+        return;
+      }
+
+      if (val === correct) {
+        msgEl.textContent = "Correct!";
+        msgEl.className = "msg ok";
+        setTimeout(next, 500);
+      } else {
+        tries += 1;
+        msgEl.textContent = "Try again";
+        msgEl.className = "msg no";
+
+        // After 2 misses, show a helpful hint (first letter)
+        if (tries === 2) {
+          hintEl.textContent = `Hint: starts with “${q.state[0]}”`;
+        }
+
+        // After 3 misses, show the answer and move on
+        if (tries >= 3) {
+          msgEl.textContent = `Answer: ${q.state}`;
+          msgEl.className = "msg no";
+          setTimeout(next, 900);
+        } else {
+          answerEl.select();
+        }
+      }
+    }
+
+    document.getElementById("submit").onclick = check;
+    answerEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") check();
+    });
+
+    document.getElementById("skip").onclick = next;
+    document.getElementById("back").onclick = () => window.location.href = "./";
+
+    render();
+  </script>
+</body>
+</html>
