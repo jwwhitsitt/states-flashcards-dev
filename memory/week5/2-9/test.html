@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 5 (2-9) – Practice Test</title>
+
+  <!-- Kitimus preload -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --btn:#0f172a;
+      --btnText:#ffffff;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:#fff;
+      padding:10px 14px;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    header a{
+      color:var(--link);
+      text-decoration:none;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .spacer{ width:52px; }
+
+    main{
+      padding:12px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:760px;
+    }
+
+    .toprow{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .pill{
+      background:#eef2ff;
+      color:#28327a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      min-width:88px;
+      text-align:center;
+    }
+    .progress{
+      height:14px;
+      background:#e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+      position:relative;
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:#c7d2fe;
+      transition:width .25s ease;
+    }
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:900;
+      color:#111827;
+    }
+
+    .kitimus{
+      width:64px;
+      height:64px;
+      user-select:none;
+      pointer-events:none;
+    }
+    .kitimus img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .ref{
+      font-weight:1000;
+      font-size:18px;
+    }
+    .prompt{
+      font-weight:800;
+      line-height:1.4;
+    }
+
+    select{
+      font-size:16px;
+      font-weight:800;
+      padding:8px 10px;
+      border-radius:10px;
+      border:2px solid #e5e7eb;
+      margin:0 4px;
+    }
+
+    .tiles{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:10px;
+    }
+    .tile{
+      border-radius:14px;
+      border:2px solid #e5e7eb;
+      padding:14px 0;
+      text-align:center;
+      font-weight:1000;
+      font-size:20px;
+      cursor:pointer;
+      user-select:none;
+      background:#fff;
+    }
+    .tile.used{
+      opacity:.35;
+      cursor:not-allowed;
+    }
+
+    .slots{
+      display:flex;
+      gap:6px;
+      justify-content:center;
+      margin-bottom:8px;
+    }
+    .slot{
+      min-width:22px;
+      border-bottom:4px solid #94a3b8;
+      text-align:center;
+      font-weight:1000;
+      font-size:18px;
+    }
+
+    .btn{
+      margin-top:10px;
+      padding:14px;
+      border-radius:16px;
+      border:0;
+      background:var(--btn);
+      color:var(--btnText);
+      font-weight:1000;
+      font-size:16px;
+      cursor:pointer;
+    }
+
+    /* Center the Backspace / Clear / Check row for tiles mode */
+    .btnRow{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+    .btnRow .btn{
+      min-width:160px;
+    }
+
+    .btn.good{ background:var(--good); }
+    .btn.bad{ background:var(--bad); }
+  
+/* ===== Shared topbar nav (Back + Home) ===== */
+header .topbar{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
+}
+header .topbar h1{
+  margin:0;
+  font-size:16px;
+  font-weight:1000;
+  text-align:center;
+}
+
+header .navbtn{
+  appearance:none;
+  background:none;
+  border:0;
+  padding:0;
+  margin:0;
+  color:var(--link, #1d4ed8);
+  font-weight:900;
+  text-decoration:none;
+  cursor:pointer;
+  white-space:nowrap;
+  font:inherit;
+}
+header .home{ color:var(--link, #1d4ed8); font-weight:900; text-decoration:none; white-space:nowrap; }
+</style>
+</head>
+
+<body>
+<header>
+  <button class="navbtn" id="backBtn" type="button">← Back</button>
+  <h1>Practice Test</h1>
+  <a class="home" href="https://kitimus.com/">Home</a>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="toprow">
+      <div class="pill" id="modePill">Blanks</div>
+      <div class="progress">
+        <div class="bar" id="bar"></div>
+        <div class="bartext" id="barText"></div>
+      </div>
+      <div class="kitimus">
+        <img id="kitimusImg" src="/mascots/kitimus/kitimus-squint.png" alt="">
+      </div>
+    </div>
+
+    <section class="card" id="card"></section>
+
+  </div>
+</main>
+
+<script>
+/* ============================
+   DATA (LOCKED)
+   - 4 thoughts => 4 blanks pages
+   - blanks words = spelling words
+   - tiles are ALL CAPS
+   - We do NOT test "What does this mean?"
+============================ */
+
+const QUESTIONS = [
+  // Blanks – Lord's Prayer (Introduction) (Thought 1)
+  {
+    mode:"blanks",
+    ref:"The Lord's Prayer – Introduction",
+    text:"Our ___ who art in ___. What does this mean?",
+    blanks:[
+      { answer:"Father", options:["Father","God","Lord","King"] },
+      { answer:"heaven", options:["heaven","earth","church","home"] }
+    ],
+    reviewLabel:"Intro (blanks 1)"
+  },
+
+  // Blanks – Lord's Prayer (Introduction) (Thought 2)
+  {
+    mode:"blanks",
+    ref:"The Lord's Prayer – Introduction",
+    text:"With these words ___ ___ ___ us to believe",
+    blanks:[
+      { answer:"God", options:["God","Lord","Father","King"] },
+      { answer:"tenderly", options:["tenderly","kindly","gently","warmly"] },
+      { answer:"invites", options:["invites","calls","asks","urges"] }
+    ],
+    reviewLabel:"Intro (blanks 2)"
+  },
+
+  // Blanks – Lord's Prayer (Introduction) (Thought 3)
+  {
+    mode:"blanks",
+    ref:"The Lord's Prayer – Introduction",
+    text:"that He is our ___ ___ and that we are His true ___,",
+    blanks:[
+      { answer:"true", options:["true","real","sure","good"] },
+      { answer:"Father", options:["Father","God","Lord","King"] },
+      { answer:"children", options:["children","people","servants","friends"] }
+    ],
+    reviewLabel:"Intro (blanks 3)"
+  },
+
+  // Blanks – Lord's Prayer (Introduction) (Thought 4)
+  {
+    mode:"blanks",
+    ref:"The Lord's Prayer – Introduction",
+    text:"so that with all ___ and ___ we may ask Him as ___ children ask their dear father.",
+    blanks:[
+      { answer:"boldness", options:["boldness","strength","courage","patience"] },
+      { answer:"confidence", options:["confidence","faith","hope","trust"] },
+      { answer:"dear", options:["dear","good","kind","true"] }
+    ],
+    reviewLabel:"Intro (blanks 4)"
+  },
+
+  // Spelling tiles – 11 words (ALL CAPS in tiles UI)
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"Our ___ who art in heaven. What does this mean?", answer:"father", reviewLabel:"Spelling: Father" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"Our Father who art in ___. What does this mean?", answer:"heaven", reviewLabel:"Spelling: heaven" },
+
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"With these words ___ tenderly invites us to believe", answer:"god", reviewLabel:"Spelling: God" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"With these words God ___ invites us to believe", answer:"tenderly", reviewLabel:"Spelling: tenderly" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"With these words God tenderly ___ us to believe", answer:"invites", reviewLabel:"Spelling: invites" },
+
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"that He is our ___ Father and that we are His true children,", answer:"true", reviewLabel:"Spelling: true" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"that He is our true ___ and that we are His true children,", answer:"father", reviewLabel:"Spelling: Father" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"that He is our true Father and that we are His true ___,", answer:"children", reviewLabel:"Spelling: children" },
+
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"so that with all ___ and confidence we may ask Him", answer:"boldness", reviewLabel:"Spelling: boldness" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"so that with all boldness and ___ we may ask Him", answer:"confidence", reviewLabel:"Spelling: confidence" },
+  { mode:"tiles", ref:"The Lord's Prayer – Introduction", context:"as ___ children ask their dear father.", answer:"dear", reviewLabel:"Spelling: dear" }
+];
+
+/* ============================
+   ENGINE
+============================ */
+
+let idx = 0;
+
+const card = document.getElementById("card");
+const bar = document.getElementById("bar");
+const barText = document.getElementById("barText");
+const pill = document.getElementById("modePill");
+
+const results = [];
+const missed = new Set();
+
+function updateProgress(){
+  const pct = Math.round(((idx+1)/QUESTIONS.length)*100);
+  bar.style.width = pct + "%";
+  barText.textContent = `${idx+1} of ${QUESTIONS.length}`;
+}
+
+function render(){
+  updateProgress();
+  card.innerHTML = "";
+
+  const q = QUESTIONS[idx];
+  pill.textContent = (q.mode === "blanks") ? "Blanks" : "Spelling";
+
+  if(q.mode === "blanks"){
+    renderBlanks(q);
+    return;
+  }
+
+  if(q.mode === "tiles"){
+    renderTiles(q);
+    return;
+  }
+}
+
+function renderBlanks(q){
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<div class="ref">${q.ref}</div>`;
+
+  const p = document.createElement("div");
+  p.className = "prompt";
+
+  let blankIndex = 0;
+  p.innerHTML = q.text.replaceAll("___", () => {
+    const b = q.blanks[blankIndex++];
+    // Display in Title Case for single-word non-proper nouns, but keep proper nouns as given.
+    // We compare answers in normalized form to avoid case issues.
+    const opts = b.options.map(o => {
+      const display = titleCase(o);
+      return `<option value="${o}">${display}</option>`;
+    }).join("");
+
+    return `<select class="blankSel" data-answer="${b.answer}">
+      <option value="">---</option>
+      ${opts}
+    </select>`;
+  });
+
+  wrap.appendChild(p);
+
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.textContent = "Check";
+
+  btn.onclick = () => {
+    const selects = Array.from(wrap.querySelectorAll("select.blankSel"));
+    const ok = selects.every(s => normalize(s.value) === normalize(s.dataset.answer));
+
+    btn.classList.remove("good","bad");
+    btn.classList.add(ok ? "good" : "bad");
+
+    results.push({ label:q.reviewLabel || q.ref, ok });
+    if(!ok) missed.add(q.reviewLabel || q.ref);
+
+    setTimeout(next, 450);
+  };
+
+  card.appendChild(wrap);
+  card.appendChild(btn);
+}
+
+function renderTiles(q){
+  card.innerHTML = `
+    <div class="ref">${q.ref}</div>
+    <div class="prompt">${q.context}</div>
+  `;
+
+  const slots = document.createElement("div");
+  slots.className = "slots";
+
+  const target = normalizeAlpha(q.answer).toUpperCase();
+  const targetArr = target.split("");
+
+  targetArr.forEach(() => {
+    const s = document.createElement("div");
+    s.className = "slot";
+    slots.appendChild(s);
+  });
+
+  card.appendChild(slots);
+
+  const decoys = buildDecoys(targetArr, 2);
+  const letters = shuffle(targetArr.concat(decoys));
+
+  const grid = document.createElement("div");
+  grid.className = "tiles";
+
+  const tileEls = [];
+
+  letters.forEach((ch) => {
+    const t = document.createElement("button");
+    t.type = "button";
+    t.className = "tile";
+    t.textContent = ch;
+
+    t.onclick = () => {
+      const empty = Array.from(slots.children).find(x => !x.textContent);
+      if(!empty) return;
+      empty.textContent = ch;
+      t.classList.add("used");
+      t.disabled = true;
+    };
+
+    tileEls.push(t);
+    grid.appendChild(t);
+  });
+
+  card.appendChild(grid);
+
+  const row = document.createElement("div");
+  row.className = "btnRow";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "btn";
+  backBtn.textContent = "Backspace";
+
+  const clearBtn = document.createElement("button");
+  clearBtn.className = "btn";
+  clearBtn.textContent = "Clear";
+
+  const checkBtn = document.createElement("button");
+  checkBtn.className = "btn";
+  checkBtn.textContent = "Check";
+
+  backBtn.onclick = () => {
+    const filled = Array.from(slots.children).filter(x => x.textContent);
+    if(!filled.length) return;
+
+    const lastSlot = filled[filled.length - 1];
+    const removedChar = lastSlot.textContent;
+    lastSlot.textContent = "";
+
+    const usedTiles = tileEls.filter(t => t.disabled && t.textContent === removedChar);
+    if(usedTiles.length){
+      const t = usedTiles[usedTiles.length - 1];
+      t.disabled = false;
+      t.classList.remove("used");
+    }
+  };
+
+  clearBtn.onclick = () => {
+    Array.from(slots.children).forEach(s => s.textContent = "");
+    tileEls.forEach(t => {
+      t.disabled = false;
+      t.classList.remove("used");
+    });
+    checkBtn.classList.remove("good","bad");
+  };
+
+  checkBtn.onclick = () => {
+    const attempt = Array.from(slots.children).map(s => (s.textContent || "")).join("");
+    const ok = (attempt === target);
+
+    checkBtn.classList.remove("good","bad");
+    checkBtn.classList.add(ok ? "good" : "bad");
+
+    results.push({ label:q.reviewLabel || q.ref, ok });
+    if(!ok) missed.add(q.reviewLabel || q.ref);
+
+    setTimeout(next, 450);
+  };
+
+  row.appendChild(backBtn);
+  row.appendChild(clearBtn);
+  row.appendChild(checkBtn);
+  card.appendChild(row);
+}
+
+function next(){
+  if(idx < QUESTIONS.length - 1){
+    idx++;
+    render();
+    return;
+  }
+  showSummary();
+}
+
+function showSummary(){
+  const total = results.length;
+  const correct = results.filter(r => r.ok).length;
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+
+  bar.style.width = "100%";
+  barText.textContent = `${total} of ${total}`;
+  pill.textContent = "Score";
+
+  const misses = Array.from(missed);
+
+  card.innerHTML = `
+    <div class="ref">Practice Test</div>
+    <div class="prompt" style="font-weight:900; font-size:28px; margin-top:6px;">
+      Score: ${pct}%
+    </div>
+    <div class="prompt" style="margin-top:8px;">
+      You got ${correct} out of ${total} correct.
+    </div>
+    <div class="prompt" style="margin-top:14px; font-weight:900;">
+      ${misses.length ? "Review these:" : "Nothing to review. Nice work."}
+    </div>
+    ${misses.length ? `<ul style="margin:8px 0 0 22px; font-weight:800;">${misses.map(m => `<li>${escapeHtml(m)}</li>`).join("")}</ul>` : ""}
+    <div class="btnRow" style="margin-top:18px;">
+      <button class="btn" id="tryAgainBtn">Try Again</button>
+    </div>
+  `;
+
+  document.getElementById("tryAgainBtn").onclick = () => {
+    idx = 0;
+    results.length = 0;
+    missed.clear();
+    render();
+  };
+}
+
+/* ============================
+   HELPERS
+============================ */
+
+function normalize(s){
+  return (s || "").trim().toLowerCase();
+}
+
+function normalizeAlpha(s){
+  return (s || "").toString().trim().replace(/[^a-zA-Z]/g,"").toLowerCase();
+}
+
+function titleCase(s){
+  // Respect provided capitalization for proper nouns (Christ, God, Moses, Paul, Jesus, Lord).
+  // Otherwise Title Case single words for nicer dropdown display.
+  const raw = (s || "").toString().trim();
+  if(!raw) return raw;
+  const proper = new Set(["Christ","God","Moses","Paul","Jesus","Lord"]);
+  if(proper.has(raw)) return raw;
+  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+}
+
+function buildDecoys(targetArr, count){
+  const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const set = new Set(targetArr);
+  const pool = alpha.filter(ch => !set.has(ch));
+  return shuffle(pool).slice(0, count);
+}
+
+function shuffle(a){
+  const x = a.slice();
+  for(let i = x.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [x[i], x[j]] = [x[j], x[i]];
+  }
+  return x;
+}
+
+function escapeHtml(str){
+  return (str || "").replace(/[&<>"']/g, (m) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+render();
+</script>
+
+<script>
+(function(){
+  const HOME = "https://kitimus.com/";
+  const back = document.getElementById("backBtn");
+  if(!back) return;
+  back.addEventListener("click", () => {
+    const before = location.href;
+    history.back();
+    setTimeout(() => {
+      if(location.href === before) location.href = HOME;
+    }, 350);
+  });
+})();
+</script>
+</body>
+</html>

@@ -2,63 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>States Flashcards</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>KiTiMUS</title>
+
+  <!-- Titan One -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+
+  <!-- Preload mascot frames -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
   <style>
-    :root { --bg:#f4f6fb; --card:#fff; --text:#111; --muted:#5b6472; --shadow:0 10px 24px rgba(0,0,0,.10); }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
-    header { padding:16px; background:#fff; box-shadow:0 1px 10px rgba(0,0,0,.06); }
-    h1 { margin:0; font-size:18px; }
-    .wrap { max-width:920px; margin:0 auto; padding:16px; }
-    .grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); }
-    a.card {
-      display:block; padding:18px; background:var(--card); border-radius:16px; box-shadow:var(--shadow);
-      text-decoration:none; color:inherit; transition:transform .05s ease-in-out;
+    :root{
+      --bg:#f4f6fb;
+      --text:#0f172a;
+      --btn:#0f172a;
+      --btnText:#ffffff;
+      --card:#ffffff;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
     }
-    a.card:active { transform:scale(.99); }
-    .title { font-size:18px; font-weight:800; margin:0 0 6px; }
-    .sub { margin:0; color:var(--muted); line-height:1.3; font-size:14px; }
-    .pill { display:inline-block; margin-top:10px; font-size:12px; padding:6px 10px; border-radius:999px; background:#eef2ff; color:#28327a; font-weight:700; }
-    .note { margin-top:14px; color:var(--muted); font-size:13px; }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding: clamp(14px, 3vw, 28px);
+      gap: clamp(14px, 3vw, 24px);
+    }
+
+    .brand{
+      width:100%;
+      max-width: 980px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding-top: clamp(6px, 2vw, 16px);
+    }
+
+    .brand h1{
+      margin:0;
+      font-family:"Titan One", system-ui, sans-serif;
+      font-size: clamp(44px, 8vw, 86px);
+      letter-spacing: 0.02em;
+      line-height:1;
+    }
+
+    .mascotStage{
+      width:100%;
+      max-width: 980px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(12px, 2.5vw, 20px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Full-width “banner” feel: big, centered, never overflows */
+    .mascotStage img{
+      width: min(100%, 980px);
+      height: auto;
+      max-height: min(42vh, 420px);
+      object-fit: contain;
+      display:block;
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .actions{
+      width:100%;
+      max-width: 980px;
+      display:flex;
+      justify-content:center;
+      padding-bottom: clamp(16px, 4vw, 40px);
+    }
+
+    .btn{
+      border:0;
+      border-radius: 16px;
+      background: var(--btn);
+      color: var(--btnText);
+      font-weight: 900;
+      font-size: 18px;
+      padding: 16px 22px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.12);
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 220px;
+    }
+    .btn:active{ transform: scale(.99); }
   </style>
 </head>
+
 <body>
-  <header>
-    <div class="wrap">
-      <h1>States Flashcards</h1>
-    </div>
-  </header>
-
   <main class="wrap">
-    <div class="grid">
-      <a class="card" href="./week1/">
-        <p class="title">Week 1</p>
-        <p class="sub">Study the states, then check your learning.</p>
-        <span class="pill">Open Week 1</span>
-      </a>
+    <header class="brand">
+      <h1>KiTiMUS</h1>
+    </header>
 
-      <a class="card" href="./week2/">
-        <p class="title">Week 2</p>
-        <p class="sub">Study the states, then check your learning.</p>
-        <span class="pill">Open Week 2</span>
-      </a>
+    <section class="mascotStage" aria-label="Kitimus silently judging">
+      <img id="kitimusHero" src="/mascots/kitimus/kitimus-squint.png" alt="Kitimus">
+    </section>
 
-      <a class="card" href="./week3/">
-        <p class="title">Week 3</p>
-        <p class="sub">Study the states, then check your learning.</p>
-        <span class="pill">Open Week 3</span>
-      </a>
-
-      <!-- NEW -->
-      <a class="card" href="./week4/">
-        <p class="title">Week 4</p>
-        <p class="sub">Study the states, then check your learning.</p>
-        <span class="pill">Open Week 4</span>
-      </a>
-    </div>
-
-    <p class="note">Tip: Bookmark this page. Each week keeps its own study + check-your-learning flow.</p>
+    <section class="actions">
+      <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; width:100%;">
+        <a class="btn" href="https://states.kitimus.com" rel="noopener">States</a>
+        <a class="btn" href="https://science.kitimus.com" rel="noopener">Science</a>
+        <a class="btn" href="https://memory.kitimus.com" rel="noopener">Memory</a>
+        <a class="btn" href="https://spelling.kitimus.com" rel="noopener">Spelling</a>
+      </div>
+    </section>
   </main>
+
+  <script>
+    // Simple idle animation: squint + glance L/R + blink
+    const hero = document.getElementById("kitimusHero");
+    const FRAMES = {
+      squint: "/mascots/kitimus/kitimus-squint.png",
+      left: "/mascots/kitimus/kitimus-squint-left.png",
+      right: "/mascots/kitimus/kitimus-squint-right.png",
+      blink: "/mascots/kitimus/kitimus-blink.png",
+    };
+
+    function setFrame(key){
+      const src = FRAMES[key] || FRAMES.squint;
+      if(hero && hero.getAttribute("src") !== src) hero.setAttribute("src", src);
+    }
+
+    // Start default
+    setFrame("squint");
+
+    // Every ~2.2s do something subtle
+    setInterval(() => {
+      const r = Math.random();
+
+      // blink
+      if(r < 0.22){
+        setFrame("blink");
+        setTimeout(() => setFrame("squint"), 140);
+        return;
+      }
+
+      // glance
+      if(r < 0.62){
+        setFrame(Math.random() < 0.5 ? "left" : "right");
+        setTimeout(() => setFrame("squint"), 220);
+        return;
+      }
+
+      // default squint
+      setFrame("squint");
+    }, 2200);
+
+    // Optional: blink on any tap/click (feels alive)
+    document.addEventListener("pointerdown", () => {
+      setFrame("blink");
+      setTimeout(() => setFrame("squint"), 120);
+    }, { passive:true });
+  </script>
 </body>
 </html>

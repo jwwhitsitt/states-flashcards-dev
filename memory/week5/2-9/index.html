@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 5 (2-9)</title>
+
+  <!-- Titan One -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+
+  <!-- Kitimus preload -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --pillBg:#eef2ff;
+      --pillText:#28327a;
+      --btn:#0f172a;
+      --btnText:#ffffff;
+      --link:#1d4ed8;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    /* ===== Shared topbar nav (Back + Home) ===== */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:#fff;
+      padding:10px 14px;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .topbar .navlink{
+      text-decoration:none;
+      font-weight:900;
+      color:var(--link);
+      white-space:nowrap;
+    }
+    .topbar .title{
+      flex:1;
+      text-align:center;
+      font-weight:1000;
+      font-size:16px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    main{
+      padding:14px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:980px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:start;
+      margin:10px 0 14px;
+    }
+    .hero h2{
+      margin:0;
+      font-size:34px;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-weight:800;
+      font-size:18px;
+    }
+    .kitimus{
+      width:72px;
+      height:72px;
+      user-select:none;
+      pointer-events:none;
+    }
+    .kitimus img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin:0 0 14px;
+    }
+
+    .pill{
+      display:inline-block;
+      background:var(--pillBg);
+      color:var(--pillText);
+      font-weight:1000;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      margin-bottom:10px;
+    }
+
+    .ref{
+      font-family:"Titan One", system-ui, sans-serif;
+      font-size:34px;
+      letter-spacing:.4px;
+      margin:2px 0 6px;
+    }
+    .verse{
+      font-weight:900;
+      font-size:20px;
+      line-height:1.35;
+      margin:0 0 12px;
+    }
+
+    .tip{
+      color:var(--muted);
+      font-weight:900;
+      font-size:18px;
+      margin:0;
+    }
+
+    .testTitle{
+      font-family:"Titan One", system-ui, sans-serif;
+      font-size:26px;
+      margin:2px 0 6px;
+      letter-spacing:.2px;
+    }
+    .testDesc{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-weight:900;
+      font-size:18px;
+      line-height:1.35;
+    }
+
+    .btn{
+      width:100%;
+      padding:18px 16px;
+      border-radius:16px;
+      border:0;
+      background:var(--btn);
+      color:var(--btnText);
+      font-weight:1000;
+      font-size:20px;
+      cursor:pointer;
+    }
+    .btn:active{ transform:translateY(1px); }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="navlink" href="#" id="backLink">← Back</a>
+    <div class="title" id="pageTitle">Week 5 (2-9)</div>
+    <a class="navlink" href="https://kitimus.com/">Home</a>
+  </header>
+
+  <main>
+    <div class="wrap">
+
+      <section class="hero">
+        <div>
+          <h2>Memories</h2>
+          <p>Read the verse, then take the practice test.</p>
+        </div>
+
+        <div class="kitimus">
+          <img src="/mascots/kitimus/kitimus-squint.png" alt="">
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="pill">Verses</div>
+
+        <div class="ref">The Lord&#39;s Prayer - The Introduction</div>
+        <p class="verse">Our Father who art in heaven. What does this mean? With these words God tenderly invites us to believe that He is our true Father and that we are His true children, so that with all boldness and confidence we may ask Him as dear children ask their dear father.</p>
+
+        <p class="tip">Tip: Read it out loud a few times, then try the test. Focus on the important words.</p>
+      </section>
+
+      <section class="card">
+        <div class="pill">Practice Test</div>
+        <div class="testTitle">Practice Test</div>
+        <p class="testDesc">Fill in the blanks using dropdown choices, then spelling tiles with decoy letters.</p>
+
+        <button class="btn" onclick="location.href='./test.html'">Start Practice Test</button>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // Back button: use history if possible, otherwise go Home
+    document.getElementById("backLink").addEventListener("click", function (e) {
+      e.preventDefault();
+      if (window.history.length > 1) window.history.back();
+      else window.location.href = "https://kitimus.com/";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+/* Kitimus Shared UI (v0.1) — centralized consistency layer
+   Scope: minimal + safe. Adds the fixed "judging Kitimus" mascot and common tokens.
+*/
+:root{
+  --kitimus-ui-shadow: 0 10px 30px rgba(15,23,42,.12);
+  --kitimus-ui-radius: 18px;
+}
+
+/* Fixed mascot (upper-right) */
+.kitimus-fixed{
+  position:fixed;
+  top:14px;
+  right:16px;
+  width:64px;
+  height:64px;
+  z-index:999;
+  pointer-events:none;
+  user-select:none;
+}
+.kitimus-fixed img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
