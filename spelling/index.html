@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Spelling</title>
+
+  <!-- Kitimus preload (prevents flicker) -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="stylesheet" href="/shared/ui/kitimus-ui.css">
+  <script defer src="/shared/ui/kitimus-ui.js"></script>
+
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+
+      --btn:#0f172a;
+      --btn2:#e5e7eb;
+      --btn2text:#111827;
+
+      --pill: clamp(12px, 3.2vw, 14px);
+      --pad: 12px;
+      --gap: 10px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      overflow:auto;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    header a, header button{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header button{ background:none; border:0; padding:0; font:inherit; color:inherit; }
+
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .right{
+      min-width:52px;
+      text-align:right;
+    }
+
+    main{
+      padding:12px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:720px;
+    }
+
+    .toprow{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .pill{
+      justify-self:start;
+      background:#dbeafe;
+      color:#1e3a8a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:var(--pill);
+      white-space:nowrap;
+      width:max-content;
+    }
+    .kitimus{
+      justify-self:end;
+      width: clamp(52px, 10vw, 76px);
+      height: clamp(52px, 10vw, 76px);
+      user-select:none;
+      pointer-events:none;
+    }
+    .kitimus img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:var(--pad);
+      display:flex;
+      flex-direction:column;
+      gap:var(--gap);
+      overflow:hidden;
+    }
+
+    .weekBtn{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      border-radius:16px;
+      border:2px solid #e5e7eb;
+      background:#fff;
+      padding:14px 14px;
+      text-decoration:none;
+      color:var(--text);
+      transition:transform .05s ease, border-color .1s ease, background .1s ease;
+    }
+    .weekBtn:active{ transform:scale(.995); }
+    .weekBtn:hover{ border-color:#cbd5e1; }
+
+    .weekTitle{
+      font-size:18px;
+      font-weight:1000;
+      line-height:1.1;
+    }
+    .weekSub{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    .hint{
+      margin-top:2px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      line-height:1.35;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <button class="navlink" id="backBtn" type="button">← Back</button>
+    <h1>Spelling</h1>
+    <a class="navlink" id="homeLink" href="https://kitimus.com/">Home</a>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="toprow">
+                <div class="kitimus" aria-hidden="true">
+          <img src="/mascots/kitimus/kitimus-neutral.png" alt="">
+        </div>
+      </div>
+
+      <section class="card">
+        <a class="weekBtn" href="./2026-02-02/index.html">
+          <div class="weekTitle">February 2nd</div>
+                  </a>
+
+        
+      </section>
+    </div>
+  </main>
+
+  <script>
+  (function(){
+    const HOME_URL = "https://kitimus.com/";
+    const backBtn = document.getElementById("backBtn");
+    const homeLink = document.getElementById("homeLink");
+    if(homeLink) homeLink.href = HOME_URL;
+
+    if(backBtn){
+      backBtn.addEventListener("click", () => {
+        if(document.referrer){
+          history.back();
+        } else {
+          window.location.href = HOME_URL;
+        }
+      });
+    }
+  })();
+  </script>
+
+</body>
+</html>
