@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Week 7 – Final Boss (Abbreviations)</title>
+
+  <!-- Kitimus preload (prevents flicker) -->
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-neutral.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-celebrate.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-blink.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-left.png">
+  <link rel="preload" as="image" href="/mascots/kitimus/kitimus-squint-right.png">
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --shadow:0 10px 30px rgba(15,23,42,.12);
+      --radius:18px;
+      --link:#1d4ed8;
+
+      --btn:#0f172a;
+      --btn2:#e5e7eb;
+      --btn2text:#111827;
+
+      --bar:#c7d2fe;
+      --barbg:#e5e7eb;
+
+      --good:#22c55e;
+      --bad:#ef4444;
+
+      --h1: clamp(26px, 5.6vw, 44px);
+      --h2: clamp(14px, 3.8vw, 18px);
+      --pill: clamp(12px, 3.2vw, 14px);
+
+      --pad: 12px;
+      --gap: 10px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      overflow:auto;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      padding:10px 14px;
+      background:#fff;
+      box-shadow:0 1px 10px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    header a{
+      text-decoration:none;
+      color:var(--link);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    header h1{
+      margin:0;
+      font-size:16px;
+      font-weight:1000;
+      text-align:center;
+      flex:1;
+    }
+    header .spacer{ width:52px; }
+
+    main{
+      padding:12px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:720px;
+    }
+
+    .toprow{
+      position:relative;
+      display:grid;
+      grid-template-columns: auto 1fr auto;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .pill{
+      background:#dbeafe;
+      color:#1e3a8a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:var(--pill);
+      min-width:110px;
+      text-align:center;
+      white-space:nowrap;
+    }
+    .barwrap{
+      flex:1;
+      height:18px;
+      background:var(--barbg);
+      border-radius:999px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:var(--bar);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      color:#111827;
+      font-size:14px;
+      text-shadow:0 1px 0 rgba(255,255,255,.75);
+      pointer-events:none;
+    }
+
+    .kitimus{
+      justify-self:end;
+      align-self:center;
+      width: clamp(52px, 10vw, 76px);
+      height: clamp(52px, 10vw, 76px);
+      pointer-events:none;
+      user-select:none;
+    }
+    .kitimus img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .heartsRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin: 0 0 10px 0;
+    }
+    .heartsLeft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .heartsPill{
+      background:#eef2ff;
+      color:#28327a;
+      font-weight:1000;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .hearts{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-size:20px;
+      line-height:1;
+      user-select:none;
+    }
+    .scoreMini{
+      color:var(--muted);
+      font-weight:1000;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:var(--pad);
+      display:flex;
+      flex-direction:column;
+      gap:var(--gap);
+      overflow:hidden;
+    }
+
+    .imgbox{
+      border-radius:16px;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+      height:220px;
+      overflow:hidden;
+    }
+    .imgbox img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      border-radius:12px;
+    }
+
+    .titleRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .qtitle{
+      font-size:var(--h1);
+      font-weight:1000;
+      line-height:1.05;
+      margin-top:2px;
+    }
+    .mark{
+      visibility:hidden;
+      font-weight:1000;
+      line-height:1;
+      font-size: clamp(34px, 9vw, 70px);
+      min-width: 44px;
+      text-align:right;
+      user-select:none;
+    }
+    .mark.good{ color: var(--good); }
+    .mark.bad{  color: var(--bad);  }
+
+    .qsub{
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:2px;
+      font-size:var(--h2);
+    }
+
+    .inputWrap{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      margin-top:6px;
+    }
+    .abbrInput{
+      width: 160px;
+      max-width: 60vw;
+      text-align:center;
+      font-weight:1000;
+      letter-spacing:6px;
+      font-size: 28px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 2px solid #e5e7eb;
+      outline: none;
+      background:#fff;
+      box-shadow: 0 10px 20px rgba(0,0,0,.06);
+    }
+    .abbrInput.ok{
+      border-color: var(--good);
+      background:#ecfdf5;
+    }
+    .abbrInput.bad{
+      border-color: var(--bad);
+      background:#fef2f2;
+    }
+
+    .review{
+      margin-top:6px;
+      padding:12px;
+      border-radius:16px;
+      background:#f8fafc;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .review h2{
+      margin:0 0 6px 0;
+      font-size:16px;
+      font-weight:1000;
+    }
+    .review ul{
+      margin:0;
+      padding-left:18px;
+      color:#111827;
+      font-weight:800;
+    }
+    .small{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      margin-top:8px;
+      line-height:1.35;
+    }
+
+    @media (max-height: 700px){
+      :root{ --pad: 10px; --gap: 8px; }
+      .imgbox{ height:190px; }
+      .abbrInput{ font-size:26px; padding:12px 14px; }
+    }
+    @media (max-height: 620px){
+      .imgbox{ height:160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="./index.html">← Back</a>
+    <h1>Final Boss</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="toprow">
+        <div class="pill" id="sectionPill">Boss</div>
+        <div class="barwrap" aria-label="Progress">
+          <div class="bar" id="bar"></div>
+          <div class="bartext" id="barText">1 of 33</div>
+        </div>
+        <div class="kitimus" aria-hidden="true">
+          <img id="kitimusImg" src="/mascots/kitimus/kitimus-neutral.png" alt="">
+        </div>
+      </div>
+
+      <div class="heartsRow">
+        <div class="heartsLeft">
+          <div class="heartsPill">Hearts</div>
+          <div class="hearts" id="hearts"></div>
+        </div>
+        <div class="scoreMini" id="scoreMini">Score: 0</div>
+      </div>
+
+      <section class="card" id="card">
+        <div class="imgbox" id="imgbox"><img id="img" alt="" /></div>
+
+        <div class="titleRow">
+          <div class="qtitle" id="qtitle">Type the abbreviation</div>
+          <div class="mark" id="mark" aria-hidden="true"></div>
+        </div>
+
+        <div class="qsub" id="qsub">Two letters. No hints. No healing.</div>
+
+        <div class="inputWrap">
+          <input
+            id="abbr"
+            class="abbrInput"
+            type="text"
+            inputmode="text"
+            maxlength="2"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            aria-label="Type the two-letter abbreviation"
+          />
+        </div>
+
+        <div id="reviewBox" style="display:none;"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // =========================
+    // FINAL BOSS: Abbreviations
+    // Auto-check on 2nd letter
+    // No healing. End at 0 hearts.
+    // =========================
+
+    const STATES = [{"state":"Maine","abbrev":"ME","img":"./images/me-map.png"},{"state":"New Hampshire","abbrev":"NH","img":"./images/nh-map.png"},{"state":"Vermont","abbrev":"VT","img":"./images/vt-map.png"},{"state":"Massachusetts","abbrev":"MA","img":"./images/ma-map.png"},{"state":"Connecticut","abbrev":"CT","img":"./images/ct-map.png"},{"state":"Rhode Island","abbrev":"RI","img":"./images/ri-map.png"},{"state":"New York","abbrev":"NY","img":"./images/ny-map.png"},{"state":"Pennsylvania","abbrev":"PA","img":"./images/pa-map.png"},{"state":"New Jersey","abbrev":"NJ","img":"./images/nj-map.png"},{"state":"Delaware","abbrev":"DE","img":"./images/de-map.png"},{"state":"Maryland","abbrev":"MD","img":"./images/md-map.png"},{"state":"Virginia","abbrev":"VA","img":"./images/va-map.png"},{"state":"West Virginia","abbrev":"WV","img":"./images/wv-map.png"},{"state":"North Carolina","abbrev":"NC","img":"./images/nc-map.png"},{"state":"South Carolina","abbrev":"SC","img":"./images/sc-map.png"},{"state":"Michigan","abbrev":"MI","img":"./images/mi-map.png"},{"state":"Indiana","abbrev":"IN","img":"./images/in-map.png"},{"state":"Ohio","abbrev":"OH","img":"./images/oh-map.png"},{"state":"Kentucky","abbrev":"KY","img":"./images/ky-map.png"},{"state":"Tennessee","abbrev":"TN","img":"./images/tn-map.png"},{"state":"Mississippi","abbrev":"MS","img":"./images/ms-map.png"},{"state":"Alabama","abbrev":"AL","img":"./images/al-map.png"},{"state":"Georgia","abbrev":"GA","img":"./images/ga-map.png"},{"state":"Florida","abbrev":"FL","img":"./images/fl-map.png"},{"state":"Minnesota","abbrev":"MN","img":"./images/mn-map.png"},{"state":"Wisconsin","abbrev":"WI","img":"./images/wi-map.png"},{"state":"Iowa","abbrev":"IA","img":"./images/ia-map.png"},{"state":"Illinois","abbrev":"IL","img":"./images/il-map.png"},{"state":"Missouri","abbrev":"MO","img":"./images/mo-map.png"},{"state":"North Dakota","abbrev":"ND","img":"./images/nd-map.png"},{"state":"South Dakota","abbrev":"SD","img":"./images/sd-map.png"},{"state":"Nebraska","abbrev":"NE","img":"./images/ne-map.png"},{"state":"Kansas","abbrev":"KS","img":"./images/ks-map.png"}];
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+
+    // Optional: randomize boss order (comment out if you want fixed order)
+    const QUESTIONS = shuffle(STATES);
+
+    const total = QUESTIONS.length;
+
+    // Hearts rule: max(3, round(total * 0.10))
+    const START_HEARTS = Math.max(3, Math.round(total * 0.10));
+
+    // ====== UI hooks ======
+    const sectionPill = document.getElementById("sectionPill");
+    const bar = document.getElementById("bar");
+    const barText = document.getElementById("barText");
+    const heartsEl = document.getElementById("hearts");
+    const scoreMini = document.getElementById("scoreMini");
+
+    const img = document.getElementById("img");
+    const qtitle = document.getElementById("qtitle");
+    const qsub = document.getElementById("qsub");
+    const markEl = document.getElementById("mark");
+    const abbrInput = document.getElementById("abbr");
+    const reviewBox = document.getElementById("reviewBox");
+
+    // ===== Kitimus =====
+    const kitimusImg = document.getElementById("kitimusImg");
+    const KITIMUS = {
+      neutral: "/mascots/kitimus/kitimus-neutral.png",
+      squint: "/mascots/kitimus/kitimus-squint.png",
+      squintLeft: "/mascots/kitimus/kitimus-squint-left.png",
+      squintRight: "/mascots/kitimus/kitimus-squint-right.png",
+      celebrate: "/mascots/kitimus/kitimus-celebrate.png",
+      blink: "/mascots/kitimus/kitimus-blink.png",
+    };
+
+    function setKitimus(mode){
+      kitimusImg.src = KITIMUS[mode] || KITIMUS.neutral;
+    }
+
+    // ===== state =====
+    let idx = 0;
+    let hearts = START_HEARTS;
+    let score = 0;
+
+    // Track wrong answers for review
+    const wrong = [];
+
+    function renderHearts(){
+      heartsEl.innerHTML = "";
+      const full = "❤️";
+      const empty = "🖤";
+      for(let i=0;i<START_HEARTS;i++){
+        const span = document.createElement("span");
+        span.textContent = (i < hearts) ? full : empty;
+        heartsEl.appendChild(span);
+      }
+    }
+
+    function setProgress(){
+      const n = Math.min(idx+1, total);
+      barText.textContent = `${n} of ${total}`;
+      bar.style.width = `${(n/total)*100}%`;
+    }
+
+    function showQuestion(){
+      const q = QUESTIONS[idx];
+      img.src = q.img;
+      img.alt = q.state;
+
+      qtitle.textContent = q.state;
+      qsub.textContent = "Type the 2-letter abbreviation.";
+      sectionPill.textContent = "Boss";
+
+      abbrInput.value = "";
+      abbrInput.classList.remove("ok","bad");
+      markEl.style.visibility = "hidden";
+      markEl.textContent = "";
+      markEl.className = "mark";
+      setKitimus("neutral");
+
+      setProgress();
+      scoreMini.textContent = `Score: ${score}`;
+      renderHearts();
+
+      reviewBox.style.display = "none";
+      reviewBox.innerHTML = "";
+
+      // focus
+      setTimeout(()=>abbrInput.focus(), 50);
+    }
+
+    function endBoss(){
+      // Build review
+      const wrap = document.createElement("div");
+      wrap.className = "review";
+
+      const h = document.createElement("h2");
+      h.textContent = (hearts <= 0) ? "Boss Defeated You 💀" : "Boss Cleared! 🎉";
+      wrap.appendChild(h);
+
+      const p = document.createElement("div");
+      p.className = "small";
+      p.textContent = `Final score: ${score} / ${total}. Hearts left: ${Math.max(0, hearts)}.`;
+      wrap.appendChild(p);
+
+      if(wrong.length){
+        const h2 = document.createElement("h2");
+        h2.style.marginTop = "12px";
+        h2.textContent = "Review (missed)";
+        wrap.appendChild(h2);
+
+        const ul = document.createElement("ul");
+        wrong.forEach(item=>{
+          const li = document.createElement("li");
+          li.textContent = `${item.state} = ${item.abbrev}`;
+          ul.appendChild(li);
+        });
+        wrap.appendChild(ul);
+      } else {
+        const p2 = document.createElement("div");
+        p2.className = "small";
+        p2.textContent = "Perfect run. Absolutely elite.";
+        wrap.appendChild(p2);
+      }
+
+      reviewBox.innerHTML = "";
+      reviewBox.appendChild(wrap);
+      reviewBox.style.display = "block";
+
+      qsub.textContent = "Refresh to try again.";
+      abbrInput.blur();
+    }
+
+    function markGood(){
+      markEl.textContent = "✓";
+      markEl.className = "mark good";
+      markEl.style.visibility = "visible";
+      abbrInput.classList.add("ok");
+      setKitimus("celebrate");
+    }
+
+    function markBad(){
+      markEl.textContent = "✕";
+      markEl.className = "mark bad";
+      markEl.style.visibility = "visible";
+      abbrInput.classList.add("bad");
+      setKitimus(Math.random() < 0.5 ? "squintLeft" : "squintRight");
+    }
+
+    function checkAnswer(){
+      const q = QUESTIONS[idx];
+      const guess = (abbrInput.value || "").trim().toUpperCase();
+      if(guess.length < 2) return;
+
+      const correct = q.abbrev.toUpperCase();
+
+      if(guess === correct){
+        score++;
+        markGood();
+      } else {
+        hearts--;
+        wrong.push({ state: q.state, abbrev: q.abbrev });
+        markBad();
+      }
+
+      scoreMini.textContent = `Score: ${score}`;
+      renderHearts();
+
+      // pause, then next / end
+      setTimeout(()=>{
+        idx++;
+        if(hearts <= 0){
+          endBoss();
+          return;
+        }
+        if(idx >= total){
+          endBoss();
+          return;
+        }
+        showQuestion();
+      }, 650);
+    }
+
+    // Auto-check on 2nd letter
+    abbrInput.addEventListener("input", ()=>{
+      // force uppercase as they type
+      abbrInput.value = abbrInput.value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,2);
+
+      // blink sometimes for flavor
+      if(Math.random() < 0.08) setKitimus("blink");
+
+      if(abbrInput.value.length === 2){
+        checkAnswer();
+      }
+    });
+
+    // Start
+    showQuestion();
+  </script>
+</body>
+</html>
